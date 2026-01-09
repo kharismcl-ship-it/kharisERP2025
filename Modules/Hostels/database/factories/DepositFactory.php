@@ -22,7 +22,7 @@ class DepositFactory extends Factory
             'status' => Deposit::STATUS_PENDING,
             'collected_date' => null,
             'refunded_date' => null,
-            'refund_amount' => 0,
+            'refund_amount' => 10,
             'deductions' => 0,
             'deduction_reason' => null,
             'notes' => $this->faker->sentence(),
