@@ -6,7 +6,7 @@
             <p>{{ $feeType->name }} - {{ $feeType->amount }}</p>
         </div>
     @empty
-        <p class="mt-4">No fee types found.</p>
+        <p class="mt-4">No fee types found...</p>
     @endforelse
 
     <div class="mt-4">
