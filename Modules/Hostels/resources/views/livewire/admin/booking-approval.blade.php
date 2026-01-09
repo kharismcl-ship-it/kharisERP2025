@@ -203,14 +203,14 @@
         title="Reject Booking Request"
     >
         <div class="space-y-4">
-            <x-filament::input.wrapper>
-                <x-filament::input.textarea
+            <x-filament-forms::field-wrapper>
+                <x-filament-forms::textarea
                     wire:model="rejectionReason"
                     placeholder="Please provide a reason for rejecting this booking request..."
                     rows="4"
                 />
-                <x-filament::input.error for="rejectionReason" />
-            </x-filament::input.wrapper>
+                <x-filament-forms::error for="rejectionReason" />
+            </x-filament-forms::field-wrapper>
             
             <div class="flex space-x-4 justify-end">
                 <x-filament::button
