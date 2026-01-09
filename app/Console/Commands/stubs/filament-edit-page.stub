@@ -1,0 +1,12 @@
+<?php
+
+namespace {{ namespace }};
+
+use Filament\Resources\Pages\EditRecord;
+use Modules\{{ module }}\Filament\Resources\{{ resourceName }}Resource;
+
+
+class {{ class }} extends EditRecord
+{
+    protected static string $resource = {{ resourceClass }}::class;
+}

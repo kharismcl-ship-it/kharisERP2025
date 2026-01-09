@@ -1,0 +1,11 @@
+{
+    "name": "ManufacturingPaper",
+    "alias": "manufacturingpaper",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\ManufacturingPaper\\Providers\\ManufacturingPaperServiceProvider"
+    ],
+    "files": []
+}

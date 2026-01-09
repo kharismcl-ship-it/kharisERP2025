@@ -17,21 +17,31 @@ class DefaultCommProviderConfigSeeder extends Seeder
         $providers = [
             [
                 'channel' => 'email',
-                'provider_name' => 'laravel_mail',
+                'provider' => 'laravel_mail',
+                'name' => 'Laravel Mail',
                 'is_active' => true,
                 'is_default' => true,
+                'config' => [],
             ],
             [
                 'channel' => 'sms',
-                'provider_name' => 'mnotify',
+                'provider' => 'mnotify',
+                'name' => 'Mnotify SMS',
                 'is_active' => true,
                 'is_default' => true,
+                'config' => [],
             ],
             [
                 'channel' => 'whatsapp',
-                'provider_name' => 'wasender',
+                'provider' => 'wasender',
+                'name' => 'Wasender WhatsApp',
                 'is_active' => true,
                 'is_default' => true,
+                'config' => [
+                    'base_url' => 'https://api.wasender.example.com',
+                    'api_key' => 'test-api-key',
+                    'device_id' => 'test-device-id',
+                ],
             ],
         ];
 
@@ -39,7 +49,7 @@ class DefaultCommProviderConfigSeeder extends Seeder
             CommProviderConfig::updateOrCreate(
                 [
                     'channel' => $provider['channel'],
-                    'provider_name' => $provider['provider_name'],
+                    'provider' => $provider['provider'],
                 ],
                 $provider
             );

@@ -2,9 +2,9 @@
 
 namespace Modules\Hostels\Filament\Resources\HostelWhatsAppGroupResource\Pages;
 
-use Modules\Hostels\Filament\Resources\HostelWhatsAppGroupResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
+use Modules\Hostels\Filament\Resources\HostelWhatsAppGroupResource;
 
 class ListHostelWhatsAppGroups extends ListRecords
 {

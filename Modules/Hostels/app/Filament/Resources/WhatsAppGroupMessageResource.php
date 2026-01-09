@@ -2,33 +2,34 @@
 
 namespace Modules\Hostels\Filament\Resources;
 
-use Modules\Hostels\Filament\Resources\WhatsAppGroupMessageResource\Pages;
-use Modules\Hostels\Filament\Resources\WhatsAppGroupMessageResource\RelationManagers;
-use Modules\Hostels\Models\WhatsAppGroupMessage;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Modules\Hostels\Filament\Resources\WhatsAppGroupMessageResource\Pages;
+use Modules\Hostels\Models\WhatsAppGroupMessage;
 
 class WhatsAppGroupMessageResource extends Resource
 {
     protected static ?string $model = WhatsAppGroupMessage::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-bottom-center-text';
+    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    protected static ?string $navigationGroup = 'Hostel Management';
+    protected static string|\UnitEnum|null $navigationGroup = 'Hostels';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 Forms\Components\Select::make('whatsapp_group_id')
                     ->relationship('whatsappGroup', 'name')
                     ->required(),
-                Forms\Components\Select::make('sender_tenant_id')
+                Forms\Components\Select::make('sender_hostel_occupant_id')
                     ->relationship('sender', 'name')
                     ->required(),
                 Forms\Components\TextInput::make('message_type')
@@ -72,11 +73,11 @@ class WhatsAppGroupMessageResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                EditAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }

@@ -1,0 +1,30 @@
+{
+    "name": "nwidart/manufacturingwater",
+    "description": "",
+    "authors": [
+        {
+            "name": "Nicolas Widart",
+            "email": "n.widart@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\ManufacturingWater\\": "app/",
+            "Modules\\ManufacturingWater\\Database\\Factories\\": "database/factories/",
+            "Modules\\ManufacturingWater\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\ManufacturingWater\\Tests\\": "tests/"
+        }
+    }
+}

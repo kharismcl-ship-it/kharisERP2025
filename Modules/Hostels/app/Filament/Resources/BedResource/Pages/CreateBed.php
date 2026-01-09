@@ -2,15 +2,21 @@
 
 namespace Modules\Hostels\Filament\Resources\BedResource\Pages;
 
-    use Filament\Resources\Pages\CreateRecord;
-    use Modules\Hostels\Filament\Resources\BedResource;
+use Filament\Actions;
+use Filament\Resources\Pages\CreateRecord;
+use Modules\Hostels\Filament\Resources\BedResource;
 
-    class CreateBed extends CreateRecord {
-        protected static string $resource = BedResource::class;
+class CreateBed extends CreateRecord
+{
+    protected static string $resource = BedResource::class;
 
-        protected function getHeaderActions(): array {
+    protected function getHeaderActions(): array
+    {
         return [
-
+            Actions\Action::make('back')
+                ->label('Back')
+                ->icon('heroicon-o-arrow-left')
+                ->url($this->getResource()::getUrl('index')),
         ];
-        }
     }
+}

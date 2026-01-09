@@ -10,11 +10,11 @@ return new class extends Migration
     {
         Schema::create('hostel_blocks', function (Blueprint $table) {
             $table->id();
-$table->foreignId('hostel_id')->constrained('hostels');
-$table->string('name');
-$table->string('gender_option')->nullable();
-$table->string('description');
-$table->timestamps();//
+            $table->foreignId('hostel_id')->constrained('hostels');
+            $table->string('name');
+            $table->string('gender_option')->nullable();
+            $table->string('description');
+            $table->timestamps();
         });
     }
 

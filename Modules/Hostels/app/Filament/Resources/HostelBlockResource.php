@@ -1,115 +1,128 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace Modules\Hostels\Filament\Resources;
 
-    use App\Filament\Resources\HostelBlockResource\Pages;
-    use BackedEnum;
-    use Filament\Actions\BulkActionGroup;
-    use Filament\Actions\DeleteAction;
-    use Filament\Actions\DeleteBulkAction;
-    use Filament\Actions\EditAction;
-    use Filament\Forms\Components\Select;
-    use Filament\Forms\Components\TextInput;
-    use Filament\Infolists\Components\TextEntry;
-    use Filament\Resources\Resource;
-    use Filament\Schemas\Schema;
-    use Filament\Support\Icons\Heroicon;
-    use Filament\Tables\Columns\TextColumn;
-    use Filament\Tables\Table;
-    use Illuminate\Database\Eloquent\Builder;
-    use Illuminate\Database\Eloquent\Model;
-    use Modules\Hostels\Models\HostelBlock;
+use BackedEnum;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Modules\Hostels\Filament\Resources\HostelBlockResource\Pages;
+use Modules\Hostels\Models\HostelBlock;
 
-    class HostelBlockResource extends Resource {
-        protected static ?string $model = HostelBlock::class;
+class HostelBlockResource extends Resource
+{
+    protected static ?string $model = HostelBlock::class;
 
-        protected static ?string $slug = 'hostel-blocks';
+    protected static ?string $slug = 'hostel-blocks';
 
-        protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-        PUBLIC static function form(Schema $schema): Schema
-        {
+    protected static string|\UnitEnum|null $navigationGroup = 'Hostels';
+
+    public static function form(Schema $schema): Schema
+    {
         return $schema
-        ->components([//
-        Select::make('hostel_id')
-        ->relationship('hostel', 'name')
-        ->searchable()
-        ->required(),
+            ->components([
+                Select::make('hostel_id')
+                    ->relationship('hostel', 'name')
+                    ->searchable()
+                    ->required(),
 
-        TextInput::make('name')
-        ->required(),
+                Select::make('name')
+                    ->options([
+                        'block_a' => 'Block A',
+                        'block_b' => 'Block B',
+                        'block_c' => 'Block C',
+                        'block_d' => 'Block D',
+                        'block_e' => 'Block E',
+                        'block_f' => 'Block F',
+                        'block_g' => 'Block G',
+                        'block_h' => 'Block H',
+                    ])
+                    ->searchable()
+                    ->required(),
 
-        TextInput::make('gender_option'),
+                Select::make('gender_option')
+                    ->options([
+                        'male' => 'Male',
+                        'female' => 'Female',
+                        'both' => 'Both',
+                    ])
+                    ->required(),
 
-        TextInput::make('description')
-        ->required(),
+                Textarea::make('description')
+                    ->nullable()
+                    ->columnSpanFull(),
+            ]);
+    }
 
-        TextEntry::make('created_at')
-        ->label('Created Date')
-        ->state(fn (?HostelBlock $record): string => $record?->created_at?->diffForHumans() ?? '-'),
-
-        TextEntry::make('updated_at')
-        ->label('Last Modified Date')
-        ->state(fn (?HostelBlock $record): string => $record?->updated_at?->diffForHumans() ?? '-'),
-        ]);
-        }
-
-        PUBLIC static function table(Table $table): Table
-        {
+    public static function table(Table $table): Table
+    {
         return $table
-        ->columns([
-        TextColumn::make('hostel.name')
-        ->searchable()
-        ->sortable(),
+            ->columns([
+                TextColumn::make('hostel.name')
+                    ->searchable()
+                    ->sortable(),
 
-        TextColumn::make('name')
-        ->searchable()
-        ->sortable(),
+                TextColumn::make('name')
+                    ->searchable()
+                    ->sortable(),
 
-        TextColumn::make('gender_option'),
+                TextColumn::make('gender_option'),
 
-        TextColumn::make('description'),
-        ])
-        ->filters([
-        //
-        ])
-        ->recordActions([
-        EditAction::make(),
-        DeleteAction::make(),
-        ])
-        ->toolbarActions([
-        BulkActionGroup::make([
-        DeleteBulkAction::make(),
-        ]),
-        ]);
-        }
+                TextColumn::make('description'),
+            ])
+            ->filters([
+                //
+            ])
+            ->recordActions([
+                EditAction::make(),
+                DeleteAction::make(),
+            ])
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                ]),
+            ]);
+    }
 
-        public static function getPages(): array
-        {
+    public static function getPages(): array
+    {
         return [
-        'index' => Pages\ListHostelBlocks::route('/'),
-'create' => Pages\CreateHostelBlock::route('/create'),
-'edit' => Pages\EditHostelBlock::route('/{record}/edit'),
+            'index' => Pages\ListHostelBlocks::route('/'),
+            'create' => Pages\CreateHostelBlock::route('/create'),
+            'edit' => Pages\EditHostelBlock::route('/{record}/edit'),
         ];
-        }
+    }
 
-        PUBLIC static function getGlobalSearchEloquentQuery(): Builder
-        {
+    public static function getGlobalSearchEloquentQuery(): Builder
+    {
         return parent::getGlobalSearchEloquentQuery()->with(['hostel']);
-        }
+    }
 
-        PUBLIC static function getGloballySearchableAttributes(): array
-        {
+    public static function getGloballySearchableAttributes(): array
+    {
         return ['name', 'hostel.name'];
-        }
+    }
 
-        PUBLIC static function getGlobalSearchResultDetails(Model $record): array
-        {
+    public static function getGlobalSearchResultDetails(Model $record): array
+    {
         $details = [];
 
         if ($record->hostel) {
-$details['Hostel'] = $record->hostel->name;}
+            $details['Hostel'] = $record->hostel->name;
+        }
 
         return $details;
-        }
     }
+}

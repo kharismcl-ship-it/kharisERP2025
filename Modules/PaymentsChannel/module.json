@@ -1,0 +1,11 @@
+{
+    "name": "PaymentsChannel",
+    "alias": "paymentschannel",
+    "description": "Universal payment engine for the entire Kharis ERP",
+    "keywords": ["payment", "gateway", "flutterwave", "paystack", "payswitch", "stripe", "ghanapay"],
+    "priority": 0,
+    "providers": [
+        "Modules\\PaymentsChannel\\Providers\\PaymentsChannelServiceProvider"
+    ],
+    "files": []
+}

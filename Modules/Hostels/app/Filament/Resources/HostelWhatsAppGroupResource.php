@@ -2,29 +2,30 @@
 
 namespace Modules\Hostels\Filament\Resources;
 
-use Modules\Hostels\Filament\Resources\HostelWhatsAppGroupResource\Pages;
-use Modules\Hostels\Filament\Resources\HostelWhatsAppGroupResource\RelationManagers;
-use Modules\Hostels\Models\HostelWhatsAppGroup;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Forms;
-use Filament\Forms\Form;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Modules\Hostels\Filament\Resources\HostelWhatsAppGroupResource\Pages;
+use Modules\Hostels\Models\HostelWhatsAppGroup;
 
 class HostelWhatsAppGroupResource extends Resource
 {
     protected static ?string $model = HostelWhatsAppGroup::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-left-right';
+    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    protected static ?string $navigationGroup = 'Hostel Management';
+    protected static string|\UnitEnum|null $navigationGroup = 'Hostels';
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
-            ->schema([
+        return $schema
+            ->components([
                 Forms\Components\Select::make('company_id')
                     ->relationship('company', 'name')
                     ->required(),
@@ -73,11 +74,11 @@ class HostelWhatsAppGroupResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                EditAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }

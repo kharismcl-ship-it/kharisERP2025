@@ -2,6 +2,7 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="dark">
     <head>
         @include('partials.head')
+         @fluxAppearance
     </head>
     <body class="min-h-screen bg-white dark:bg-zinc-800">
         <flux:header container class="border-b border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
@@ -18,6 +19,24 @@
             </flux:navbar>
 
             <flux:spacer />
+
+            <!-- Company Switcher -->
+            @auth
+            <flux:dropdown>
+                <flux:button icon="building-2" variant="ghost">
+                    {{ session('company_slug') ? strtoupper(session('company_slug')) : __('Company') }}
+                </flux:button>
+                <flux:menu>
+                    @forelse (auth()->user()->companies as $company)
+                        <flux:menu.item :href="route('companies.switch', $company->slug)" icon="arrow-path" wire:navigate>
+                            {{ $company->name }}
+                        </flux:menu.item>
+                    @empty
+                        <flux:menu.item disabled>{{ __('No companies') }}</flux:menu.item>
+                    @endforelse
+                </flux:menu>
+            </flux:dropdown>
+            @endauth
 
             <flux:navbar class="me-1.5 space-x-0.5 rtl:space-x-reverse py-0!">
                 <flux:tooltip :content="__('Search')" position="bottom">
@@ -120,5 +139,6 @@
         {{ $slot }}
 
         @fluxScripts
+        
     </body>
 </html>

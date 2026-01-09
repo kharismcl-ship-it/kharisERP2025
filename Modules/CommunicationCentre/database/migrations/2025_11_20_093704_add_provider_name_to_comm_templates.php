@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('comm_templates', function (Blueprint $table) {
-           //
+            $table->string('provider')->after('channel')->nullable();
         });
     }
 

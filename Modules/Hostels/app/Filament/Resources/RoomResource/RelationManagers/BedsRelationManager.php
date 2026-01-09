@@ -2,71 +2,63 @@
 
 namespace Modules\Hostels\Filament\Resources\RoomResource\RelationManagers;
 
-    use Filament\Actions\BulkActionGroup;
-    use Filament\Actions\CreateAction;
-    use Filament\Actions\DeleteAction;
-    use Filament\Actions\DeleteBulkAction;
-    use Filament\Actions\EditAction;
-    use Filament\Forms\Components\TextInput;
-    use Filament\Infolists\Components\TextEntry;
-    use Filament\Resources\RelationManagers\RelationManager;
-    use Filament\Schemas\Schema;
-    use Filament\Tables\Columns\TextColumn;
-    use Filament\Tables\Table;
-    use Modules\Hostels\Models\Bed;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\CreateAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Schema;
+use Filament\Tables;
+use Filament\Tables\Table;
 
-    class BedsRelationManager extends RelationManager {
-        protected static string $relationship = 'beds';
+class BedsRelationManager extends RelationManager
+{
+    protected static string $relationship = 'beds';
 
-        PUBLIC function form(Schema $schema): Schema
-        {
+    public function form(Schema $schema): Schema
+    {
         return $schema
-        ->components([
-        TextInput::make('room_id')
-        ->required()
-        ->integer(),
+            ->components([
+                TextInput::make('bed_number')
+                    ->required()
+                    ->maxLength(255),
 
-        TextInput::make('bed_number')
-        ->required(),
-
-        TextInput::make('status')
-        ->required(),
-
-        TextEntry::make('created_at')
-        ->label('Created Date')
-        ->state(fn (?Bed $record): string => $record?->created_at?->diffForHumans() ?? '-'),
-
-        TextEntry::make('updated_at')
-        ->label('Last Modified Date')
-        ->state(fn (?Bed $record): string => $record?->updated_at?->diffForHumans() ?? '-'),
-        ]);
-        }
-
-        PUBLIC function table(Table $table): Table
-        {
-        return $table
-        ->recordTitleAttribute('id')
-        ->columns([
-        TextColumn::make('room_id'),
-
-        TextColumn::make('bed_number'),
-
-        TextColumn::make('status'),
-        ])
-        ->filters([
-        //
-        ])
-        ->headerActions([
-        CreateAction::make(),
-        ])
-        ->recordActions([
-        EditAction::make(),
-        DeleteAction::make(),
-        ])
-        ->toolbarActions([
-        BulkActionGroup::make([
-        DeleteBulkAction::make(),
-        ]),
-        ]);
-        }
+                Select::make('status')
+                    ->options([
+                        'available' => 'Available',
+                        'occupied' => 'Occupied',
+                        'maintenance' => 'Maintenance',
+                    ])
+                    ->required()
+                    ->default('available'),
+            ]);
     }
+
+    public function table(Table $table): Table
+    {
+        return $table
+            ->recordTitleAttribute('bed_number')
+            ->columns([
+                Tables\Columns\TextColumn::make('bed_number'),
+                Tables\Columns\TextColumn::make('status'),
+            ])
+            ->filters([
+                //
+            ])
+            ->headerActions([
+                CreateAction::make(),
+            ])
+            ->actions([
+                EditAction::make(),
+                DeleteAction::make(),
+            ])
+            ->bulkActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                ]),
+            ]);
+    }
+}

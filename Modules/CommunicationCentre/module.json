@@ -1,0 +1,11 @@
+{
+    "name": "CommunicationCentre",
+    "alias": "communicationcentre",
+    "description": "Centralized communication engine for the entire Kharis ERP",
+    "keywords": ["communication", "email", "sms", "whatsapp"],
+    "priority": 0,
+    "providers": [
+        "Modules\\CommunicationCentre\\Providers\\CommunicationCentreServiceProvider"
+    ],
+    "files": []
+}

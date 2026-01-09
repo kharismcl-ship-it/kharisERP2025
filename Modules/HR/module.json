@@ -1,0 +1,11 @@
+{
+    "name": "HR",
+    "alias": "hr",
+    "description": "Human Resources and Payroll Module",
+    "keywords": ["hr", "human resources", "payroll", "employees"],
+    "priority": 0,
+    "providers": [
+        "Modules\\HR\\Providers\\HRServiceProvider"
+    ],
+    "files": []
+}

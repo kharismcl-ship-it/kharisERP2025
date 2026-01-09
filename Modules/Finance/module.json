@@ -1,0 +1,11 @@
+{
+    "name": "Finance",
+    "alias": "finance",
+    "description": "Accounting backbone for the entire Kharis ERP",
+    "keywords": ["finance", "accounting", "invoice", "payment"],
+    "priority": 0,
+    "providers": [
+        "Modules\\Finance\\Providers\\FinanceServiceProvider"
+    ],
+    "files": []
+}

@@ -1,0 +1,60 @@
+<?php
+
+namespace {{ namespace }};
+
+use BackedEnum;
+use UnitEnum;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
+use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use {{ modelNamespace }};
+use Modules\{{ module }}\Filament\Resources\{{ class }}\Schemas\{{ model }}Form;
+use Modules\{{ module }}\Filament\Resources\{{ class }}\Tables\{{ model }}Table;
+use Modules\{{ module }}\Filament\Resources\{{ class }}\Pages;
+
+class {{ class }} extends Resource
+{
+    protected static ?string $model = {{ model }}::class;
+
+    protected static ?string $slug = '{{ slug }}';
+
+    protected static string|BackedEnum|null $navigationIcon = '{{ navigationIcon }}';
+
+    protected static string|UnitEnum|null $navigationGroup = '{{ navigationGroup }}';
+
+    protected static ?int $navigationSort = 1;{{ softDeletes }}
+
+    public static function form(Schema $schema): Schema
+    {
+        return {{ model }}Form::configure($schema);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return {{ model }}Table::configure($table);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            //
+        ];
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => Pages\List{{ pluralResourceName }}::route('/'),
+            'create' => Pages\Create{{ resourceName }}::route('/create'),
+            'view' => Pages\View{{ resourceName }}::route('/{record}'),
+            'edit' => Pages\Edit{{ resourceName }}::route('/{record}/edit'),
+        ];
+    }
+}

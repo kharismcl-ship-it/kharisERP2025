@@ -10,9 +10,7 @@ class BookingList extends Component
     public function render()
     {
         return view('hostels::livewire.booking-list', [
-            'bookings' => Booking::whereHas('tenant', function ($query) {
-                $query->where('company_id', auth()->user()->currentCompanyId());
-            })->paginate(),
+            'bookings' => Booking::where('hostel_id', request()->route('hostel'))->paginate(),
         ])->layout('layouts.app');
     }
 }

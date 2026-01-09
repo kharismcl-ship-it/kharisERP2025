@@ -1,0 +1,30 @@
+{
+    "name": "nwidart/communicationcentre",
+    "description": "Centralized communication engine for the entire Kharis ERP",
+    "authors": [
+        {
+            "name": "Trae",
+            "email": "trae@example.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\CommunicationCentre\\": "app/",
+            "Modules\\CommunicationCentre\\Database\\Factories\\": "database/factories/",
+            "Modules\\CommunicationCentre\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\CommunicationCentre\\Tests\\": "tests/"
+        }
+    }
+}

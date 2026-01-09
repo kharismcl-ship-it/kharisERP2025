@@ -9,4 +9,14 @@ use Modules\Hostels\Filament\Resources\HostelTemplateResource;
 class EditHostelTemplate extends EditRecord
 {
     protected static string $resource = HostelTemplateResource::class;
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            Actions\Action::make('back')
+                ->label('Back')
+                ->icon('heroicon-o-arrow-left')
+                ->url($this->getResource()::getUrl('index')),
+        ];
+    }
 }

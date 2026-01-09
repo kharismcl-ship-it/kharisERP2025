@@ -2,16 +2,18 @@
 
 namespace Modules\Hostels\Filament\Resources\VisitorLogResource\Pages;
 
-    use Filament\Actions\CreateAction;
-    use Filament\Resources\Pages\ListRecords;
-    use Modules\Hostels\Filament\Resources\VisitorLogResource;
+use Filament\Actions\CreateAction;
+use Filament\Resources\Pages\ListRecords;
+use Modules\Hostels\Filament\Resources\VisitorLogResource;
 
-    class ListVisitorLogs extends ListRecords {
-        protected static string $resource = VisitorLogResource::class;
+class ListVisitorLogs extends ListRecords
+{
+    protected static string $resource = VisitorLogResource::class;
 
-        protected function getHeaderActions(): array {
+    protected function getHeaderActions(): array
+    {
         return [
-        CreateAction::make(),
+            CreateAction::make(),
         ];
-        }
     }
+}

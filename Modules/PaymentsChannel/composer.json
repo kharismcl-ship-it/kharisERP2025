@@ -1,0 +1,30 @@
+{
+    "name": "nwidart/paymentschannel",
+    "description": "Universal payment engine for the entire Kharis ERP",
+    "authors": [
+        {
+            "name": "Trae",
+            "email": "trae@example.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\PaymentsChannel\\": "app/",
+            "Modules\\PaymentsChannel\\Database\\Factories\\": "database/factories/",
+            "Modules\\PaymentsChannel\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\PaymentsChannel\\Tests\\": "tests/"
+        }
+    }
+}

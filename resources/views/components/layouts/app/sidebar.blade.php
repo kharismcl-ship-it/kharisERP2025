@@ -15,6 +15,16 @@
                 <flux:navlist.group :heading="__('Platform')" class="grid">
                     <flux:navlist.item icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Dashboard') }}</flux:navlist.item>
                 </flux:navlist.group>
+
+                @if(Module::isEnabled('Hostels'))
+                <flux:navlist.group :heading="__('Hostels')" class="grid">
+                    <flux:navlist.item icon="building-office" :href="route('hostels.index')" :current="request()->routeIs('hostels.index')" wire:navigate>{{ __('Hostels') }}</flux:navlist.item>
+                    <flux:navlist.item icon="user-group" :href="route('hostels.hostel-occupants.index', ['hostel' => request()->route('hostel')])" :current="request()->routeIs('hostels.hostel-occupants.index')" wire:navigate>{{ __('Tenants') }}</flux:navlist.item>
+                    <flux:navlist.item icon="calendar-days" :href="route('hostels.bookings.index', ['hostel' => request()->route('hostel')])" :current="request()->routeIs('hostels.bookings.index')" wire:navigate>{{ __('Bookings') }}</flux:navlist.item>
+                    <flux:navlist.item icon="wrench" :href="route('hostels.maintenance.index', ['hostel' => request()->route('hostel')])" :current="request()->routeIs('hostels.maintenance.index')" wire:navigate>{{ __('Maintenance') }}</flux:navlist.item>
+                    <flux:navlist.item icon="exclamation-triangle" :href="route('hostels.incidents.index', ['hostel' => request()->route('hostel')])" :current="request()->routeIs('hostels.incidents.index')" wire:navigate>{{ __('Incidents') }}</flux:navlist.item>
+                </flux:navlist.group>
+                @endif
             </flux:navlist>
 
             <flux:spacer />

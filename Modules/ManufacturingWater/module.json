@@ -1,0 +1,11 @@
+{
+    "name": "ManufacturingWater",
+    "alias": "manufacturingwater",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\ManufacturingWater\\Providers\\ManufacturingWaterServiceProvider"
+    ],
+    "files": []
+}

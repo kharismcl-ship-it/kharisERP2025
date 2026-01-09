@@ -3,9 +3,9 @@
 namespace Modules\Hostels\Http\Livewire;
 
 use Livewire\Component;
+use Livewire\WithPagination;
 use Modules\Hostels\Models\HostelWhatsAppGroup;
 use Modules\Hostels\Models\WhatsAppGroupMessage;
-use Livewire\WithPagination;
 
 class WhatsAppGroupMessages extends Component
 {

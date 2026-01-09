@@ -1,0 +1,45 @@
+<?php
+
+namespace {{ namespace }};
+
+use Filament\Contracts\Plugin;
+use Filament\Panel;
+{{ useStatements }}
+
+class {{ class }} implements Plugin
+{
+    public static function make(): static
+    {
+        return app(static::class);
+    }
+
+    public function getId(): string
+    {
+        return '{{ moduleLower }}';
+    }
+
+    public function register(Panel $panel): void
+    {
+        $panel->resources([
+            // Register all Filament Resources Class
+            // Eg. Resource::class,
+        ]);
+
+        $panel->pages([
+            // Register all Filament Pages Class
+            // Eg. Page::class,
+        ]);
+
+        $panel->navigationItems([
+            // Register navigation items
+            // NavigationItem::make('Dashboard')
+            //     ->url('/dashboard')
+            //     ->icon('heroicon-o-home'),
+        ]);
+    }
+
+    public function boot(Panel $panel): void
+    {
+        // Boot logic here
+    }
+}

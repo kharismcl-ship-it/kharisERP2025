@@ -2,16 +2,23 @@
 
 namespace Modules\Hostels\Filament\Resources\VisitorLogResource\Pages;
 
-    use Filament\Actions\DeleteAction;
-    use Filament\Resources\Pages\EditRecord;
-    use Modules\Hostels\Filament\Resources\VisitorLogResource;
+use Filament\Actions;
+use Filament\Actions\DeleteAction;
+use Filament\Resources\Pages\EditRecord;
+use Modules\Hostels\Filament\Resources\VisitorLogResource;
 
-    class EditVisitorLog extends EditRecord {
-        protected static string $resource = VisitorLogResource::class;
+class EditVisitorLog extends EditRecord
+{
+    protected static string $resource = VisitorLogResource::class;
 
-        protected function getHeaderActions(): array {
+    protected function getHeaderActions(): array
+    {
         return [
-        DeleteAction::make(),
+            Actions\Action::make('back')
+                ->label('Back')
+                ->icon('heroicon-o-arrow-left')
+                ->url($this->getResource()::getUrl('index')),
+            DeleteAction::make(),
         ];
-        }
     }
+}

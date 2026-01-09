@@ -1,16 +1,22 @@
 <?php
 
-namespace App\Filament\Resources\HostelBlockResource\Pages;
+namespace Modules\Hostels\Filament\Resources\HostelBlockResource\Pages;
 
-    use App\Filament\Resources\HostelBlockResource;
-    use Filament\Resources\Pages\CreateRecord;
+use Filament\Actions;
+use Filament\Resources\Pages\CreateRecord;
+use Modules\Hostels\Filament\Resources\HostelBlockResource;
 
-    class CreateHostelBlock extends CreateRecord {
-        protected static string $resource = HostelBlockResource::class;
+class CreateHostelBlock extends CreateRecord
+{
+    protected static string $resource = HostelBlockResource::class;
 
-        protected function getHeaderActions(): array {
+    protected function getHeaderActions(): array
+    {
         return [
-
+            Actions\Action::make('back')
+                ->label('Back')
+                ->icon('heroicon-o-arrow-left')
+                ->url($this->getResource()::getUrl('index')),
         ];
-        }
     }
+}

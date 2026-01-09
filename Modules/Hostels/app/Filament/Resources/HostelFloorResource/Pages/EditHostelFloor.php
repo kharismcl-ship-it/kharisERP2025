@@ -1,17 +1,24 @@
 <?php
 
-namespace App\Filament\Resources\HostelFloorResource\Pages;
+namespace Modules\Hostels\Filament\Resources\HostelFloorResource\Pages;
 
-    use App\Filament\Resources\HostelFloorResource;
-    use Filament\Actions\DeleteAction;
-    use Filament\Resources\Pages\EditRecord;
+use Filament\Actions;
+use Filament\Actions\DeleteAction;
+use Filament\Resources\Pages\EditRecord;
+use Modules\Hostels\Filament\Resources\HostelFloorResource;
 
-    class EditHostelFloor extends EditRecord {
-        protected static string $resource = HostelFloorResource::class;
+class EditHostelFloor extends EditRecord
+{
+    protected static string $resource = HostelFloorResource::class;
 
-        protected function getHeaderActions(): array {
+    protected function getHeaderActions(): array
+    {
         return [
-        DeleteAction::make(),
+            Actions\Action::make('back')
+                ->label('Back')
+                ->icon('heroicon-o-arrow-left')
+                ->url($this->getResource()::getUrl('index')),
+            DeleteAction::make(),
         ];
-        }
     }
+}

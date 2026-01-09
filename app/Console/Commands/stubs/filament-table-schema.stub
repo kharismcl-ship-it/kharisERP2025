@@ -1,0 +1,25 @@
+<?php
+
+namespace {{ namespace }};
+
+use Filament\Tables;
+use Filament\Tables\Table;
+
+class {{ class }}
+{
+    public static function configure(Table $table): Table
+    {
+        return $table
+            ->columns([{{ tableSchema }}
+            ])
+            ->filters([
+                // Add your table filters here
+            ])
+            ->actions([
+                // Add your table actions here
+            ])
+            ->bulkActions([
+                // Add your bulk actions here
+            ]);
+    }
+}

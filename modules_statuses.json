@@ -1,0 +1,14 @@
+{
+    "Core": true,
+    "Hostels": true,
+    "Farms": true,
+    "Construction": true,
+    "ManufacturingWater": true,
+    "ManufacturingPaper": true,
+    "HR": true,
+    "ProcurementInventory": true,
+    "Fleet": true,
+    "Finance": true,
+    "CommunicationCentre": true,
+    "PaymentsChannel": true
+}

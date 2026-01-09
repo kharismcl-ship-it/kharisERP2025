@@ -55,4 +55,40 @@ class UserFactory extends Factory
             'two_factor_confirmed_at' => null,
         ]);
     }
+
+    /**
+     * Configure the model factory to create a user with a specific company.
+     */
+    public function withCompany($company = null)
+    {
+        return $this->afterCreating(function (\App\Models\User $user) use ($company) {
+            if (! $company) {
+                $company = \App\Models\Company::factory()->create();
+            }
+
+            $user->companies()->attach($company->id, [
+                'position' => 'Administrator',
+                'is_active' => true,
+                'assigned_at' => now(),
+            ]);
+
+            $user->current_company_id = $company->id;
+            $user->save();
+        });
+    }
+
+    /**
+     * Configure the model factory to create a super admin user.
+     */
+    public function superAdmin()
+    {
+        return $this->afterCreating(function (\App\Models\User $user) {
+            $superAdminRole = \Spatie\Permission\Models\Role::firstOrCreate(
+                ['name' => 'super_admin', 'guard_name' => 'web'],
+                ['name' => 'super_admin', 'guard_name' => 'web', 'company_id' => null]
+            );
+
+            $user->assignRole($superAdminRole);
+        });
+    }
 }

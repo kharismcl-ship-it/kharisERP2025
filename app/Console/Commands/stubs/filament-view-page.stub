@@ -1,0 +1,12 @@
+<?php
+
+namespace {{ namespace }};
+
+use Filament\Resources\Pages\ViewRecord;
+use Modules\{{ module }}\Filament\Resources\{{ resourceName }}Resource;
+
+
+class {{ class }} extends ViewRecord
+{
+    protected static string $resource = {{ resourceClass }}::class;
+}

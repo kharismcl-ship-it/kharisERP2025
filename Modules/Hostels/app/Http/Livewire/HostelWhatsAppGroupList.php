@@ -3,8 +3,8 @@
 namespace Modules\Hostels\Http\Livewire;
 
 use Livewire\Component;
-use Modules\Hostels\Models\HostelWhatsAppGroup;
 use Livewire\WithPagination;
+use Modules\Hostels\Models\HostelWhatsAppGroup;
 
 class HostelWhatsAppGroupList extends Component
 {
