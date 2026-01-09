@@ -197,36 +197,37 @@
     </x-filament::modal>
 
     <!-- Rejection Modal -->
-    <x-filament::modal
-        id="rejection-modal"
-        wire:model="showApprovalModal"
-        title="Reject Booking Request"
+       <x-filament::field-wrapper
+        label="Rejection reason"
+        statePath="rejectionReason"
     >
-        <div class="space-y-4">
-            <x-filament::field-wrapper>
-                <x-filament::textarea
-                    wire:model="rejectionReason"
-                    placeholder="Please provide a reason for rejecting this booking request..."
-                    rows="4"
-                />
-                <x-filament::forms::field-wrapper.error for="rejectionReason" />
-             </x-filament::field-wrapper>
-            
-            <div class="flex space-x-4 justify-end">
-                <x-filament::button
-                    color="danger"
-                    wire:click="rejectBooking"
-                >
-                    Confirm Rejection
-                </x-filament::button>
-                
-                <x-filament::button
-                    color="gray"
-                    wire:click="$set('showApprovalModal', false)"
-                >
-                    Cancel
-                </x-filament::button>
-            </div>
-        </div>
-    </x-filament::modal>
+        <x-filament::input.wrapper>
+            <textarea
+                wire:model.live="rejectionReason"
+                placeholder="Please provide a reason for rejecting this booking request..."
+                rows="4"
+                class="fi-input w-full"
+            ></textarea>
+        </x-filament::input.wrapper>
+
+        <x-filament::field-wrapper.error for="rejectionReason" />
+    </x-filament::field-wrapper>
+
+    <div class="flex space-x-4 justify-end">
+        <x-filament::button
+            color="danger"
+            wire:click="rejectBooking"
+        >
+            Confirm Rejection
+        </x-filament::button>
+
+        <x-filament::button
+            color="gray"
+            wire:click="$set('showApprovalModal', false)"
+        >
+            Cancel
+        </x-filament::button>
+    </div>
+</div>
+
 </div>
