@@ -9,8 +9,13 @@ use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Filament\Tables;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use Modules\Farms\Filament\Resources\FarmExpenseResource\Pages;
@@ -69,18 +74,19 @@ class FarmExpenseResource extends Resource
                 TextColumn::make('cropCycle.crop_name')->label('Crop Cycle'),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('category')
+                SelectFilter::make('category')
                     ->options(array_combine(FarmExpense::CATEGORIES, array_map('ucfirst', FarmExpense::CATEGORIES))),
-                Tables\Filters\SelectFilter::make('farm_id')
+                SelectFilter::make('farm_id')
                     ->label('Farm')
                     ->relationship('farm', 'name'),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                ViewAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()]),
+                BulkActionGroup::make([DeleteBulkAction::make()]),
             ])
             ->defaultSort('expense_date', 'desc');
     }
@@ -90,6 +96,7 @@ class FarmExpenseResource extends Resource
         return [
             'index'  => Pages\ListFarmExpenses::route('/'),
             'create' => Pages\CreateFarmExpense::route('/create'),
+            'view'   => Pages\ViewFarmExpense::route('/{record}'),
             'edit'   => Pages\EditFarmExpense::route('/{record}/edit'),
         ];
     }

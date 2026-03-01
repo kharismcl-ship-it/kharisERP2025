@@ -8,10 +8,12 @@ use Illuminate\Support\ServiceProvider;
 use Modules\Farms\Models\CropCycle;
 use Modules\Farms\Models\Farm;
 use Modules\Farms\Models\FarmExpense;
+use Modules\Farms\Models\FarmPlot;
 use Modules\Farms\Models\HarvestRecord;
 use Modules\Farms\Models\LivestockBatch;
 use Modules\Farms\Policies\CropCyclePolicy;
 use Modules\Farms\Policies\FarmExpensePolicy;
+use Modules\Farms\Policies\FarmPlotPolicy;
 use Modules\Farms\Policies\FarmPolicy;
 use Modules\Farms\Policies\HarvestRecordPolicy;
 use Modules\Farms\Policies\LivestockBatchPolicy;
@@ -63,6 +65,7 @@ class FarmsServiceProvider extends ServiceProvider
     protected function registerPolicies(): void
     {
         Gate::policy(Farm::class, FarmPolicy::class);
+        Gate::policy(FarmPlot::class, FarmPlotPolicy::class);
         Gate::policy(CropCycle::class, CropCyclePolicy::class);
         Gate::policy(LivestockBatch::class, LivestockBatchPolicy::class);
         Gate::policy(HarvestRecord::class, HarvestRecordPolicy::class);

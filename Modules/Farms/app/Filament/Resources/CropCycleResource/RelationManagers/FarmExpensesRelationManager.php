@@ -1,16 +1,16 @@
 <?php
 
-namespace Modules\Farms\Filament\Resources\FarmResource\RelationManagers;
+namespace Modules\Farms\Filament\Resources\CropCycleResource\RelationManagers;
 
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -31,7 +31,6 @@ class FarmExpensesRelationManager extends RelationManager
             TextInput::make('description')->required()->maxLength(255)->columnSpanFull(),
             TextInput::make('amount')->required()->numeric()->prefix('GHS')->step(0.01),
             TextInput::make('supplier')->maxLength(255),
-            Select::make('crop_cycle_id')->label('Crop Cycle')->relationship('cropCycle', 'crop_name')->searchable()->nullable(),
             Textarea::make('notes')->rows(2)->columnSpanFull(),
         ]);
     }
@@ -40,12 +39,11 @@ class FarmExpensesRelationManager extends RelationManager
     {
         return $table
             ->columns([
-                TextColumn::make('expense_date')->date()->sortable(),
+                TextColumn::make('expense_date')->date('d M Y')->sortable(),
                 TextColumn::make('category')->badge(),
                 TextColumn::make('description')->limit(40),
                 TextColumn::make('amount')->money('GHS')->sortable(),
-                TextColumn::make('supplier'),
-                TextColumn::make('cropCycle.crop_name')->label('Crop Cycle'),
+                TextColumn::make('supplier')->placeholder('—'),
             ])
             ->headerActions([CreateAction::make()])
             ->actions([EditAction::make(), DeleteAction::make()])

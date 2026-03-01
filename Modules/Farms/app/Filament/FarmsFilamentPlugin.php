@@ -4,8 +4,10 @@ namespace Modules\Farms\Filament;
 
 use Filament\Contracts\Plugin;
 use Filament\Panel;
+use Modules\Farms\Filament\Resources\CropCycleResource;
 use Modules\Farms\Filament\Resources\FarmExpenseResource;
 use Modules\Farms\Filament\Resources\FarmResource;
+use Modules\Farms\Filament\Resources\LivestockBatchResource;
 
 class FarmsFilamentPlugin implements Plugin
 {
@@ -18,6 +20,8 @@ class FarmsFilamentPlugin implements Plugin
     {
         $panel->resources([
             FarmResource::class,
+            CropCycleResource::class,
+            LivestockBatchResource::class,
             FarmExpenseResource::class,
         ]);
     }

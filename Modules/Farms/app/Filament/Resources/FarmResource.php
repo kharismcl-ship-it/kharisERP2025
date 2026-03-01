@@ -8,8 +8,12 @@ use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Filament\Tables;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use Modules\Farms\Filament\Resources\FarmResource\Pages;
@@ -76,17 +80,17 @@ class FarmResource extends Resource
                     }),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('type')
+                SelectFilter::make('type')
                     ->options(array_combine(Farm::TYPES, array_map('ucfirst', Farm::TYPES))),
-                Tables\Filters\SelectFilter::make('status')
+                SelectFilter::make('status')
                     ->options(array_combine(Farm::STATUSES, array_map('ucfirst', Farm::STATUSES))),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
+                ViewAction::make(),
+                EditAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([Tables\Actions\DeleteBulkAction::make()]),
+                BulkActionGroup::make([DeleteBulkAction::make()]),
             ]);
     }
 
