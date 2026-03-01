@@ -2,11 +2,14 @@
 
 namespace Modules\Finance\Filament\Resources;
 
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables;
@@ -18,38 +21,54 @@ class AccountResource extends Resource
 {
     protected static ?string $model = Account::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedCalculator;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Finance';
+    protected static string|\UnitEnum|null $navigationGroup = 'General Ledger';
+
+    protected static ?int $navigationSort = 40;
 
     public static function form(Schema $schema): Schema
     {
         return $schema
+            ->columns(2)
             ->components([
-                Forms\Components\Select::make('company_id')
-                    ->relationship('company', 'name')
-                    ->preload()
-                    ->required(),
-                Forms\Components\TextInput::make('code')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\Select::make('type')
-                    ->options([
-                        'asset' => 'Asset',
-                        'liability' => 'Liability',
-                        'equity' => 'Equity',
-                        'income' => 'Income',
-                        'expense' => 'Expense',
-                    ])
-                    ->required(),
-                Forms\Components\Select::make('parent_id')
-                    ->label('Parent Account')
-                    ->relationship('parent', 'name')
-                    ->searchable()
-                    ->preload(),
+                Section::make('Account Details')
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\Select::make('company_id')
+                            ->relationship('company', 'name')
+                            ->preload()
+                            ->required()
+                            ->columnSpanFull(),
+                        Forms\Components\TextInput::make('code')
+                            ->required()
+                            ->maxLength(50)
+                            ->placeholder('e.g. 1100'),
+                        Forms\Components\TextInput::make('name')
+                            ->required()
+                            ->maxLength(255)
+                            ->placeholder('e.g. Accounts Receivable'),
+                        Forms\Components\Select::make('type')
+                            ->options([
+                                'asset'     => 'Asset',
+                                'liability' => 'Liability',
+                                'equity'    => 'Equity',
+                                'income'    => 'Income',
+                                'expense'   => 'Expense',
+                            ])
+                            ->required(),
+                    ]),
+
+                Section::make('Chart Hierarchy')
+                    ->columns(1)
+                    ->schema([
+                        Forms\Components\Select::make('parent_id')
+                            ->label('Parent Account')
+                            ->relationship('parent', 'name')
+                            ->searchable()
+                            ->preload()
+                            ->placeholder('None (top-level account)'),
+                    ]),
             ]);
     }
 
@@ -57,33 +76,50 @@ class AccountResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('company.name')
-                    ->numeric()
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('code')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable()
+                    ->weight('bold'),
                 Tables\Columns\TextColumn::make('name')
-                    ->searchable(),
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('type')
-                    ->searchable(),
+                    ->badge()
+                    ->color(fn (string $state) => match ($state) {
+                        'asset'     => 'info',
+                        'liability' => 'warning',
+                        'equity'    => 'success',
+                        'income'    => 'success',
+                        'expense'   => 'danger',
+                        default     => 'gray',
+                    }),
                 Tables\Columns\TextColumn::make('parent.name')
                     ->label('Parent Account')
-                    ->numeric()
+                    ->placeholder('—')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
+                Tables\Columns\TextColumn::make('company.name')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
+                Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('type')
+                    ->options([
+                        'asset'     => 'Asset',
+                        'liability' => 'Liability',
+                        'equity'    => 'Equity',
+                        'income'    => 'Income',
+                        'expense'   => 'Expense',
+                    ]),
             ])
             ->actions([
-                EditAction::make(),
+                ActionGroup::make([
+                    ViewAction::make(),
+                    EditAction::make(),
+                ]),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
@@ -94,17 +130,16 @@ class AccountResource extends Resource
 
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListAccounts::route('/'),
+            'index'  => Pages\ListAccounts::route('/'),
             'create' => Pages\CreateAccount::route('/create'),
-            'edit' => Pages\EditAccount::route('/{record}/edit'),
+            'view'   => Pages\ViewAccount::route('/{record}'),
+            'edit'   => Pages\EditAccount::route('/{record}/edit'),
         ];
     }
 }

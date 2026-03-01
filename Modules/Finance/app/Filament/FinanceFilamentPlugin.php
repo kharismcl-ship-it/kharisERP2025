@@ -26,30 +26,43 @@ class FinanceFilamentPlugin implements Plugin
 
     public function register(Panel $panel): void
     {
-        $panel->resources([
-            ReceiptResource::class,
-            AccountResource::class,
-            InvoiceLineResource::class,
-            JournalLineResource::class,
-            InvoiceResource::class,
-            PaymentResource::class,
-            JournalEntryResource::class,
-        ]);
+        if ($panel->getId() === 'admin') {
+            $panel->resources([
+                // Billing
+                InvoiceResource::class,
+                PaymentResource::class,
+                ReceiptResource::class,
 
-        $panel->pages([
-            // Register all Filament Pages Class
-        ]);
+                // General Ledger
+                AccountResource::class,
+                JournalEntryResource::class,
 
-        $panel->navigationItems([
-            // Register navigation items
-            // NavigationItem::make('Dashboard')
-            //     ->url('/dashboard')
-            //     ->icon('heroicon-o-home'),
-        ]);
+                // Hidden from nav (accessed via relation managers)
+                InvoiceLineResource::class,
+                JournalLineResource::class,
+            ]);
+        } elseif ($panel->getId() === 'company-admin') {
+            $panel->resources([
+                // Billing
+                InvoiceResource::class,
+                PaymentResource::class,
+                ReceiptResource::class,
+
+                // General Ledger
+                AccountResource::class,
+                JournalEntryResource::class,
+
+                // Hidden from nav (accessed via relation managers)
+                InvoiceLineResource::class,
+                JournalLineResource::class,
+            ]);
+        }
+
+        $panel->pages([]);
     }
 
     public function boot(Panel $panel): void
     {
-        // Boot logic here
+        //
     }
 }

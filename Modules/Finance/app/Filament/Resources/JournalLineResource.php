@@ -2,11 +2,14 @@
 
 namespace Modules\Finance\Filament\Resources;
 
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables;
@@ -18,26 +21,40 @@ class JournalLineResource extends Resource
 {
     protected static ?string $model = JournalLine::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedQueueList;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Finance';
+    protected static string|\UnitEnum|null $navigationGroup = 'General Ledger';
+
+    protected static ?int $navigationSort = 42;
+
+    protected static bool $shouldRegisterNavigation = false;
 
     public static function form(Schema $schema): Schema
     {
         return $schema
             ->components([
-                Forms\Components\Select::make('journal_entry_id')
-                    ->relationship('journalEntry', 'reference')
-                    ->required(),
-                Forms\Components\Select::make('account_id')
-                    ->relationship('account', 'name')
-                    ->required(),
-                Forms\Components\TextInput::make('debit')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('credit')
-                    ->required()
-                    ->numeric(),
+                Section::make('Journal Line')
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\Select::make('journal_entry_id')
+                            ->relationship('journalEntry', 'reference')
+                            ->required()
+                            ->columnSpanFull(),
+                        Forms\Components\Select::make('account_id')
+                            ->relationship('account', 'name')
+                            ->required()
+                            ->columnSpanFull(),
+                        Forms\Components\TextInput::make('debit')
+                            ->required()
+                            ->numeric()
+                            ->prefix('GHS')
+                            ->default(0),
+                        Forms\Components\TextInput::make('credit')
+                            ->required()
+                            ->numeric()
+                            ->prefix('GHS')
+                            ->default(0),
+                    ]),
             ]);
     }
 
@@ -46,31 +63,28 @@ class JournalLineResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('journalEntry.reference')
-                    ->numeric()
+                    ->label('Journal Entry')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('account.name')
-                    ->numeric()
+                    ->label('Account')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('debit')
-                    ->numeric()
+                    ->money('GHS')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('credit')
-                    ->numeric()
+                    ->money('GHS')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->filters([
-                //
-            ])
+            ->filters([])
             ->actions([
-                EditAction::make(),
+                ActionGroup::make([
+                    ViewAction::make(),
+                    EditAction::make(),
+                ]),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
@@ -81,17 +95,16 @@ class JournalLineResource extends Resource
 
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListJournalLines::route('/'),
+            'index'  => Pages\ListJournalLines::route('/'),
             'create' => Pages\CreateJournalLine::route('/create'),
-            'edit' => Pages\EditJournalLine::route('/{record}/edit'),
+            'view'   => Pages\ViewJournalLine::route('/{record}'),
+            'edit'   => Pages\EditJournalLine::route('/{record}/edit'),
         ];
     }
 }

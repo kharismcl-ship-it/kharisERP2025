@@ -2,11 +2,14 @@
 
 namespace Modules\Finance\Filament\Resources;
 
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables;
@@ -18,29 +21,42 @@ class InvoiceLineResource extends Resource
 {
     protected static ?string $model = InvoiceLine::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedListBullet;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Finance';
+    protected static string|\UnitEnum|null $navigationGroup = 'Billing';
+
+    protected static ?int $navigationSort = 11;
+
+    protected static bool $shouldRegisterNavigation = false;
 
     public static function form(Schema $schema): Schema
     {
         return $schema
             ->components([
-                Forms\Components\Select::make('invoice_id')
-                    ->relationship('invoice', 'invoice_number')
-                    ->required(),
-                Forms\Components\Textarea::make('description')
-                    ->required()
-                    ->columnSpanFull(),
-                Forms\Components\TextInput::make('quantity')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('unit_price')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('line_total')
-                    ->required()
-                    ->numeric(),
+                Section::make('Line Item')
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\Select::make('invoice_id')
+                            ->relationship('invoice', 'invoice_number')
+                            ->required()
+                            ->columnSpanFull(),
+                        Forms\Components\Textarea::make('description')
+                            ->required()
+                            ->columnSpanFull()
+                            ->rows(2),
+                        Forms\Components\TextInput::make('quantity')
+                            ->required()
+                            ->numeric()
+                            ->default(1),
+                        Forms\Components\TextInput::make('unit_price')
+                            ->required()
+                            ->numeric()
+                            ->prefix('GHS'),
+                        Forms\Components\TextInput::make('line_total')
+                            ->required()
+                            ->numeric()
+                            ->prefix('GHS'),
+                    ]),
             ]);
     }
 
@@ -49,31 +65,30 @@ class InvoiceLineResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('invoice.invoice_number')
-                    ->numeric()
+                    ->label('Invoice')
                     ->sortable(),
+                Tables\Columns\TextColumn::make('description')
+                    ->limit(50),
                 Tables\Columns\TextColumn::make('quantity')
                     ->numeric()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('unit_price')
-                    ->numeric()
+                    ->money('GHS')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('line_total')
-                    ->numeric()
+                    ->money('GHS')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->filters([
-                //
-            ])
+            ->filters([])
             ->actions([
-                EditAction::make(),
+                ActionGroup::make([
+                    ViewAction::make(),
+                    EditAction::make(),
+                ]),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
@@ -84,17 +99,16 @@ class InvoiceLineResource extends Resource
 
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListInvoiceLines::route('/'),
+            'index'  => Pages\ListInvoiceLines::route('/'),
             'create' => Pages\CreateInvoiceLine::route('/create'),
-            'edit' => Pages\EditInvoiceLine::route('/{record}/edit'),
+            'view'   => Pages\ViewInvoiceLine::route('/{record}'),
+            'edit'   => Pages\EditInvoiceLine::route('/{record}/edit'),
         ];
     }
 }
