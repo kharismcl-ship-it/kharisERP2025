@@ -146,6 +146,13 @@ class VendorResource extends Resource
             ]);
     }
 
+    public static function getRelations(): array
+    {
+        return [
+            \Modules\ProcurementInventory\Filament\Resources\VendorResource\RelationManagers\PurchaseOrdersRelationManager::class,
+        ];
+    }
+
     public static function getPages(): array
     {
         return [

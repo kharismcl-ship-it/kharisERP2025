@@ -122,6 +122,7 @@ class ConstructionProjectResource extends Resource
     {
         return [
             RelationManagers\ProjectPhasesRelationManager::class,
+            RelationManagers\ProjectTasksRelationManager::class,
             RelationManagers\MaterialUsagesRelationManager::class,
             RelationManagers\ProjectBudgetItemsRelationManager::class,
         ];
