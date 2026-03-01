@@ -11,7 +11,18 @@ class EventServiceProvider extends ServiceProvider
      *
      * @var array<string, array<int, string>>
      */
-    protected $listen = [];
+    protected $listen = [
+        // CommunicationCentre integration
+        \Modules\Construction\Events\ProjectMilestoneCompleted::class => [
+            \Modules\Construction\Listeners\SendProjectMilestoneNotification::class,
+        ],
+        \Modules\Construction\Events\ProjectBudgetOverrun::class => [
+            \Modules\Construction\Listeners\SendProjectBudgetOverrunAlert::class,
+        ],
+        \Modules\Construction\Events\ProjectCompleted::class => [
+            \Modules\Construction\Listeners\SendProjectCompletionNotification::class,
+        ],
+    ];
 
     /**
      * Indicates if events should be discovered.

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\Company;
+use Modules\Construction\Events\ProjectMilestoneCompleted;
 
 class ProjectPhase extends Model
 {
@@ -36,6 +37,18 @@ class ProjectPhase extends Model
     ];
 
     const STATUSES = ['pending', 'in_progress', 'completed', 'on_hold'];
+
+    protected static function booted(): void
+    {
+        static::updated(function (self $phase) {
+            if ($phase->isDirty('status') && $phase->status === 'completed') {
+                $project = $phase->project;
+                if ($project) {
+                    ProjectMilestoneCompleted::dispatch($project, $phase);
+                }
+            }
+        });
+    }
 
     public function project(): BelongsTo
     {

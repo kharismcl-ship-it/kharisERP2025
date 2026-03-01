@@ -5,6 +5,7 @@ namespace Modules\Construction\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\Company;
+use Modules\ProcurementInventory\Models\Item;
 
 class MaterialUsage extends Model
 {
@@ -12,6 +13,7 @@ class MaterialUsage extends Model
         'construction_project_id',
         'project_phase_id',
         'company_id',
+        'item_id',
         'material_name',
         'unit',
         'quantity',
@@ -51,5 +53,13 @@ class MaterialUsage extends Model
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
+    }
+
+    /**
+     * Optional link to a ProcurementInventory item for stock tracking.
+     */
+    public function item(): BelongsTo
+    {
+        return $this->belongsTo(Item::class);
     }
 }

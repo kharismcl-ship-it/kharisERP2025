@@ -7,9 +7,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 use App\Models\Company;
+use Modules\Construction\Events\ProjectBudgetOverrun;
+use Modules\Construction\Events\ProjectCompleted;
+use Modules\PaymentsChannel\Traits\HasPayments;
 
 class ConstructionProject extends Model
 {
+    use HasPayments;
+
     protected $fillable = [
         'company_id',
         'name',
@@ -18,6 +23,8 @@ class ConstructionProject extends Model
         'location',
         'client_name',
         'client_contact',
+        'client_email',
+        'client_phone',
         'project_manager',
         'start_date',
         'expected_end_date',
@@ -25,6 +32,9 @@ class ConstructionProject extends Model
         'contract_value',
         'budget',
         'total_spent',
+        'payment_status',
+        'amount_paid',
+        'invoice_id',
         'status',
         'notes',
     ];
@@ -45,6 +55,20 @@ class ConstructionProject extends Model
         static::creating(function (self $project) {
             if (empty($project->slug)) {
                 $project->slug = Str::slug($project->name);
+            }
+        });
+
+        static::updated(function (self $project) {
+            // Dispatch ProjectCompleted when status changes to completed
+            if ($project->isDirty('status') && $project->status === 'completed') {
+                ProjectCompleted::dispatch($project);
+            }
+            // Dispatch ProjectBudgetOverrun when total_spent exceeds budget
+            if ($project->isDirty('total_spent') && $project->budget > 0) {
+                $overrun = (float) $project->total_spent - (float) $project->budget;
+                if ($overrun > 0) {
+                    ProjectBudgetOverrun::dispatch($project, $overrun);
+                }
             }
         });
     }
@@ -72,6 +96,36 @@ class ConstructionProject extends Model
     public function materialUsages(): HasMany
     {
         return $this->hasMany(MaterialUsage::class);
+    }
+
+    public function getPaymentDescription(): ?string
+    {
+        return "Construction Project: {$this->name}";
+    }
+
+    public function getPaymentAmount(): float
+    {
+        return max(0, (float) $this->contract_value - (float) $this->amount_paid);
+    }
+
+    public function getPaymentCustomerName(): ?string
+    {
+        return $this->client_name;
+    }
+
+    public function getPaymentCustomerEmail(): ?string
+    {
+        return $this->client_email;
+    }
+
+    public function getPaymentCustomerPhone(): ?string
+    {
+        return $this->client_phone;
+    }
+
+    public function invoice(): BelongsTo
+    {
+        return $this->belongsTo(\Modules\Finance\Models\Invoice::class, 'invoice_id');
     }
 
     public function getBudgetVarianceAttribute(): float

@@ -47,6 +47,10 @@ class EventServiceProvider extends ServiceProvider
             \Modules\Finance\Listeners\ProcurementInventory\PostInventoryOnGoodsReceived::class,
             \Modules\Finance\Listeners\RunThreeWayMatchOnGoodsReceived::class,
         ],
+        // Construction Finance integration — milestone invoice + GL posting
+        \Modules\Construction\Events\ProjectMilestoneCompleted::class => [
+            \Modules\Finance\Listeners\Construction\CreateInvoiceForProject::class,
+        ],
     ];
 
     /**
