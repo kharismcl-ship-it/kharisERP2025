@@ -87,7 +87,7 @@ class AutomationService
 
     protected function getHandlerClassName(string $action): string
     {
-        return str_replace('_', '', ucwords($action, '_'));
+        return str_replace(['-', '_'], '', ucwords($action, '-_'));
     }
 
     public function getAutomationsForModule(string $module): array
@@ -113,19 +113,26 @@ class AutomationService
                 ],
             ],
             'Hostels' => [
-                'billing_cycle_generation' => [
+                'billing-cycle-generation' => [
                     'name' => 'Recurring Billing Cycle Generation',
                     'description' => 'Auto-generate billing cycles for active hostel occupants',
                     'schedule_types' => ['daily', 'monthly'],
                 ],
-                'deposit_reminder' => [
+                'deposit-reminder' => [
                     'name' => 'Deposit Collection Reminder',
                     'description' => 'Send SMS reminders for pending hostel deposits',
                     'schedule_types' => ['daily', 'weekly'],
                 ],
-                'overdue_charge_reminder' => [
+                'overdue-charge-reminder' => [
                     'name' => 'Overdue Charge Reminder',
                     'description' => 'Send SMS reminders for overdue hostel charges',
+                    'schedule_types' => ['daily', 'weekly'],
+                ],
+            ],
+            'Fleet' => [
+                'maintenance-reminder' => [
+                    'name' => 'Vehicle Maintenance Reminder',
+                    'description' => 'Send reminders for upcoming vehicle maintenance schedules',
                     'schedule_types' => ['daily', 'weekly'],
                 ],
             ],

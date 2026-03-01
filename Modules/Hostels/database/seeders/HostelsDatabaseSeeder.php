@@ -12,6 +12,7 @@ class HostelsDatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
+            HostelsCommTemplateSeeder::class,
             HostelSeeder::class,
             HostelBlockSeeder::class,
             HostelFloorSeeder::class,

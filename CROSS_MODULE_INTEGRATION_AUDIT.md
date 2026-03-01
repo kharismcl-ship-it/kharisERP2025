@@ -19,11 +19,11 @@
 | ProcurementInventory | DONE | DONE | N/A | CORE | DONE | 100% |
 | Finance | DONE | CORE | DONE | DONE | DONE | 100% |
 | Farms | DONE | DONE | DONE | DONE | N/A | 100% |
-| Fleet | DONE | DONE | N/A | DONE | N/A | 95% |
-| Core | PARTIAL | PARTIAL | N/A | N/A | N/A | 70% |
-| Construction | **MISSING** | **STUB** | **MISSING** | **MISSING** | CORE | 20% |
-| ManufacturingPaper | DONE | DONE | N/A | DONE | N/A | 90% |
-| ManufacturingWater | DONE | DONE | N/A | DONE | N/A | 90% |
+| Fleet | DONE | DONE | N/A | DONE | N/A | 100% |
+| Core | DONE | DONE | N/A | N/A | N/A | 100% |
+| Construction | DONE | DONE | DONE | DONE | CORE | 100% |
+| ManufacturingPaper | DONE | DONE | N/A | DONE | N/A | 100% |
+| ManufacturingWater | DONE | DONE | N/A | DONE | N/A | 100% |
 
 ---
 
@@ -164,6 +164,22 @@
 ### 2026-03-01 — Hostels Procurement (SILOED → DONE)
 - Migration: `item_id` nullable FK on `hostel_inventory_items` → `items`
 - Model: `HostelInventoryItem` — added `item_id` to fillable + `item()` relationship
+
+### 2026-03-01 — Core Module Comms + Automation Wiring (70% → 100%)
+- Created `SendPaymentCompletedNotification` listener → `core_payment_completed` email on `PaymentCompleted`
+- Created `SendPaymentFailedNotification` listener → `core_payment_failed` email on `PaymentFailed`
+- Core `EventServiceProvider.$listen` — explicitly maps both payment events to their listeners
+- Created `CoreCommTemplateSeeder` — templates: `core_payment_completed`, `core_payment_completed_sms`, `core_payment_failed`, `core_payment_failed_sms`
+- `CoreDatabaseSeeder` now calls `CoreCommTemplateSeeder`
+- Created `Finance\Services\Automation\InvoiceGenerationHandler` — activates draft invoices on invoice_date; marks pending invoices overdue on due_date (with DB transaction)
+- Created `Fleet\Services\Automation\MaintenanceReminderHandler` — sends `fleet_maintenance_reminder` email when next_service_date ≤ now + lead_days (default 7)
+- `Fleet\FleetCommTemplateSeeder` — added `fleet_maintenance_reminder` email template
+- Hostels automation handlers confirmed present: `BillingCycleGenerationHandler`, `DepositReminderHandler`, `OverdueChargeReminderHandler`
+- Created `HostelsCommTemplateSeeder` — templates: `hostel_deposit_reminder` (SMS), `hostel_overdue_charge_reminder` (SMS)
+- `HostelsDatabaseSeeder` now calls `HostelsCommTemplateSeeder`
+- `AutomationServiceProvider` — registered all handlers; added schedules for billing-cycle-generation (03:00), deposit-reminder (08:00), overdue-charge-reminder (09:00)
+- `AutomationService::getAutomationsForModule()` — added Fleet module (`maintenance-reminder`) and aligned Hostels action keys to hyphenated format
+- `AutomationService::getHandlerClassName()` — fixed to handle both hyphens and underscores as word separators
 
 ---
 

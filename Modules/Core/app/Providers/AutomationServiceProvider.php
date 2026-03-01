@@ -52,8 +52,11 @@ class AutomationServiceProvider extends ServiceProvider
 
         // Additional scheduled tasks for specific automation types
         Schedule::command('automations:process --type=leave-accrual')->dailyAt('00:01');
-        Schedule::command('automations:process --type=invoice-generation')->monthlyOn(1, '02:00');
-        Schedule::command('automations:process --type=maintenance-reminders')->dailyAt('06:00');
+        Schedule::command('automations:process --type=invoice-generation')->dailyAt('02:00');
+        Schedule::command('automations:process --type=maintenance-reminder')->dailyAt('06:00');
+        Schedule::command('automations:process --type=billing-cycle-generation')->dailyAt('03:00');
+        Schedule::command('automations:process --type=deposit-reminder')->dailyAt('08:00');
+        Schedule::command('automations:process --type=overdue-charge-reminder')->dailyAt('09:00');
     }
 
     /**
@@ -62,10 +65,12 @@ class AutomationServiceProvider extends ServiceProvider
     protected function registerAutomationHandlers(): void
     {
         $handlers = [
-            'leave-accrual' => 'Modules\HR\Services\Automation\LeaveAccrualHandler',
-            // Add more handlers as modules implement them:
-            // 'invoice-generation' => 'Modules\Finance\Services\Automation\InvoiceGenerationHandler',
-            // 'maintenance-reminders' => 'Modules\Hostels\Services\Automation\MaintenanceReminderHandler',
+            'leave-accrual'             => 'Modules\HR\Services\Automation\LeaveAccrualHandler',
+            'invoice-generation'        => 'Modules\Finance\Services\Automation\InvoiceGenerationHandler',
+            'maintenance-reminder'      => 'Modules\Fleet\Services\Automation\MaintenanceReminderHandler',
+            'billing-cycle-generation'  => 'Modules\Hostels\Services\Automation\BillingCycleGenerationHandler',
+            'deposit-reminder'          => 'Modules\Hostels\Services\Automation\DepositReminderHandler',
+            'overdue-charge-reminder'   => 'Modules\Hostels\Services\Automation\OverdueChargeReminderHandler',
         ];
 
         foreach ($handlers as $type => $handlerClass) {
