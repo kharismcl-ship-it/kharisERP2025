@@ -5,6 +5,7 @@ namespace Modules\ProcurementInventory\Filament\Resources;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -21,7 +22,7 @@ class ItemCategoryResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedTag;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Procurement & Inventory';
+    protected static string|\UnitEnum|null $navigationGroup = 'Inventory';
 
     protected static ?int $navigationSort = 30;
 
@@ -77,6 +78,7 @@ class ItemCategoryResource extends Resource
                     ->relationship('company', 'name'),
             ])
             ->actions([
+                ViewAction::make(),
                 EditAction::make()->slideOver(),
                 DeleteAction::make(),
             ])
@@ -90,6 +92,7 @@ class ItemCategoryResource extends Resource
         return [
             'index'  => Pages\ListItemCategories::route('/'),
             'create' => Pages\CreateItemCategory::route('/create'),
+            'view'   => Pages\ViewItemCategory::route('/{record}'),
             'edit'   => Pages\EditItemCategory::route('/{record}/edit'),
         ];
     }

@@ -22,7 +22,7 @@ class GoodsReceiptResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedArchiveBox;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Procurement & Inventory';
+    protected static string|\UnitEnum|null $navigationGroup = 'Procurement';
 
     protected static ?int $navigationSort = 50;
 

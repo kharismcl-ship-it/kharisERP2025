@@ -5,6 +5,7 @@ namespace Modules\ProcurementInventory\Filament\Resources;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -21,7 +22,7 @@ class ItemResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedCube;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Procurement & Inventory';
+    protected static string|\UnitEnum|null $navigationGroup = 'Inventory';
 
     protected static ?int $navigationSort = 20;
 
@@ -153,6 +154,7 @@ class ItemResource extends Resource
                 Tables\Filters\TernaryFilter::make('is_active'),
             ])
             ->actions([
+                ViewAction::make(),
                 EditAction::make()->slideOver(),
                 DeleteAction::make(),
             ])
@@ -166,6 +168,7 @@ class ItemResource extends Resource
         return [
             'index'  => Pages\ListItems::route('/'),
             'create' => Pages\CreateItem::route('/create'),
+            'view'   => Pages\ViewItem::route('/{record}'),
             'edit'   => Pages\EditItem::route('/{record}/edit'),
         ];
     }

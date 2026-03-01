@@ -2,11 +2,14 @@
 
 namespace Modules\ProcurementInventory\Filament\Resources;
 
+use Filament\Forms;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Modules\ProcurementInventory\Filament\Resources\PurchaseOrderResource;
 use Modules\ProcurementInventory\Filament\Resources\StockLevelResource\Pages;
 use Modules\ProcurementInventory\Models\StockLevel;
 
@@ -16,7 +19,7 @@ class StockLevelResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedChartBar;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Procurement & Inventory';
+    protected static string|\UnitEnum|null $navigationGroup = 'Inventory';
 
     protected static ?int $navigationSort = 60;
 
@@ -96,6 +99,40 @@ class StockLevelResource extends Resource
             ])
             ->actions([
                 Tables\Actions\ViewAction::make(),
+
+                Tables\Actions\Action::make('adjust')
+                    ->label('Adjust')
+                    ->icon('heroicon-o-adjustments-horizontal')
+                    ->color('warning')
+                    ->form([
+                        Forms\Components\TextInput::make('adjustment')
+                            ->label('Quantity Adjustment')
+                            ->helperText('Use positive to add, negative to reduce (e.g. -5)')
+                            ->numeric()
+                            ->required(),
+                        Forms\Components\Textarea::make('note')
+                            ->label('Reason / Note')
+                            ->rows(2)
+                            ->required(),
+                    ])
+                    ->action(function (StockLevel $record, array $data) {
+                        $newQty = max(0, (float) $record->quantity_on_hand + (float) $data['adjustment']);
+                        $record->update([
+                            'quantity_on_hand' => $newQty,
+                            'last_counted_at'  => now(),
+                        ]);
+                        Notification::make()
+                            ->title('Stock adjusted to ' . number_format($newQty, 2))
+                            ->success()
+                            ->send();
+                    }),
+
+                Tables\Actions\Action::make('reorder')
+                    ->label('Reorder Now')
+                    ->icon('heroicon-o-shopping-cart')
+                    ->color('info')
+                    ->visible(fn (StockLevel $record) => $record->needsReorder())
+                    ->url(fn (StockLevel $record) => PurchaseOrderResource::getUrl('create')),
             ])
             ->bulkActions([]);
     }

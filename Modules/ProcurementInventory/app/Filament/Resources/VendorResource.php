@@ -5,6 +5,7 @@ namespace Modules\ProcurementInventory\Filament\Resources;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -21,7 +22,7 @@ class VendorResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedBuildingStorefront;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Procurement & Inventory';
+    protected static string|\UnitEnum|null $navigationGroup = 'Procurement';
 
     protected static ?int $navigationSort = 10;
 
@@ -136,6 +137,7 @@ class VendorResource extends Resource
                     ->options(['active' => 'Active', 'inactive' => 'Inactive', 'blocked' => 'Blocked']),
             ])
             ->actions([
+                ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),
             ])
@@ -149,6 +151,7 @@ class VendorResource extends Resource
         return [
             'index'  => Pages\ListVendors::route('/'),
             'create' => Pages\CreateVendor::route('/create'),
+            'view'   => Pages\ViewVendor::route('/{record}'),
             'edit'   => Pages\EditVendor::route('/{record}/edit'),
         ];
     }

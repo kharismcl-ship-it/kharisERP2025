@@ -9,6 +9,7 @@ use Filament\Resources\Pages\ViewRecord;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Modules\ProcurementInventory\Filament\Resources\GoodsReceiptResource;
 use Modules\ProcurementInventory\Filament\Resources\PurchaseOrderResource;
 use Modules\ProcurementInventory\Models\PurchaseOrder;
 use Modules\ProcurementInventory\Services\ProcurementService;
@@ -125,6 +126,13 @@ class ViewPurchaseOrder extends ViewRecord
                         Notification::make()->title($e->getMessage())->danger()->send();
                     }
                 }),
+
+            \Filament\Actions\Action::make('receive_goods')
+                ->label('Receive Goods')
+                ->icon('heroicon-o-archive-box-arrow-down')
+                ->color('success')
+                ->visible(fn () => in_array($this->record->status, ['ordered', 'partially_received']))
+                ->url(fn () => GoodsReceiptResource::getUrl('create', ['purchase_order_id' => $this->record->id])),
         ];
     }
 }
