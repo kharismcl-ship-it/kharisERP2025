@@ -4,6 +4,7 @@ namespace Modules\Farms\Filament;
 
 use Filament\Contracts\Plugin;
 use Filament\Panel;
+use Modules\Farms\Filament\Pages\FarmDashboard;
 use Modules\Farms\Filament\Resources\CropActivityResource;
 use Modules\Farms\Filament\Resources\CropCycleResource;
 use Modules\Farms\Filament\Resources\CropScoutingResource;
@@ -40,7 +41,10 @@ class FarmsFilamentPlugin implements Plugin
         ]);
     }
 
-    public function boot(Panel $panel): void {}
+    public function boot(Panel $panel): void
+    {
+        $panel->pages([FarmDashboard::class]);
+    }
 
     public static function make(): static
     {

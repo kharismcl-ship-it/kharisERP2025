@@ -114,7 +114,10 @@ class FarmsServiceProvider extends ServiceProvider
      */
     protected function registerCommands(): void
     {
-        // $this->commands([]);
+        $this->commands([
+            \Modules\Farms\Console\Commands\FarmsHarvestDueAlertCommand::class,
+            \Modules\Farms\Console\Commands\FarmsLivestockHealthReminderCommand::class,
+        ]);
     }
 
     /**
@@ -122,10 +125,13 @@ class FarmsServiceProvider extends ServiceProvider
      */
     protected function registerCommandSchedules(): void
     {
-        // $this->app->booted(function () {
-        //     $schedule = $this->app->make(Schedule::class);
-        //     $schedule->command('inspire')->hourly();
-        // });
+        $this->app->booted(function () {
+            $schedule = $this->app->make(\Illuminate\Console\Scheduling\Schedule::class);
+            // Run harvest due alerts daily at 7am
+            $schedule->command('farms:harvest-due-alerts')->dailyAt('07:00');
+            // Run livestock health reminders daily at 7:30am
+            $schedule->command('farms:livestock-health-reminders')->dailyAt('07:30');
+        });
     }
 
     /**

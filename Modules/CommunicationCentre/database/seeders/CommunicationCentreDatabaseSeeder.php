@@ -20,6 +20,7 @@ class CommunicationCentreDatabaseSeeder extends Seeder
             FinanceCommTemplateSeeder::class,
             ProcurementCommTemplateSeeder::class,
             FleetCommTemplateSeeder::class,
+            \Modules\Farms\Database\Seeders\FarmsCommTemplateSeeder::class,
             CommPreferenceSeeder::class,
         ]);
     }
