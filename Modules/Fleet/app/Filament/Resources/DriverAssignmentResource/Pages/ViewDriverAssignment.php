@@ -55,10 +55,16 @@ class ViewDriverAssignment extends ViewRecord
                         ->badge()
                         ->color('gray'),
 
-                    TextEntry::make('user.name')
-                        ->label('Assigned Driver')
-                        ->weight('bold')
-                        ->icon('heroicon-o-user'),
+                    TextEntry::make('vehicle.status')
+                        ->label('Vehicle Status')
+                        ->badge()
+                        ->color(fn (string $state): string => match ($state) {
+                            'active'            => 'success',
+                            'inactive'          => 'gray',
+                            'under_maintenance' => 'warning',
+                            'retired'           => 'danger',
+                            default             => 'gray',
+                        }),
 
                     TextEntry::make('assigned_from')
                         ->label('Assigned From')
@@ -74,25 +80,72 @@ class ViewDriverAssignment extends ViewRecord
                         ->boolean(),
                 ]),
 
-            Section::make('Status')
+            Section::make('Driver — HR Record')
+                ->description('Linked HR employee details')
+                ->columns(3)
+                ->schema([
+                    TextEntry::make('employee.full_name')
+                        ->label('Employee Name')
+                        ->weight('bold')
+                        ->icon('heroicon-o-user')
+                        ->placeholder('No HR employee linked'),
+
+                    TextEntry::make('employee.employee_code')
+                        ->label('Employee Code')
+                        ->badge()
+                        ->color('gray')
+                        ->placeholder('—'),
+
+                    TextEntry::make('employee.department.name')
+                        ->label('Department')
+                        ->placeholder('—'),
+
+                    TextEntry::make('employee.jobPosition.title')
+                        ->label('Job Position')
+                        ->placeholder('—'),
+
+                    TextEntry::make('employee.phone')
+                        ->label('Phone')
+                        ->placeholder('—'),
+
+                    TextEntry::make('on_leave_status')
+                        ->label('Leave Status')
+                        ->getStateUsing(function ($record) {
+                            if (! $record->employee_id) {
+                                return 'No HR link';
+                            }
+                            if (! class_exists(\Modules\HR\Models\LeaveRequest::class)) {
+                                return 'HR module unavailable';
+                            }
+                            $onLeave = \Modules\HR\Models\LeaveRequest::where('employee_id', $record->employee_id)
+                                ->where('status', 'approved')
+                                ->where('start_date', '<=', now()->toDateString())
+                                ->where('end_date', '>=', now()->toDateString())
+                                ->exists();
+
+                            return $onLeave ? 'Currently on Leave' : 'Available';
+                        })
+                        ->badge()
+                        ->color(fn (string $state): string => match ($state) {
+                            'Currently on Leave' => 'danger',
+                            'Available'          => 'success',
+                            default              => 'gray',
+                        }),
+                ]),
+
+            Section::make('System Access')
                 ->columns(2)
                 ->schema([
+                    TextEntry::make('user.name')
+                        ->label('System User')
+                        ->icon('heroicon-o-computer-desktop')
+                        ->placeholder('No system account linked'),
+
                     TextEntry::make('is_active')
                         ->label('Assignment Status')
                         ->getStateUsing(fn ($record) => $record->is_active ? 'Active' : 'Ended')
                         ->badge()
                         ->color(fn (string $state): string => $state === 'Active' ? 'success' : 'danger'),
-
-                    TextEntry::make('vehicle.status')
-                        ->label('Vehicle Status')
-                        ->badge()
-                        ->color(fn (string $state): string => match ($state) {
-                            'active'            => 'success',
-                            'inactive'          => 'gray',
-                            'under_maintenance' => 'warning',
-                            'retired'           => 'danger',
-                            default             => 'gray',
-                        }),
                 ]),
 
             Section::make('Notes')

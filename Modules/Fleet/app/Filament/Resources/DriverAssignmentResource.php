@@ -34,8 +34,8 @@ class DriverAssignmentResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
-            Section::make('Assignment Details')
-                ->description('Link a driver to a vehicle for a specified period')
+            Section::make('Vehicle & Driver')
+                ->description('Select the vehicle and link to an HR employee or system user')
                 ->columns(2)
                 ->schema([
                     Select::make('vehicle_id')
@@ -44,12 +44,34 @@ class DriverAssignmentResource extends Resource
                         ->searchable()
                         ->preload()
                         ->required(),
+
+                    Select::make('employee_id')
+                        ->label('Driver (HR Employee)')
+                        ->relationship('employee', 'full_name')
+                        ->searchable()
+                        ->preload()
+                        ->nullable()
+                        ->helperText('Link to the HR employee record for leave and document checks'),
+
                     Select::make('user_id')
-                        ->label('Driver')
+                        ->label('System User Account')
                         ->relationship('user', 'name')
                         ->searchable()
                         ->preload()
-                        ->required(),
+                        ->nullable()
+                        ->helperText('Required for system login access'),
+
+                    Toggle::make('is_primary')
+                        ->label('Primary Driver')
+                        ->default(true)
+                        ->inline(false)
+                        ->helperText('Mark as the vehicle\'s primary assigned driver'),
+                ]),
+
+            Section::make('Assignment Period')
+                ->description('Set the duration of this assignment')
+                ->columns(2)
+                ->schema([
                     DatePicker::make('assigned_from')
                         ->label('Assigned From')
                         ->required()
@@ -59,11 +81,6 @@ class DriverAssignmentResource extends Resource
                         ->nullable()
                         ->displayFormat('d M Y')
                         ->helperText('Leave blank if the assignment is ongoing'),
-                    Toggle::make('is_primary')
-                        ->label('Primary Driver')
-                        ->default(true)
-                        ->inline(false)
-                        ->helperText('Mark as the vehicle\'s primary assigned driver'),
                 ]),
 
             Section::make('Notes')
@@ -80,7 +97,8 @@ class DriverAssignmentResource extends Resource
             ->columns([
                 TextColumn::make('vehicle.name')->label('Vehicle')->searchable()->sortable(),
                 TextColumn::make('vehicle.plate')->label('Plate'),
-                TextColumn::make('user.name')->label('Driver')->searchable(),
+                TextColumn::make('employee.full_name')->label('HR Employee')->searchable()->placeholder('—'),
+                TextColumn::make('user.name')->label('System User')->placeholder('—'),
                 TextColumn::make('assigned_from')->date()->sortable(),
                 TextColumn::make('assigned_until')->date()->label('Until')->placeholder('Ongoing'),
                 IconColumn::make('is_primary')->label('Primary')->boolean(),

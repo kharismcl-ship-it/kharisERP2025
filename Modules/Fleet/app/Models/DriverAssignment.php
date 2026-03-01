@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\Company;
 use App\Models\User;
+use Modules\HR\Models\Employee;
 
 class DriverAssignment extends Model
 {
@@ -39,6 +40,11 @@ class DriverAssignment extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function employee(): BelongsTo
+    {
+        return $this->belongsTo(Employee::class);
     }
 
     public function getIsActiveAttribute(): bool

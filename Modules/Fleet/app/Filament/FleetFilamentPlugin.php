@@ -9,6 +9,7 @@ use Modules\Fleet\Filament\Resources\DriverAssignmentResource;
 use Modules\Fleet\Filament\Resources\FuelLogResource;
 use Modules\Fleet\Filament\Resources\MaintenanceRecordResource;
 use Modules\Fleet\Filament\Resources\TripLogResource;
+use Modules\Fleet\Filament\Resources\VehicleDocumentResource;
 use Modules\Fleet\Filament\Resources\VehicleResource;
 
 class FleetFilamentPlugin implements Plugin
@@ -26,6 +27,7 @@ class FleetFilamentPlugin implements Plugin
             ])
             ->resources([
                 VehicleResource::class,
+                VehicleDocumentResource::class,
                 MaintenanceRecordResource::class,
                 FuelLogResource::class,
                 TripLogResource::class,
