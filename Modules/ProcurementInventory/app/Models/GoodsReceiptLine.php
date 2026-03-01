@@ -18,6 +18,8 @@ class GoodsReceiptLine extends Model
         'item_id',
         'quantity_ordered',
         'quantity_received',
+        'quantity_rejected',
+        'rejection_reason',
         'unit_of_measure',
         'unit_price',
         'notes',
@@ -26,6 +28,7 @@ class GoodsReceiptLine extends Model
     protected $casts = [
         'quantity_ordered'  => 'decimal:4',
         'quantity_received' => 'decimal:4',
+        'quantity_rejected' => 'decimal:4',
         'unit_price'        => 'decimal:4',
     ];
 

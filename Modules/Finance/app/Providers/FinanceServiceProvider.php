@@ -45,6 +45,7 @@ class FinanceServiceProvider extends ServiceProvider
         $this->app->register(EventServiceProvider::class);
         $this->app->register(RouteServiceProvider::class);
         $this->app->register(FinanceIntegrationServiceProvider::class);
+        $this->app->singleton(\Modules\Finance\Services\ThreeWayMatchService::class);
     }
 
     /**

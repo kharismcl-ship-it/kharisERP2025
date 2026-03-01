@@ -35,6 +35,7 @@ class EventServiceProvider extends ServiceProvider
         ],
         \Modules\ProcurementInventory\Events\GoodsReceived::class => [
             \Modules\Finance\Listeners\ProcurementInventory\PostInventoryOnGoodsReceived::class,
+            \Modules\Finance\Listeners\RunThreeWayMatchOnGoodsReceived::class,
         ],
     ];
 
