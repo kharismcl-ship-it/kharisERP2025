@@ -27,8 +27,6 @@ class BookingChargeSeeder extends Seeder
             $feeTypes = FeeType::all();
         }
 
-        $statuses = ['pending', 'billed', 'paid', 'waived'];
-
         foreach ($bookings as $booking) {
             // Add 2-5 random charges per booking
             $chargeCount = rand(2, 5);
@@ -39,15 +37,12 @@ class BookingChargeSeeder extends Seeder
 
                 foreach ($selectedFeeTypes as $feeType) {
                     BookingCharge::create([
-                        'booking_id' => $booking->id,
+                        'booking_id'  => $booking->id,
                         'fee_type_id' => $feeType->id,
-                        'amount' => $feeType->amount,
-                        'quantity' => 1,
-                        'total_amount' => $feeType->amount,
-                        'status' => $statuses[array_rand($statuses)],
+                        'unit_price'  => $feeType->default_amount,
+                        'quantity'    => 1,
+                        'amount'      => $feeType->default_amount,
                         'description' => $feeType->name.' for booking '.$booking->booking_reference,
-                        'billing_date' => now()->subDays(rand(1, 30)),
-                        'due_date' => now()->addDays(rand(1, 30)),
                     ]);
                 }
             }

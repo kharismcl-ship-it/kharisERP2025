@@ -15,6 +15,11 @@ class BookingSeeder extends Seeder
      */
     public function run(): void
     {
+        // Skip if bookings already exist (idempotent)
+        if (Booking::exists()) {
+            return;
+        }
+
         $occupants = HostelOccupant::all();
         if ($occupants->isEmpty()) {
             $this->call(HostelOccupantSeeder::class);

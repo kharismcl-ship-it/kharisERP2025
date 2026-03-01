@@ -8,14 +8,18 @@ use Modules\Hostels\Enums\MaintenancePriority;
 use Modules\Hostels\Enums\MaintenanceStatus;
 use Modules\Hostels\Models\Bed;
 use Modules\Hostels\Models\Hostel;
+use Modules\Hostels\Models\HostelOccupant;
 use Modules\Hostels\Models\MaintenanceRequest;
 use Modules\Hostels\Models\Room;
-use Modules\Hostels\Models\Tenant;
 
 class MaintenanceRequestSeeder extends Seeder
 {
     public function run(): void
     {
+        if (MaintenanceRequest::exists()) {
+            return;
+        }
+
         $hostels = Hostel::all();
 
         if ($hostels->isEmpty()) {
@@ -23,29 +27,18 @@ class MaintenanceRequestSeeder extends Seeder
             $hostels = Hostel::all();
         }
 
-        $rooms = Room::all();
+        $rooms = Room::limit(20)->get();
         if ($rooms->isEmpty()) {
-            $this->call(RoomSeeder::class);
-            $rooms = Room::all();
+            return;
         }
 
-        $beds = Bed::all();
-        if ($beds->isEmpty()) {
-            $this->call(BedSeeder::class);
-            $beds = Bed::all();
-        }
+        $beds = Bed::whereIn('room_id', $rooms->pluck('id'))->limit(50)->get();
 
-        $tenants = Tenant::all();
-        if ($tenants->isEmpty()) {
-            $this->call(TenantSeeder::class);
-            $tenants = Tenant::all();
-        }
+        $tenants = HostelOccupant::limit(20)->get();
 
-        $users = User::whereIn('role', ['admin', 'manager', 'supervisor', 'maintenance'])->get();
+        $users = User::limit(5)->get();
         if ($users->isEmpty()) {
-            $users = User::factory()->count(5)->create([
-                'role' => 'maintenance',
-            ]);
+            return;
         }
 
         $maintenanceIssues = [
@@ -74,18 +67,25 @@ class MaintenanceRequestSeeder extends Seeder
 
         foreach ($hostels as $hostel) {
             $hostelRooms = $rooms->where('hostel_id', $hostel->id);
+            if ($hostelRooms->isEmpty()) {
+                continue;
+            }
             $hostelBeds = $beds->whereIn('room_id', $hostelRooms->pluck('id'));
-            $hostelTenants = $tenants->whereIn('bed_id', $hostelBeds->pluck('id'));
+            $hostelOccupants = $tenants->where('hostel_id', $hostel->id);
 
-            $requestsPerHostel = rand(10, 30);
+            $requestsPerHostel = rand(5, 10);
 
             for ($i = 0; $i < $requestsPerHostel; $i++) {
                 $category = array_rand($maintenanceIssues);
                 $issue = $maintenanceIssues[$category][array_rand($maintenanceIssues[$category])];
 
-                $room = $hostelRooms->random();
-                $bed = $hostelBeds->where('room_id', $room->id)->random();
-                $tenant = $hostelTenants->where('bed_id', $bed->id)->first();
+                $room         = $hostelRooms->random();
+                $bedsForRoom  = $hostelBeds->where('room_id', $room->id);
+                if ($bedsForRoom->isEmpty()) {
+                    continue;
+                }
+                $bed = $bedsForRoom->random();
+                $tenant = $hostelOccupants->isNotEmpty() ? $hostelOccupants->random() : null;
 
                 $status = $this->getWeightedStatus($statusWeights);
                 $priority = $this->getWeightedStatus($priorityWeights);
@@ -94,7 +94,7 @@ class MaintenanceRequestSeeder extends Seeder
                     'hostel_id' => $hostel->id,
                     'room_id' => $room->id,
                     'bed_id' => $bed->id,
-                    'reported_by_tenant_id' => $tenant?->id,
+                    'reported_by_hostel_occupant_id' => $tenant?->id,
                     'reported_by_user_id' => $users->random()->id,
                     'title' => $issue,
                     'description' => $this->generateDescription($category, $issue, $room->room_number),

@@ -20,23 +20,19 @@ class HostelBillingRuleSeeder extends Seeder
             $hostels = Hostel::all();
         }
 
-        $ruleTypes = ['room_rate', 'utility_charge', 'service_fee', 'penalty', 'discount'];
-        $calculationMethods = ['fixed', 'percentage', 'per_day', 'per_person'];
-        $statuses = ['active', 'inactive'];
+        $ruleTypes = ['late_fee', 'damage_charge', 'service_fee', 'penalty', 'discount'];
+        $calculationMethods = ['fixed', 'percentage', 'per_day', 'per_unit'];
 
         foreach ($hostels as $hostel) {
             foreach ($ruleTypes as $ruleType) {
                 HostelBillingRule::create([
                     'hostel_id' => $hostel->id,
                     'name' => ucfirst(str_replace('_', ' ', $ruleType)).' Rule',
-                    'type' => $ruleType,
+                    'rule_type' => $ruleType,
                     'calculation_method' => $calculationMethods[array_rand($calculationMethods)],
                     'amount' => rand(10, 500),
                     'is_active' => true,
                     'description' => 'Billing rule for '.$ruleType.' at '.$hostel->name,
-                    'applicable_from' => now()->subMonths(rand(1, 6)),
-                    'applicable_to' => now()->addMonths(rand(6, 12)),
-                    'priority' => rand(1, 10),
                 ]);
             }
         }

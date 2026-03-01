@@ -14,6 +14,10 @@ class DepositSeeder extends Seeder
      */
     public function run(): void
     {
+        if (! \Illuminate\Support\Facades\Schema::hasTable('hostel_deposits')) {
+            return;
+        }
+
         $bookings = Booking::all();
 
         if ($bookings->isEmpty()) {
@@ -40,13 +44,13 @@ class DepositSeeder extends Seeder
 
                 Deposit::create([
                     'hostel_id' => $hostel->id,
-                    'tenant_id' => $booking->tenant_id,
+                    'hostel_occupant_id' => $booking->hostel_occupant_id,
                     'booking_id' => $booking->id,
                     'amount' => $depositAmount,
                     'deposit_type' => $depositTypes[array_rand($depositTypes)],
                     'status' => $statuses[array_rand($statuses)],
                     'collected_date' => now()->subDays(rand(1, 30)),
-                    'refund_date' => rand(0, 1) ? now()->subDays(rand(1, 15)) : null,
+                    'refunded_date' => rand(0, 1) ? now()->subDays(rand(1, 15)) : null,
                     'refund_amount' => rand(0, 1) ? $depositAmount * (rand(50, 100) / 100) : 0,
                     'deductions' => rand(0, 1) ? ['cleaning' => 50, 'damages' => 100] : [],
                     'notes' => 'Deposit for booking '.$booking->booking_reference,

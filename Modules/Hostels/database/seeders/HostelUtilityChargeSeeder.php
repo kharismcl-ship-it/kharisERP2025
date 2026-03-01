@@ -20,25 +20,26 @@ class HostelUtilityChargeSeeder extends Seeder
             $hostels = Hostel::all();
         }
 
-        $utilityTypes = ['electricity', 'water', 'internet', 'gas', 'sewage'];
-        $billingPeriods = ['monthly', 'bimonthly', 'quarterly'];
+        $utilityTypes = ['electricity', 'water', 'internet', 'gas', 'maintenance'];
         $statuses = ['pending', 'billed', 'paid', 'overdue'];
 
         foreach ($hostels as $hostel) {
             foreach ($utilityTypes as $utilityType) {
+                $periodStart = now()->subMonths(rand(1, 12))->startOfMonth();
+                $periodEnd = $periodStart->copy()->endOfMonth();
+                $consumption = rand(100, 1000);
+                $ratePerUnit = rand(1, 10) / 10;
+
                 HostelUtilityCharge::create([
                     'hostel_id' => $hostel->id,
                     'utility_type' => $utilityType,
-                    'billing_period' => $billingPeriods[array_rand($billingPeriods)],
-                    'start_date' => now()->subMonths(rand(1, 12))->startOfMonth(),
-                    'end_date' => now()->subMonths(rand(0, 11))->endOfMonth(),
-                    'consumption' => rand(100, 1000),
-                    'rate' => rand(1, 10) / 10,
-                    'amount' => rand(500, 5000),
+                    'billing_period_start' => $periodStart,
+                    'billing_period_end' => $periodEnd,
+                    'consumption' => $consumption,
+                    'rate_per_unit' => $ratePerUnit,
+                    'total_amount' => round($consumption * $ratePerUnit, 2),
                     'status' => $statuses[array_rand($statuses)],
-                    'due_date' => now()->addDays(rand(1, 30)),
-                    'paid_date' => rand(0, 1) ? now()->subDays(rand(1, 15)) : null,
-                    'notes' => $utilityType.' charges for '.$hostel->name,
+                    'due_date' => $periodEnd->copy()->addDays(rand(7, 30)),
                 ]);
             }
         }

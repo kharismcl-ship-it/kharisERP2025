@@ -20,8 +20,7 @@ class HostelBillingCycleSeeder extends Seeder
             $hostels = Hostel::all();
         }
 
-        $cycleTypes = ['monthly', 'quarterly', 'semester', 'annual'];
-        $statuses = ['active', 'closed', 'pending'];
+        $cycleTypes = ['monthly', 'quarterly', 'semester', 'custom'];
 
         foreach ($hostels as $hostel) {
             for ($i = 1; $i <= 12; $i++) {
@@ -32,14 +31,10 @@ class HostelBillingCycleSeeder extends Seeder
                     'hostel_id' => $hostel->id,
                     'name' => 'Billing Cycle '.$startDate->format('F Y'),
                     'cycle_type' => $cycleTypes[array_rand($cycleTypes)],
-                    'start_date' => $startDate,
-                    'end_date' => $endDate,
-                    'due_date' => $endDate->copy()->addDays(7),
-                    'status' => $statuses[array_rand($statuses)],
-                    'total_amount' => rand(50000, 200000) / 100,
-                    'total_collected' => rand(40000, 180000) / 100,
-                    'total_outstanding' => rand(0, 20000) / 100,
-                    'notes' => 'Billing cycle for '.$startDate->format('F Y').' at '.$hostel->name,
+                    'start_date'   => $startDate,
+                    'end_date'     => $endDate,
+                    'billing_date' => $startDate,
+                    'due_date'     => $endDate->copy()->addDays(7),
                 ]);
             }
         }

@@ -12,7 +12,11 @@ class RoomInventoryAssignmentSeeder extends Seeder
 {
     public function run(): void
     {
-        $rooms = Room::with('hostel')->get();
+        if (! \Illuminate\Support\Facades\Schema::hasTable('hostel_room_inventory_assignments')) {
+            return;
+        }
+
+        $rooms = Room::with('hostel')->limit(20)->get();
 
         if ($rooms->isEmpty()) {
             $this->call(RoomSeeder::class);

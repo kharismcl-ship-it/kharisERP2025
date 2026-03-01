@@ -14,6 +14,10 @@ class RoomSeeder extends Seeder
      */
     public function run(): void
     {
+        if (Room::exists()) {
+            return;
+        }
+
         $hostels = Hostel::all();
 
         if ($hostels->isEmpty()) {

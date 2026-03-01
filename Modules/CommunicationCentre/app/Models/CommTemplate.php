@@ -22,6 +22,7 @@ class CommTemplate extends Model
         'subject',
         'body',
         'description',
+        'variables',
         'is_active',
         'provider_config_id',
         'language',
@@ -31,7 +32,8 @@ class CommTemplate extends Model
      * The attributes that should be cast.
      */
     protected $casts = [
-        'is_active' => 'boolean',
+        'is_active'  => 'boolean',
+        'variables'  => 'array',
     ];
 
     /**

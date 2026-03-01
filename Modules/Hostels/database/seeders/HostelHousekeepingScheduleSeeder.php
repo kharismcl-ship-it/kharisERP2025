@@ -13,101 +13,59 @@ class HostelHousekeepingScheduleSeeder extends Seeder
 {
     public function run(): void
     {
+        if (HostelHousekeepingSchedule::exists()) {
+            return;
+        }
+
         $hostels = Hostel::all();
-
         if ($hostels->isEmpty()) {
-            $this->call(HostelSeeder::class);
-            $hostels = Hostel::all();
+            return;
         }
 
-        // Get rooms for cleaning
-        $rooms = Room::all();
-
-        if ($rooms->isEmpty()) {
-            $this->call(RoomSeeder::class);
-            $rooms = Room::all();
-        }
-
-        // Get housekeeping staff
-        $housekeepingStaff = Employee::whereHas('hostelAssignments', function ($query) {
-            $query->whereHas('role', function ($roleQuery) {
-                $roleQuery->where('slug', 'like', '%housekeeper%')
-                    ->orWhere('name', 'like', '%housekeeping%');
-            });
-        })->get();
-
-        // If no housekeeping staff, get any available employees
-        if ($housekeepingStaff->isEmpty()) {
-            $housekeepingStaff = Employee::whereHas('hostelAssignments')->limit(5)->get();
-        }
-
-        if ($housekeepingStaff->isEmpty()) {
-            // Create some basic staff if none exist
-            $this->call(HostelStaffRoleSeeder::class);
-            $housekeepingStaff = Employee::whereHas('hostelAssignments')->limit(5)->get();
+        // Use any available employees (limit to avoid OOM)
+        $staff = Employee::limit(5)->get();
+        if ($staff->isEmpty()) {
+            return;
         }
 
         $cleaningTypes = ['daily', 'deep', 'weekly', 'monthly', 'checkout'];
-        $cleaningWeights = [40, 15, 25, 10, 10]; // Weighted probabilities
-        $statuses = ['pending', 'in_progress', 'completed'];
-        $statusWeights = [30, 20, 50]; // More completed than pending/in-progress
-
-        // Generate schedules for the next 30 days
-        $startDate = Carbon::now();
-        $endDate = Carbon::now()->addDays(30);
+        $statuses     = ['pending', 'in_progress', 'completed'];
+        $startDate    = Carbon::now();
 
         foreach ($hostels as $hostel) {
-            $hostelRooms = $rooms->where('hostel_id', $hostel->id);
-            $hostelStaff = $housekeepingStaff->filter(function ($employee) use ($hostel) {
-                return $employee->hostelAssignments()->where('hostel_id', $hostel->id)->exists();
-            });
-
-            if ($hostelRooms->isEmpty() || $hostelStaff->isEmpty()) {
+            // Load only a small sample of rooms per hostel to avoid OOM
+            $rooms = Room::where('hostel_id', $hostel->id)->limit(10)->get();
+            if ($rooms->isEmpty()) {
                 continue;
             }
 
-            $currentDate = $startDate->copy();
+            // Generate 7 days of schedules
+            for ($day = 0; $day < 7; $day++) {
+                $currentDate = $startDate->copy()->addDays($day);
 
-            while ($currentDate <= $endDate) {
-                // Skip weekends for most cleaning types
-                if ($currentDate->isWeekend() && rand(1, 10) > 2) { // 20% chance of weekend cleaning
-                    $currentDate->addDay();
-
-                    continue;
-                }
-
-                // Determine how many rooms to clean today (1-5 rooms per day)
-                $roomsToClean = $hostelRooms->random(min(5, $hostelRooms->count()));
-
-                foreach ($roomsToClean as $room) {
-                    $cleaningType = $this->getWeightedRandomType($cleaningTypes, $cleaningWeights);
-                    $status = $this->getWeightedRandomStatus($statuses, $statusWeights);
-                    $assignedStaff = $hostelStaff->random();
-
+                foreach ($rooms->random(min(3, $rooms->count())) as $room) {
+                    $status       = $statuses[array_rand($statuses)];
+                    $cleaningType = $cleaningTypes[array_rand($cleaningTypes)];
                     $scheduleData = [
-                        'hostel_id' => $hostel->id,
-                        'room_id' => $room->id,
-                        'assigned_employee_id' => $assignedStaff->id,
-                        'schedule_date' => $currentDate->toDateString(),
-                        'cleaning_type' => $cleaningType,
-                        'status' => $status,
-                        'quality_score' => null,
-                        'notes' => $this->generateCleaningNotes($cleaningType),
+                        'hostel_id'            => $hostel->id,
+                        'room_id'              => $room->id,
+                        'assigned_employee_id' => $staff->random()->id,
+                        'schedule_date'        => $currentDate->toDateString(),
+                        'cleaning_type'        => $cleaningType,
+                        'status'               => $status,
+                        'notes'                => $this->generateCleaningNotes($cleaningType),
                     ];
 
-                    // Add timestamps for in-progress and completed statuses
                     if ($status === 'in_progress') {
-                        $scheduleData['started_at'] = $currentDate->copy()->setTime(rand(8, 10), rand(0, 59));
+                        $scheduleData['started_at'] = $currentDate->copy()->setTime(8, 0);
                     } elseif ($status === 'completed') {
-                        $scheduleData['started_at'] = $currentDate->copy()->setTime(rand(8, 10), rand(0, 59));
-                        $scheduleData['completed_at'] = $scheduleData['started_at']->copy()->addHours(rand(1, 3));
-                        $scheduleData['quality_score'] = rand(80, 100); // Quality score 80-100%
+                        $scheduleData['started_at']   = $currentDate->copy()->setTime(8, 0);
+                        $scheduleData['completed_at'] = $currentDate->copy()->setTime(11, 0);
+                        $scheduleData['quality_score'] = rand(80, 100);
                     }
 
                     HostelHousekeepingSchedule::create($scheduleData);
                 }
-
-                $currentDate->addDay();
             }
         }
     }

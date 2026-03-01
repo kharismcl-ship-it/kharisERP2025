@@ -19,18 +19,11 @@ class HostelStaffAttendanceSeeder extends Seeder
             $hostels = Hostel::all();
         }
 
-        // Get employees assigned to hostels
-        $employees = Employee::whereHas('hostelAssignments')->get();
+        // Get any employees (hostelAssignments relationship doesn't exist on Employee)
+        $employees = Employee::limit(10)->get();
 
         if ($employees->isEmpty()) {
-            $this->call(HostelStaffRoleSeeder::class);
-            $employees = Employee::whereHas('hostelAssignments')->get();
-
-            // If still empty, create some basic assignments
-            if ($employees->isEmpty()) {
-                $this->createBasicStaffAssignments($hostels);
-                $employees = Employee::whereHas('hostelAssignments')->get();
-            }
+            return;
         }
 
         // Generate attendance for the last 30 days
@@ -63,7 +56,6 @@ class HostelStaffAttendanceSeeder extends Seeder
                     $status = $this->getWeightedRandomStatus($attendanceStatuses, $attendanceWeights);
 
                     $attendanceData = [
-                        'tenant_id' => $hostel->tenant_id,
                         'hostel_id' => $hostel->id,
                         'employee_id' => $employee->id,
                         'attendance_date' => $currentDate->toDateString(),
@@ -155,13 +147,12 @@ class HostelStaffAttendanceSeeder extends Seeder
             foreach ($employees as $employee) {
                 // Create a basic staff assignment
                 \Modules\Hostels\Models\HostelStaffRoleAssignment::create([
-                    'tenant_id' => $hostel->tenant_id,
                     'hostel_id' => $hostel->id,
                     'employee_id' => $employee->id,
                     'role_id' => \Modules\Hostels\Models\HostelStaffRole::firstOrCreate([
-                        'tenant_id' => $hostel->tenant_id,
                         'name' => 'General Staff',
                         'slug' => 'general-staff',
+                    ], [
                         'description' => 'General hostel staff member',
                         'permissions' => ['view_basic_info'],
                         'base_salary' => 150000, // 1,500 GHS

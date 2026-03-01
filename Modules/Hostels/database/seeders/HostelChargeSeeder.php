@@ -4,7 +4,7 @@ namespace Modules\Hostels\Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Modules\Hostels\Models\Hostel;
-use Modules\Hostels\Models\HostelFeeSetting;
+use Modules\Hostels\Models\HostelCharge;
 
 class HostelChargeSeeder extends Seeder
 {
@@ -24,7 +24,7 @@ class HostelChargeSeeder extends Seeder
 
         foreach ($hostels as $hostel) {
             // Create a few different types of charges
-            HostelFeeSetting::create([
+            HostelCharge::create([
                 'hostel_id' => $hostel->id,
                 'name' => 'Electricity Charge',
                 'charge_type' => 'recurring',
@@ -32,7 +32,7 @@ class HostelChargeSeeder extends Seeder
                 'is_active' => true,
             ]);
 
-            HostelFeeSetting::create([
+            HostelCharge::create([
                 'hostel_id' => $hostel->id,
                 'name' => 'Water Charge',
                 'charge_type' => 'recurring',
@@ -40,7 +40,7 @@ class HostelChargeSeeder extends Seeder
                 'is_active' => true,
             ]);
 
-            HostelFeeSetting::create([
+            HostelCharge::create([
                 'hostel_id' => $hostel->id,
                 'name' => 'Maintenance Fee',
                 'charge_type' => 'one_time',

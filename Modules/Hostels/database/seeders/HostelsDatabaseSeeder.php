@@ -37,12 +37,6 @@ class HostelsDatabaseSeeder extends Seeder
             MaintenanceRequestSeeder::class,
             MaintenanceRecordSeeder::class,
             IncidentSeeder::class,
-            VisitorLogSeeder::class,
-            TenantDocumentSeeder::class,
-            HostelWhatsAppGroupSeeder::class,
-            WhatsAppGroupMessageSeeder::class,
-            PricingPolicySeeder::class,
-            BookingChangeRequestSeeder::class,
         ]);
     }
 }

@@ -13,6 +13,10 @@ class BedSeeder extends Seeder
      */
     public function run(): void
     {
+        if (Bed::exists()) {
+            return;
+        }
+
         $rooms = Room::all();
 
         if ($rooms->isEmpty()) {

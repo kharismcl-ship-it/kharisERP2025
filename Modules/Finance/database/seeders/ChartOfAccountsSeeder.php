@@ -2,6 +2,7 @@
 
 namespace Modules\Finance\Database\Seeders;
 
+use App\Models\Company;
 use Illuminate\Database\Seeder;
 use Modules\Finance\Models\Account;
 
@@ -80,23 +81,24 @@ class ChartOfAccountsSeeder extends Seeder
             ['code' => '5900', 'name' => 'Other Expenses',             'type' => 'expense',   'parent_code' => '5000'],
         ];
 
-        // Build a code→id map as we insert, so children can reference parents
-        $codeToId = [];
+        foreach (Company::all() as $company) {
+            // Build a code→id map per company so children can reference parents
+            $codeToId = [];
 
-        foreach ($accounts as $data) {
-            $parentId = $data['parent_code'] ? ($codeToId[$data['parent_code']] ?? null) : null;
+            foreach ($accounts as $data) {
+                $parentId = $data['parent_code'] ? ($codeToId[$data['parent_code']] ?? null) : null;
 
-            $account = Account::firstOrCreate(
-                ['code' => $data['code']],
-                [
-                    'name'      => $data['name'],
-                    'type'      => $data['type'],
-                    'parent_id' => $parentId,
-                    'company_id' => null, // system-level accounts; company-specific ones are created separately
-                ]
-            );
+                $account = Account::firstOrCreate(
+                    ['company_id' => $company->id, 'code' => $data['code']],
+                    [
+                        'name'      => $data['name'],
+                        'type'      => $data['type'],
+                        'parent_id' => $parentId,
+                    ]
+                );
 
-            $codeToId[$data['code']] = $account->id;
+                $codeToId[$data['code']] = $account->id;
+            }
         }
     }
 }

@@ -3,7 +3,6 @@
 namespace Modules\Hostels\Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Modules\Hostels\Models\Hostel;
 use Modules\Hostels\Models\HostelStaffRole;
 
 class HostelStaffRoleSeeder extends Seeder
@@ -13,13 +12,6 @@ class HostelStaffRoleSeeder extends Seeder
      */
     public function run(): void
     {
-        $hostels = Hostel::all();
-
-        if ($hostels->isEmpty()) {
-            $this->call(HostelSeeder::class);
-            $hostels = Hostel::all();
-        }
-
         $staffRoles = [
             ['Warden', 'Overall hostel management and supervision'],
             ['Assistant Warden', 'Assists warden in daily operations'],
@@ -33,16 +25,17 @@ class HostelStaffRoleSeeder extends Seeder
             ['IT Support', 'Technical support and network maintenance'],
         ];
 
-        foreach ($hostels as $hostel) {
-            foreach ($staffRoles as $role) {
-                HostelStaffRole::create([
-                    'hostel_id' => $hostel->id,
+        foreach ($staffRoles as $role) {
+            $slug = strtolower(str_replace([' ', '/'], ['-', '-'], $role[0]));
+            HostelStaffRole::firstOrCreate(
+                ['slug' => $slug],
+                [
                     'name' => $role[0],
                     'description' => $role[1],
                     'is_active' => true,
                     'permissions' => $this->getPermissionsForRole($role[0]),
-                ]);
-            }
+                ]
+            );
         }
     }
 

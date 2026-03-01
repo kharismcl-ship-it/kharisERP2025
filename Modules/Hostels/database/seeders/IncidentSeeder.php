@@ -5,38 +5,28 @@ namespace Modules\Hostels\Database\Seeders;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Modules\Hostels\Models\Hostel;
+use Modules\Hostels\Models\HostelOccupant;
 use Modules\Hostels\Models\Incident;
 use Modules\Hostels\Models\Room;
-use Modules\Hostels\Models\Tenant;
 
 class IncidentSeeder extends Seeder
 {
     public function run(): void
     {
+        if (Incident::exists()) {
+            return;
+        }
+
         $hostels = Hostel::all();
-
         if ($hostels->isEmpty()) {
-            $this->call(HostelSeeder::class);
-            $hostels = Hostel::all();
+            return;
         }
 
-        $rooms = Room::all();
-        if ($rooms->isEmpty()) {
-            $this->call(RoomSeeder::class);
-            $rooms = Room::all();
-        }
-
-        $tenants = Tenant::all();
-        if ($tenants->isEmpty()) {
-            $this->call(TenantSeeder::class);
-            $tenants = Tenant::all();
-        }
-
-        $users = User::whereIn('role', ['admin', 'manager', 'supervisor', 'security'])->get();
+        $rooms   = Room::limit(20)->get();
+        $tenants = HostelOccupant::limit(20)->get();
+        $users   = User::limit(5)->get();
         if ($users->isEmpty()) {
-            $users = User::factory()->count(4)->create([
-                'role' => 'security',
-            ]);
+            return;
         }
 
         $incidentTypes = [
@@ -85,18 +75,16 @@ class IncidentSeeder extends Seeder
         ];
 
         $severityLevels = [
-            'low' => 40,
-            'medium' => 35,
-            'high' => 20,
+            'minor' => 40,
+            'major'  => 35,
+            'critical' => 20,
             'critical' => 5,
         ];
 
         $statusTypes = [
-            'reported' => 25,
-            'under_investigation' => 20,
-            'in_progress' => 15,
-            'resolved' => 35,
-            'closed' => 5,
+            'open'      => 45,
+            'escalated' => 20,
+            'resolved'  => 35,
         ];
 
         $actionsTaken = [
@@ -146,9 +134,12 @@ class IncidentSeeder extends Seeder
 
         foreach ($hostels as $hostel) {
             $hostelRooms = $rooms->where('hostel_id', $hostel->id);
-            $hostelTenants = $tenants->whereIn('bed_id', $hostelRooms->pluck('id'));
+            if ($hostelRooms->isEmpty()) {
+                continue;
+            }
+            $hostelOccupants = $tenants->where('hostel_id', $hostel->id);
 
-            $incidentsPerHostel = rand(8, 25);
+            $incidentsPerHostel = rand(3, 8);
 
             for ($i = 0; $i < $incidentsPerHostel; $i++) {
                 $type = array_rand($incidentTypes);
@@ -158,14 +149,14 @@ class IncidentSeeder extends Seeder
                 $status = $this->getWeightedStatus($statusTypes);
 
                 $room = $hostelRooms->random();
-                $tenant = $hostelTenants->where('bed_id', $room->id)->first();
+                $tenant = $hostelOccupants->isNotEmpty() ? $hostelOccupants->random() : null;
                 $reporter = $users->random();
 
                 $actionTaken = $actionsTaken[$type][array_rand($actionsTaken[$type])];
 
                 $incidentData = [
                     'hostel_id' => $hostel->id,
-                    'tenant_id' => $tenant?->id,
+                    'hostel_occupant_id' => $tenant?->id,
                     'room_id' => $room->id,
                     'title' => $specificIssue,
                     'description' => $this->generateIncidentDescription($type, $specificIssue, $room->room_number, $severity),
@@ -176,7 +167,7 @@ class IncidentSeeder extends Seeder
                     'reported_at' => now()->subDays(rand(1, 180)),
                 ];
 
-                if (in_array($status, ['resolved', 'closed'])) {
+                if ($status === 'resolved') {
                     $incidentData['resolved_at'] = now()->subDays(rand(0, 30));
                 }
 
@@ -198,7 +189,7 @@ class IncidentSeeder extends Seeder
             }
         }
 
-        return 'medium';
+        return 'minor';
     }
 
     private function generateIncidentDescription(string $type, string $specificIssue, string $roomNumber, string $severity): string

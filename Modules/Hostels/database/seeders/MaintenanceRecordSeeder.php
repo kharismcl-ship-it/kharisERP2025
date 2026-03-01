@@ -10,16 +10,20 @@ use Modules\Hostels\Enums\MaintenanceStatus;
 use Modules\Hostels\Enums\MaintenanceType;
 use Modules\Hostels\Models\Hostel;
 use Modules\Hostels\Models\HostelInventoryItem;
+use Modules\Hostels\Models\HostelOccupant;
 use Modules\Hostels\Models\MaintenanceRecord;
 use Modules\Hostels\Models\Room;
 use Modules\Hostels\Models\RoomInventoryAssignment;
-use Modules\Hostels\Models\Tenant;
 use Modules\HR\Models\Employee;
 
 class MaintenanceRecordSeeder extends Seeder
 {
     public function run(): void
     {
+        if (!\Schema::hasTable('hostel_maintenance_records')) {
+            return;
+        }
+
         $hostels = Hostel::all();
 
         if ($hostels->isEmpty()) {
@@ -45,10 +49,10 @@ class MaintenanceRecordSeeder extends Seeder
             $roomAssignments = RoomInventoryAssignment::all();
         }
 
-        $tenants = Tenant::all();
+        $tenants = HostelOccupant::all();
         if ($tenants->isEmpty()) {
-            $this->call(TenantSeeder::class);
-            $tenants = Tenant::all();
+            $this->call(HostelOccupantSeeder::class);
+            $tenants = HostelOccupant::all();
         }
 
         $employees = Employee::all();
@@ -115,7 +119,7 @@ class MaintenanceRecordSeeder extends Seeder
             $hostelRooms = $rooms->where('hostel_id', $hostel->id);
             $hostelItems = $inventoryItems->where('hostel_id', $hostel->id);
             $hostelAssignments = $roomAssignments->whereIn('room_id', $hostelRooms->pluck('id'));
-            $hostelTenants = $tenants->whereIn('bed_id', $hostelRooms->pluck('id'));
+            $hostelTenants = $tenants->where('hostel_id', $hostel->id);
 
             $recordsPerHostel = rand(15, 40);
 
@@ -131,7 +135,7 @@ class MaintenanceRecordSeeder extends Seeder
                 $room = $hostelRooms->random();
                 $inventoryItem = $hostelItems->random();
                 $assignment = $hostelAssignments->where('room_id', $room->id)->first();
-                $tenant = $hostelTenants->where('bed_id', $room->id)->first();
+                $tenant = $hostelTenants->isNotEmpty() ? $hostelTenants->random() : null;
                 $employee = $employees->random();
                 $user = $users->random();
 

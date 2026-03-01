@@ -13,6 +13,10 @@ class HostelInventoryTransactionSeeder extends Seeder
 {
     public function run(): void
     {
+        if (HostelInventoryTransaction::exists()) {
+            return;
+        }
+
         $hostels = Hostel::all();
 
         if ($hostels->isEmpty()) {
@@ -26,15 +30,15 @@ class HostelInventoryTransactionSeeder extends Seeder
             $inventoryItems = HostelInventoryItem::all();
         }
 
-        $rooms = Room::all();
+        $rooms = Room::limit(20)->get();
         if ($rooms->isEmpty()) {
             $this->call(RoomSeeder::class);
             $rooms = Room::all();
         }
 
-        $users = User::whereIn('role', ['admin', 'manager', 'supervisor'])->get();
+        $users = User::limit(5)->get();
         if ($users->isEmpty()) {
-            $users = User::factory()->count(3)->create(['role' => 'manager']);
+            return;
         }
 
         $transactionTypes = ['receipt', 'issue', 'adjustment', 'transfer'];

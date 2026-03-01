@@ -10,6 +10,10 @@ class HostelInventoryItemSeeder extends Seeder
 {
     public function run(): void
     {
+        if (HostelInventoryItem::exists()) {
+            return;
+        }
+
         $hostels = Hostel::all();
 
         if ($hostels->isEmpty()) {

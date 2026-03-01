@@ -2,9 +2,11 @@
 
 namespace Modules\Hostels\Database\Seeders;
 
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Modules\Hostels\Models\Hostel;
 use Modules\Hostels\Models\HostelStaffShift;
+use Modules\HR\Models\Employee;
 
 class HostelStaffShiftSeeder extends Seeder
 {
@@ -13,6 +15,10 @@ class HostelStaffShiftSeeder extends Seeder
      */
     public function run(): void
     {
+        if (! \Illuminate\Support\Facades\Schema::hasTable('hostel_shifts')) {
+            return;
+        }
+
         $hostels = Hostel::all();
 
         if ($hostels->isEmpty()) {
@@ -20,23 +26,42 @@ class HostelStaffShiftSeeder extends Seeder
             $hostels = Hostel::all();
         }
 
+        $employees = Employee::whereHas('hostelAssignments')->get();
+        if ($employees->isEmpty()) {
+            $employees = Employee::limit(5)->get();
+        }
+
+        if ($employees->isEmpty()) {
+            return;
+        }
+
         $shiftTypes = ['morning', 'afternoon', 'night', 'general'];
-        $daysOfWeek = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+        $statuses = ['scheduled', 'completed', 'absent'];
+
+        // Generate shifts for the next 7 days
+        $startDate = Carbon::now()->startOfDay();
+        $endDate = Carbon::now()->addDays(6)->endOfDay();
 
         foreach ($hostels as $hostel) {
-            foreach ($shiftTypes as $shiftType) {
-                foreach ($daysOfWeek as $day) {
+            $currentDate = $startDate->copy();
+
+            while ($currentDate <= $endDate) {
+                foreach ($shiftTypes as $shiftType) {
+                    $employee = $employees->random();
+
                     HostelStaffShift::create([
                         'hostel_id' => $hostel->id,
-                        'name' => ucfirst($shiftType).' Shift - '.ucfirst($day),
+                        'employee_id' => $employee->id,
                         'shift_type' => $shiftType,
-                        'day_of_week' => $day,
+                        'shift_date' => $currentDate->toDateString(),
                         'start_time' => $this->getStartTime($shiftType),
                         'end_time' => $this->getEndTime($shiftType),
-                        'is_active' => true,
-                        'description' => ucfirst($shiftType).' shift on '.$day.' for '.$hostel->name,
+                        'status' => $statuses[array_rand($statuses)],
+                        'notes' => ucfirst($shiftType) . ' shift on ' . $currentDate->format('D, d M Y') . ' for ' . $hostel->name,
                     ]);
                 }
+
+                $currentDate->addDay();
             }
         }
     }
