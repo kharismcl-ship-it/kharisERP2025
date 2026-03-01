@@ -105,21 +105,31 @@ class HRFilamentPlugin implements Plugin
         } elseif ($panel->getId() === 'company-admin') {
             $panel->resources([
                 // Core HR (operational)
+                DepartmentResource::class,
+                JobPositionResource::class,
                 EmployeeResource::class,
                 EmployeeSalaryResource::class,
                 EmploymentContractResource::class,
                 EmployeeDocumentResource::class,
-                LeaveRequestResource::class,
-                PerformanceReviewResource::class,
-                AttendanceRecordResource::class,
                 EmployeeCompanyAssignmentResource::class,
                 HostelStaffAssignmentResource::class,
+                SalaryScaleResource::class,
+
+                // Leave
+                LeaveTypeResource::class,
+                LeaveRequestResource::class,
+                LeaveBalanceResource::class,
+                LeaveApprovalWorkflowResource::class,
 
                 // Payroll
                 PayrollRunResource::class,
+                AllowanceTypeResource::class,
+                DeductionTypeResource::class,
+                BenefitTypeResource::class,
 
                 // Workforce
                 ShiftResource::class,
+                PublicHolidayResource::class,
 
                 // Recruitment
                 JobVacancyResource::class,
@@ -133,7 +143,10 @@ class HRFilamentPlugin implements Plugin
                 GrievanceCaseResource::class,
 
                 // Performance
+                PerformanceReviewResource::class,
+                AttendanceRecordResource::class,
                 EmployeeGoalResource::class,
+                KpiDefinitionResource::class,
 
                 // Benefits & Loans
                 EmployeeLoanResource::class,

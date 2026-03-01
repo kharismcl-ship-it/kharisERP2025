@@ -2,11 +2,15 @@
 
 namespace Modules\HR\Filament\Resources;
 
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables;
@@ -18,34 +22,45 @@ class AttendanceRecordResource extends Resource
 {
     protected static ?string $model = AttendanceRecord::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedFingerPrint;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'HR';
+    protected static string|\UnitEnum|null $navigationGroup = 'Workforce';
+
+    protected static ?int $navigationSort = 56;
 
     public static function form(Schema $schema): Schema
     {
         return $schema
             ->components([
-                Forms\Components\Select::make('company_id')
-                    ->relationship('company', 'name')
-                    ->required(),
-                Forms\Components\Select::make('employee_id')
-                    ->relationship('employee', 'full_name')
-                    ->searchable()
-                    ->preload()
-                    ->required(),
-                Forms\Components\DatePicker::make('date')
-                    ->required(),
-                Forms\Components\Select::make('status')
-                    ->options([
-                        'present' => 'Present',
-                        'absent' => 'Absent',
-                        'leave' => 'Leave',
-                        'off' => 'Day Off',
-                    ])
-                    ->required(),
-                Forms\Components\DateTimePicker::make('check_in_time'),
-                Forms\Components\DateTimePicker::make('check_out_time'),
+                Section::make('Record Details')
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\Select::make('company_id')
+                            ->relationship('company', 'name')
+                            ->required(),
+                        Forms\Components\Select::make('employee_id')
+                            ->relationship('employee', 'full_name')
+                            ->searchable()
+                            ->preload()
+                            ->required(),
+                        Forms\Components\DatePicker::make('date')
+                            ->required(),
+                        Forms\Components\Select::make('status')
+                            ->options([
+                                'present' => 'Present',
+                                'absent'  => 'Absent',
+                                'leave'   => 'Leave',
+                                'off'     => 'Day Off',
+                            ])
+                            ->required(),
+                    ]),
+
+                Section::make('Timing')
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\DateTimePicker::make('check_in_time'),
+                        Forms\Components\DateTimePicker::make('check_out_time'),
+                    ]),
             ]);
     }
 
@@ -102,7 +117,11 @@ class AttendanceRecordResource extends Resource
                     }),
             ])
             ->actions([
-                EditAction::make(),
+                ActionGroup::make([
+                    ViewAction::make(),
+                    EditAction::make(),
+                    DeleteAction::make(),
+                ]),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
@@ -123,6 +142,7 @@ class AttendanceRecordResource extends Resource
         return [
             'index' => Pages\ListAttendanceRecords::route('/'),
             'create' => Pages\CreateAttendanceRecord::route('/create'),
+            'view' => Pages\ViewAttendanceRecord::route('/{record}'),
             'edit' => Pages\EditAttendanceRecord::route('/{record}/edit'),
         ];
     }

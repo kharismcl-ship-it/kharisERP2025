@@ -21,10 +21,10 @@ class EmployeesRelationManager extends RelationManager
 
     protected static ?string $title = 'Department Employees';
 
-    public function schema(Schema $schema): Schema
+    public function form(Schema $schema): Schema
     {
         return $schema
-            ->schema([
+            ->components([
                 Forms\Components\Select::make('user_id')
                     ->relationship('user', 'name')
                     ->searchable()

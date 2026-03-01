@@ -22,11 +22,11 @@ class CertificationResource extends Resource
 {
     protected static ?string $model = Certification::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedDocumentCheck;
+    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedAcademicCap;
 
     protected static string|\UnitEnum|null $navigationGroup = 'Learning & Development';
 
-    protected static ?int $navigationSort = 57;
+    protected static ?int $navigationSort = 59;
 
     protected static ?string $navigationLabel = 'Certifications';
 
@@ -107,6 +107,7 @@ class CertificationResource extends Resource
         return [
             'index'  => Pages\ListCertifications::route('/'),
             'create' => Pages\CreateCertification::route('/create'),
+            'view'   => Pages\ViewCertification::route('/{record}'),
             'edit'   => Pages\EditCertification::route('/{record}/edit'),
         ];
     }

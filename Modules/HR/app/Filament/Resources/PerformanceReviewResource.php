@@ -2,11 +2,15 @@
 
 namespace Modules\HR\Filament\Resources;
 
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables;
@@ -18,31 +22,43 @@ class PerformanceReviewResource extends Resource
 {
     protected static ?string $model = PerformanceReview::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedStar;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'HR';
+    protected static string|\UnitEnum|null $navigationGroup = 'Performance';
+
+    protected static ?int $navigationSort = 61;
 
     public static function form(Schema $schema): Schema
     {
         return $schema
             ->components([
-                Forms\Components\Select::make('company_id')
-                    ->relationship('company', 'name')
-                    ->required(),
-                Forms\Components\Select::make('performance_cycle_id')
-                    ->relationship('performanceCycle', 'name')
-                    ->required(),
-                Forms\Components\Select::make('employee_id')
-                    ->relationship('employee', 'first_name')
-                    ->required(),
-                Forms\Components\Select::make('reviewer_employee_id')
-                    ->relationship('reviewer', 'first_name')
-                    ->nullable(),
-                Forms\Components\TextInput::make('rating')
-                    ->numeric()
-                    ->nullable(),
-                Forms\Components\Textarea::make('comments')
-                    ->nullable(),
+                Section::make('Review Details')
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\Select::make('company_id')
+                            ->relationship('company', 'name')
+                            ->required(),
+                        Forms\Components\Select::make('performance_cycle_id')
+                            ->relationship('performanceCycle', 'name')
+                            ->required(),
+                        Forms\Components\Select::make('employee_id')
+                            ->relationship('employee', 'first_name')
+                            ->required(),
+                        Forms\Components\Select::make('reviewer_employee_id')
+                            ->label('Reviewer')
+                            ->relationship('reviewer', 'first_name')
+                            ->nullable(),
+                    ]),
+
+                Section::make('Assessment')
+                    ->columns(1)
+                    ->schema([
+                        Forms\Components\TextInput::make('rating')
+                            ->numeric()
+                            ->nullable(),
+                        Forms\Components\Textarea::make('comments')
+                            ->nullable(),
+                    ]),
             ]);
     }
 
@@ -80,7 +96,11 @@ class PerformanceReviewResource extends Resource
                     ->relationship('employee', 'first_name'),
             ])
             ->actions([
-                EditAction::make(),
+                ActionGroup::make([
+                    ViewAction::make(),
+                    EditAction::make(),
+                    DeleteAction::make(),
+                ]),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
@@ -101,6 +121,7 @@ class PerformanceReviewResource extends Resource
         return [
             'index' => Pages\ListPerformanceReviews::route('/'),
             'create' => Pages\CreatePerformanceReview::route('/create'),
+            'view' => Pages\ViewPerformanceReview::route('/{record}'),
             'edit' => Pages\EditPerformanceReview::route('/{record}/edit'),
         ];
     }

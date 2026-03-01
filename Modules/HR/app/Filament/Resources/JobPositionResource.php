@@ -7,6 +7,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Utilities\Get;
@@ -23,48 +24,59 @@ class JobPositionResource extends Resource
 {
     protected static ?string $model = JobPosition::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedBriefcase;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'HR';
+    protected static string|\UnitEnum|null $navigationGroup = 'Core HR';
+
+    protected static ?int $navigationSort = 12;
+
+    protected static ?string $navigationLabel = 'Job Positions';
 
     public static function form(Schema $schema): Schema
     {
         return $schema
             ->components([
-                Forms\Components\Select::make('company_id')
-                    ->relationship('company', 'name')
-                    ->live()
-                    ->required(),
-                Forms\Components\Select::make('department_id')
-                    ->relationship('department', 'name')
-                    ->options(fn (Get $get) => \Modules\HR\Models\Department::query()
-                        ->when($get('company_id'), fn ($q, $companyId) => $q->where('company_id', $companyId))
-                        ->pluck('name', 'id'))
-                    ->searchable()
-                    ->preload(),
-                Forms\Components\TextInput::make('title')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('code')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\Textarea::make('description')
-                    ->columnSpanFull(),
-                Forms\Components\Select::make('grade')
-                    ->options([
-                        'A' => 'Grade A',
-                        'B' => 'Grade B',
-                        'C' => 'Grade C',
-                        'D' => 'Grade D',
-                        'E' => 'Grade E',
-                        'F' => 'Grade F',
-                    ])
-                    ->required(),
-                Forms\Components\ToggleButtons::make('is_active')
-                    ->boolean()
-                    ->inline()
-                    ->required(),
+                \Filament\Schemas\Components\Section::make('Position Details')
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\Select::make('company_id')
+                            ->relationship('company', 'name')
+                            ->live()
+                            ->required(),
+                        Forms\Components\Select::make('department_id')
+                            ->relationship('department', 'name')
+                            ->options(fn (Get $get) => \Modules\HR\Models\Department::query()
+                                ->when($get('company_id'), fn ($q, $companyId) => $q->where('company_id', $companyId))
+                                ->pluck('name', 'id'))
+                            ->searchable()
+                            ->preload(),
+                        Forms\Components\TextInput::make('title')
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('code')
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\Select::make('grade')
+                            ->options([
+                                'A' => 'Grade A',
+                                'B' => 'Grade B',
+                                'C' => 'Grade C',
+                                'D' => 'Grade D',
+                                'E' => 'Grade E',
+                                'F' => 'Grade F',
+                            ])
+                            ->required(),
+                        Forms\Components\ToggleButtons::make('is_active')
+                            ->boolean()
+                            ->inline()
+                            ->required(),
+                    ]),
 
+                \Filament\Schemas\Components\Section::make('Description')
+                    ->schema([
+                        Forms\Components\Textarea::make('description')
+                            ->columnSpanFull(),
+                    ]),
             ]);
     }
 
@@ -107,6 +119,7 @@ class JobPositionResource extends Resource
             ])
             ->actions([
                 ActionGroup::make([
+                    ViewAction::make(),
                     EditAction::make(),
                     DeleteAction::make(),
                 ]),
@@ -131,6 +144,7 @@ class JobPositionResource extends Resource
         return [
             'index' => Pages\ListJobPositions::route('/'),
             'create' => Pages\CreateJobPosition::route('/create'),
+            'view' => Pages\ViewJobPosition::route('/{record}'),
             'edit' => Pages\EditJobPosition::route('/{record}/edit'),
         ];
     }

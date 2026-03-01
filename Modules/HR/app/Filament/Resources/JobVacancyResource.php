@@ -29,7 +29,7 @@ class JobVacancyResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'Recruitment';
 
-    protected static ?int $navigationSort = 55;
+    protected static ?int $navigationSort = 57;
 
     protected static ?string $navigationLabel = 'Job Vacancies';
 

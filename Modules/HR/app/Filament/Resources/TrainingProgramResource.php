@@ -29,7 +29,7 @@ class TrainingProgramResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'Learning & Development';
 
-    protected static ?int $navigationSort = 56;
+    protected static ?int $navigationSort = 58;
 
     protected static ?string $navigationLabel = 'Training Programs';
 

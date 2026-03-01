@@ -7,6 +7,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables;
@@ -18,34 +19,45 @@ class PerformanceCycleResource extends Resource
 {
     protected static ?string $model = PerformanceCycle::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedArrowPathRoundedSquare;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'HR';
+    protected static string|\UnitEnum|null $navigationGroup = 'Performance';
+
+    protected static ?int $navigationSort = 60;
 
     public static function form(Schema $schema): Schema
     {
         return $schema
             ->components([
-                Forms\Components\Select::make('company_id')
-                    ->relationship('company', 'name')
-                    ->required(),
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\DatePicker::make('start_date')
-                    ->required(),
-                Forms\Components\DatePicker::make('end_date')
-                    ->required(),
-                Forms\Components\Select::make('status')
-                    ->options([
-                        'planned' => 'Planned',
-                        'open' => 'Open',
-                        'closed' => 'Closed',
-                    ])
-                    ->required()
-                    ->default('planned'),
-                Forms\Components\Textarea::make('description')
-                    ->nullable(),
+                Section::make('Cycle Information')
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\Select::make('company_id')
+                            ->relationship('company', 'name')
+                            ->required(),
+                        Forms\Components\TextInput::make('name')
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\DatePicker::make('start_date')
+                            ->required(),
+                        Forms\Components\DatePicker::make('end_date')
+                            ->required(),
+                    ]),
+
+                Section::make('Settings')
+                    ->columns(1)
+                    ->schema([
+                        Forms\Components\Select::make('status')
+                            ->options([
+                                'planned' => 'Planned',
+                                'open'    => 'Open',
+                                'closed'  => 'Closed',
+                            ])
+                            ->required()
+                            ->default('planned'),
+                        Forms\Components\Textarea::make('description')
+                            ->nullable(),
+                    ]),
             ]);
     }
 

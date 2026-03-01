@@ -2,11 +2,15 @@
 
 namespace Modules\HR\Filament\Resources;
 
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables;
@@ -18,36 +22,47 @@ class EmployeeSalaryResource extends Resource
 {
     protected static ?string $model = EmployeeSalary::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedBanknotes;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'HR';
+    protected static string|\UnitEnum|null $navigationGroup = 'Payroll';
+
+    protected static ?int $navigationSort = 53;
 
     public static function form(Schema $schema): Schema
     {
         return $schema
             ->components([
-                Forms\Components\Select::make('employee_id')
-                    ->relationship('employee', 'first_name')
-                    ->required(),
-                Forms\Components\Select::make('company_id')
-                    ->relationship('company', 'name')
-                    ->required(),
-                Forms\Components\Select::make('salary_scale_id')
-                    ->relationship('salaryScale', 'name')
-                    ->nullable(),
-                Forms\Components\TextInput::make('basic_salary')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('currency')
-                    ->required()
-                    ->maxLength(3)
-                    ->default('GHS'),
-                Forms\Components\DatePicker::make('effective_from')
-                    ->required(),
-                Forms\Components\DatePicker::make('effective_to')
-                    ->nullable(),
-                Forms\Components\Toggle::make('is_current')
-                    ->required(),
+                Section::make('Salary Details')
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\Select::make('employee_id')
+                            ->relationship('employee', 'first_name')
+                            ->required(),
+                        Forms\Components\Select::make('company_id')
+                            ->relationship('company', 'name')
+                            ->required(),
+                        Forms\Components\Select::make('salary_scale_id')
+                            ->relationship('salaryScale', 'name')
+                            ->nullable(),
+                        Forms\Components\TextInput::make('basic_salary')
+                            ->required()
+                            ->numeric(),
+                    ]),
+
+                Section::make('Dates & Currency')
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\DatePicker::make('effective_from')
+                            ->required(),
+                        Forms\Components\DatePicker::make('effective_to')
+                            ->nullable(),
+                        Forms\Components\TextInput::make('currency')
+                            ->required()
+                            ->maxLength(3)
+                            ->default('GHS'),
+                        Forms\Components\Toggle::make('is_current')
+                            ->required(),
+                    ]),
             ]);
     }
 
@@ -96,7 +111,11 @@ class EmployeeSalaryResource extends Resource
                 Tables\Filters\TernaryFilter::make('is_current'),
             ])
             ->actions([
-                EditAction::make(),
+                ActionGroup::make([
+                    ViewAction::make(),
+                    EditAction::make(),
+                    DeleteAction::make(),
+                ]),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
@@ -117,6 +136,7 @@ class EmployeeSalaryResource extends Resource
         return [
             'index' => Pages\ListEmployeeSalaries::route('/'),
             'create' => Pages\CreateEmployeeSalary::route('/create'),
+            'view' => Pages\ViewEmployeeSalary::route('/{record}'),
             'edit' => Pages\EditEmployeeSalary::route('/{record}/edit'),
         ];
     }

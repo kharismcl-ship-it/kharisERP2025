@@ -2,11 +2,15 @@
 
 namespace Modules\HR\Filament\Resources;
 
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables;
@@ -18,63 +22,78 @@ class LeaveBalanceResource extends Resource
 {
     protected static ?string $model = LeaveBalance::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedCalculator;
+    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedChartBar;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'HR';
+    protected static string|\UnitEnum|null $navigationGroup = 'Leave';
+
+    protected static ?int $navigationSort = 21;
 
     public static function form(Schema $schema): Schema
     {
         return $schema
             ->components([
-                Forms\Components\Select::make('company_id')
-                    ->relationship('company', 'name')
-                    ->required(),
-                Forms\Components\Select::make('employee_id')
-                    ->relationship('employee', 'full_name')
-                    ->searchable()
-                    ->preload()
-                    ->required(),
-                Forms\Components\Select::make('leave_type_id')
-                    ->relationship('leaveType', 'name')
-                    ->searchable()
-                    ->preload()
-                    ->required(),
-                Forms\Components\TextInput::make('year')
-                    ->required()
-                    ->numeric()
-                    ->default(now()->year),
-                Forms\Components\TextInput::make('initial_balance')
-                    ->label('Initial Balance')
-                    ->required()
-                    ->numeric()
-                    ->step(0.5)
-                    ->minValue(0),
-                Forms\Components\TextInput::make('used_balance')
-                    ->label('Used Balance')
-                    ->required()
-                    ->numeric()
-                    ->step(0.5)
-                    ->minValue(0),
-                Forms\Components\TextInput::make('carried_over')
-                    ->label('Carried Over')
-                    ->required()
-                    ->numeric()
-                    ->step(0.5)
-                    ->minValue(0),
-                Forms\Components\TextInput::make('adjustments')
-                    ->label('Adjustments')
-                    ->required()
-                    ->numeric()
-                    ->step(0.5),
-                Forms\Components\TextInput::make('current_balance')
-                    ->label('Current Balance')
-                    ->required()
-                    ->numeric()
-                    ->step(0.5)
-                    ->readOnly(),
-                Forms\Components\Textarea::make('notes')
-                    ->label('Notes')
-                    ->columnSpanFull(),
+                Section::make('Balance Details')
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\Select::make('company_id')
+                            ->relationship('company', 'name')
+                            ->required(),
+                        Forms\Components\Select::make('employee_id')
+                            ->relationship('employee', 'full_name')
+                            ->searchable()
+                            ->preload()
+                            ->required(),
+                        Forms\Components\Select::make('leave_type_id')
+                            ->relationship('leaveType', 'name')
+                            ->searchable()
+                            ->preload()
+                            ->required(),
+                        Forms\Components\TextInput::make('year')
+                            ->required()
+                            ->numeric()
+                            ->default(now()->year),
+                    ]),
+
+                Section::make('Balance Figures')
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\TextInput::make('initial_balance')
+                            ->label('Initial Balance')
+                            ->required()
+                            ->numeric()
+                            ->step(0.5)
+                            ->minValue(0),
+                        Forms\Components\TextInput::make('used_balance')
+                            ->label('Used Balance')
+                            ->required()
+                            ->numeric()
+                            ->step(0.5)
+                            ->minValue(0),
+                        Forms\Components\TextInput::make('current_balance')
+                            ->label('Current Balance')
+                            ->required()
+                            ->numeric()
+                            ->step(0.5)
+                            ->readOnly(),
+                        Forms\Components\TextInput::make('carried_over')
+                            ->label('Carried Over')
+                            ->required()
+                            ->numeric()
+                            ->step(0.5)
+                            ->minValue(0),
+                        Forms\Components\TextInput::make('adjustments')
+                            ->label('Adjustments')
+                            ->required()
+                            ->numeric()
+                            ->step(0.5),
+                    ]),
+
+                Section::make('Notes')
+                    ->schema([
+                        Forms\Components\Textarea::make('notes')
+                            ->label('Notes')
+                            ->columnSpanFull(),
+                    ]),
             ]);
     }
 
@@ -135,7 +154,11 @@ class LeaveBalanceResource extends Resource
                     )),
             ])
             ->actions([
-                EditAction::make(),
+                ActionGroup::make([
+                    ViewAction::make(),
+                    EditAction::make(),
+                    DeleteAction::make(),
+                ]),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
@@ -156,6 +179,7 @@ class LeaveBalanceResource extends Resource
         return [
             'index' => Pages\ListLeaveBalances::route('/'),
             'create' => Pages\CreateLeaveBalance::route('/create'),
+            'view' => Pages\ViewLeaveBalance::route('/{record}'),
             'edit' => Pages\EditLeaveBalance::route('/{record}/edit'),
         ];
     }

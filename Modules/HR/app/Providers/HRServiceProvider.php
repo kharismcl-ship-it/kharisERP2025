@@ -68,6 +68,30 @@ class HRServiceProvider extends ServiceProvider
         $this->app->singleton(AnnouncementService::class, function ($app) {
             return new AnnouncementService;
         });
+
+        $this->app->singleton(\Modules\HR\Services\LeaveAccrualService::class, function ($app) {
+            return new \Modules\HR\Services\LeaveAccrualService;
+        });
+
+        $this->app->singleton(\Modules\HR\Services\LeaveApprovalService::class, function ($app) {
+            return new \Modules\HR\Services\LeaveApprovalService;
+        });
+
+        $this->app->singleton(\Modules\HR\Services\LeaveAttachmentService::class, function ($app) {
+            return new \Modules\HR\Services\LeaveAttachmentService;
+        });
+
+        $this->app->singleton(\Modules\HR\Services\LeaveBalanceService::class, function ($app) {
+            return new \Modules\HR\Services\LeaveBalanceService;
+        });
+
+        $this->app->singleton(\Modules\HR\Services\LeaveNotificationService::class, function ($app) {
+            return new \Modules\HR\Services\LeaveNotificationService;
+        });
+
+        $this->app->singleton(\Modules\HR\Services\LeaveReportingService::class, function ($app) {
+            return new \Modules\HR\Services\LeaveReportingService;
+        });
     }
 
     /**

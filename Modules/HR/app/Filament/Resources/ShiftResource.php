@@ -27,7 +27,7 @@ class ShiftResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'Workforce';
 
-    protected static ?int $navigationSort = 53;
+    protected static ?int $navigationSort = 54;
 
     protected static ?string $navigationLabel = 'Work Shifts';
 

@@ -2,9 +2,12 @@
 
 namespace Modules\HR\Filament\Resources;
 
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -18,50 +21,71 @@ class EmploymentContractResource extends Resource
 {
     protected static ?string $model = EmploymentContract::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedDocumentText;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'HR';
+    protected static string|\UnitEnum|null $navigationGroup = 'Documents';
+
+    protected static ?int $navigationSort = 68;
 
     public static function form(Schema $schema): Schema
     {
         return $schema
             ->components([
-                Forms\Components\Select::make('employee_id')
-                    ->relationship('employee', 'first_name')
-                    ->required(),
-                Forms\Components\Select::make('company_id')
-                    ->relationship('company', 'name')
-                    ->required(),
-                Forms\Components\TextInput::make('contract_number')
-                    ->maxLength(255)
-                    ->nullable(),
-                Forms\Components\DatePicker::make('start_date')
-                    ->required(),
-                Forms\Components\DatePicker::make('end_date')
-                    ->nullable(),
-                Forms\Components\Select::make('contract_type')
-                    ->options([
-                        'permanent' => 'Permanent',
-                        'fixed_term' => 'Fixed Term',
-                        'casual' => 'Casual',
-                    ])
-                    ->required()
-                    ->default('permanent'),
-                Forms\Components\DatePicker::make('probation_end_date')
-                    ->nullable(),
-                Forms\Components\Toggle::make('is_current')
-                    ->required(),
-                Forms\Components\TextInput::make('basic_salary')
-                    ->numeric()
-                    ->nullable(),
-                Forms\Components\TextInput::make('currency')
-                    ->maxLength(3)
-                    ->default('GHS'),
-                Forms\Components\TextInput::make('working_hours_per_week')
-                    ->numeric()
-                    ->nullable(),
-                Forms\Components\Textarea::make('notes')
-                    ->nullable(),
+                \Filament\Schemas\Components\Section::make('Contract Details')
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\Select::make('employee_id')
+                            ->relationship('employee', 'first_name')
+                            ->required(),
+                        Forms\Components\Select::make('company_id')
+                            ->relationship('company', 'name')
+                            ->required(),
+                        Forms\Components\TextInput::make('contract_number')
+                            ->maxLength(255)
+                            ->nullable(),
+                        Forms\Components\Select::make('contract_type')
+                            ->options([
+                                'permanent'  => 'Permanent',
+                                'fixed_term' => 'Fixed Term',
+                                'casual'     => 'Casual',
+                            ])
+                            ->required()
+                            ->default('permanent'),
+                    ]),
+
+                \Filament\Schemas\Components\Section::make('Duration')
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\DatePicker::make('start_date')
+                            ->required(),
+                        Forms\Components\DatePicker::make('end_date')
+                            ->nullable(),
+                        Forms\Components\DatePicker::make('probation_end_date')
+                            ->nullable(),
+                        Forms\Components\Toggle::make('is_current')
+                            ->required(),
+                    ]),
+
+                \Filament\Schemas\Components\Section::make('Compensation')
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\TextInput::make('basic_salary')
+                            ->numeric()
+                            ->nullable(),
+                        Forms\Components\TextInput::make('currency')
+                            ->maxLength(3)
+                            ->default('GHS'),
+                        Forms\Components\TextInput::make('working_hours_per_week')
+                            ->numeric()
+                            ->nullable(),
+                    ]),
+
+                \Filament\Schemas\Components\Section::make('Notes')
+                    ->schema([
+                        Forms\Components\Textarea::make('notes')
+                            ->nullable()
+                            ->columnSpanFull(),
+                    ]),
             ]);
     }
 
@@ -122,7 +146,11 @@ class EmploymentContractResource extends Resource
                 Tables\Filters\TernaryFilter::make('is_current'),
             ])
             ->actions([
-                EditAction::make(),
+                ActionGroup::make([
+                    ViewAction::make(),
+                    EditAction::make(),
+                    DeleteAction::make(),
+                ]),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
@@ -143,6 +171,7 @@ class EmploymentContractResource extends Resource
         return [
             'index' => Pages\ListEmploymentContracts::route('/'),
             'create' => Pages\CreateEmploymentContract::route('/create'),
+            'view' => Pages\ViewEmploymentContract::route('/{record}'),
             'edit' => Pages\EditEmploymentContract::route('/{record}/edit'),
         ];
     }

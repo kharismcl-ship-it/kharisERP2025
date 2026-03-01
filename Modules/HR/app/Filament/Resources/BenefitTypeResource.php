@@ -27,7 +27,7 @@ class BenefitTypeResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'Benefits & Loans';
 
-    protected static ?int $navigationSort = 64;
+    protected static ?int $navigationSort = 66;
 
     protected static ?string $navigationLabel = 'Benefit Types';
 

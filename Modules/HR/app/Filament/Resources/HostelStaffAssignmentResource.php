@@ -7,6 +7,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables;
@@ -24,31 +25,42 @@ class HostelStaffAssignmentResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Hostel Staff Assignments';
 
-    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedHomeModern;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'HR';
+    protected static string|\UnitEnum|null $navigationGroup = 'Core HR';
+
+    protected static ?int $navigationSort = 15;
 
     public static function form(Schema $schema): Schema
     {
         return $schema
             ->components([
-                Forms\Components\Select::make('company_id')
-                    ->relationship('company', 'name')
-                    ->required(),
-                Forms\Components\Select::make('employee_id')
-                    ->relationship('employee', 'full_name')
-                    ->searchable()
-                    ->preload()
-                    ->required(),
-                Forms\Components\Select::make('hostel_id')
-                    ->relationship('hostel', 'name')
-                    ->searchable()
-                    ->preload()
-                    ->required(),
-                Forms\Components\TextInput::make('role')
-                    ->maxLength(255),
-                Forms\Components\DateTimePicker::make('assigned_at'),
-                Forms\Components\DateTimePicker::make('expires_at'),
+                Section::make('Assignment Details')
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\Select::make('company_id')
+                            ->relationship('company', 'name')
+                            ->required(),
+                        Forms\Components\Select::make('employee_id')
+                            ->relationship('employee', 'full_name')
+                            ->searchable()
+                            ->preload()
+                            ->required(),
+                        Forms\Components\Select::make('hostel_id')
+                            ->relationship('hostel', 'name')
+                            ->searchable()
+                            ->preload()
+                            ->required(),
+                        Forms\Components\TextInput::make('role')
+                            ->maxLength(255),
+                    ]),
+
+                Section::make('Dates')
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\DateTimePicker::make('assigned_at'),
+                        Forms\Components\DateTimePicker::make('expires_at'),
+                    ]),
             ]);
     }
 

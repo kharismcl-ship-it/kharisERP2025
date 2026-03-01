@@ -28,7 +28,7 @@ class AnnouncementResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'HR Comms';
 
-    protected static ?int $navigationSort = 66;
+    protected static ?int $navigationSort = 70;
 
     protected static ?string $navigationLabel = 'Announcements';
 

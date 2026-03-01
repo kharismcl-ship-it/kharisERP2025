@@ -2,10 +2,12 @@
 
 namespace Modules\HR\Filament\Resources;
 
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
@@ -22,11 +24,11 @@ class LeaveApprovalWorkflowResource extends Resource
 {
     protected static ?string $model = LeaveApprovalWorkflow::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedDocumentDuplicate;
+    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedArrowPath;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'HR';
+    protected static string|\UnitEnum|null $navigationGroup = 'Leave';
 
-    protected static ?int $navigationSort = 40;
+    protected static ?int $navigationSort = 22;
 
     public static function form(Schema $schema): Schema
     {
@@ -137,8 +139,11 @@ class LeaveApprovalWorkflowResource extends Resource
                     ->query(fn (Builder $query) => $query->where('is_active', true)),
             ])
             ->actions([
-                EditAction::make(),
-                DeleteAction::make(),
+                ActionGroup::make([
+                    ViewAction::make(),
+                    EditAction::make(),
+                    DeleteAction::make(),
+                ]),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
@@ -159,6 +164,7 @@ class LeaveApprovalWorkflowResource extends Resource
         return [
             'index' => Pages\ListLeaveApprovalWorkflows::route('/'),
             'create' => Pages\CreateLeaveApprovalWorkflow::route('/create'),
+            'view' => Pages\ViewLeaveApprovalWorkflow::route('/{record}'),
             'edit' => Pages\EditLeaveApprovalWorkflow::route('/{record}/edit'),
         ];
     }

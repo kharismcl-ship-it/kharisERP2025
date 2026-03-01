@@ -7,6 +7,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -23,30 +24,43 @@ class DepartmentResource extends Resource
 
     protected static ?string $slug = 'departments';
 
-    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedBuildingOffice2;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'HR';
+    protected static string|\UnitEnum|null $navigationGroup = 'Core HR';
+
+    protected static ?int $navigationSort = 11;
+
+    protected static ?string $navigationLabel = 'Departments';
 
     public static function form(Schema $schema): Schema
     {
         return $schema
             ->components([
-                Forms\Components\Select::make('company_id')
-                    ->relationship('company', 'name')
-                    ->required(),
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('code')
-                    ->maxLength(255)
-                    ->nullable(),
-                Forms\Components\Textarea::make('description')
-                    ->nullable(),
-                Forms\Components\Select::make('parent_id')
-                    ->relationship('parent', 'name')
-                    ->nullable(),
-                Forms\Components\Toggle::make('is_active')
-                    ->required(),
+                \Filament\Schemas\Components\Section::make('Department Info')
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\Select::make('company_id')
+                            ->relationship('company', 'name')
+                            ->required(),
+                        Forms\Components\TextInput::make('name')
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('code')
+                            ->maxLength(255)
+                            ->nullable(),
+                        Forms\Components\Select::make('parent_id')
+                            ->relationship('parent', 'name')
+                            ->nullable(),
+                    ]),
+
+                \Filament\Schemas\Components\Section::make('Settings')
+                    ->columns(1)
+                    ->schema([
+                        Forms\Components\Toggle::make('is_active')
+                            ->required(),
+                        Forms\Components\Textarea::make('description')
+                            ->nullable(),
+                    ]),
             ]);
     }
 
@@ -91,6 +105,7 @@ class DepartmentResource extends Resource
             ])
             ->actions([
                 ActionGroup::make([
+                    ViewAction::make(),
                     EditAction::make()
                         ->slideOver(),
                     DeleteAction::make(),
@@ -117,6 +132,7 @@ class DepartmentResource extends Resource
         return [
             'index' => Pages\ListDepartments::route('/'),
             'create' => Pages\CreateDepartment::route('/create'),
+            'view' => Pages\ViewDepartment::route('/{record}'),
             'edit' => Pages\EditDepartment::route('/{record}/edit'),
         ];
     }

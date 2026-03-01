@@ -2,9 +2,12 @@
 
 namespace Modules\HR\Filament\Resources;
 
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -18,35 +21,51 @@ class SalaryScaleResource extends Resource
 {
     protected static ?string $model = SalaryScale::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedScale;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'HR';
+    protected static string|\UnitEnum|null $navigationGroup = 'Core HR';
+
+    protected static ?int $navigationSort = 13;
 
     public static function form(Schema $schema): Schema
     {
         return $schema
             ->components([
-                Forms\Components\Select::make('company_id')
-                    ->relationship('company', 'name')
-                    ->required(),
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('code')
-                    ->maxLength(255)
-                    ->nullable(),
-                Forms\Components\TextInput::make('min_basic')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('max_basic')
-                    ->required()
-                    ->numeric(),
-                Forms\Components\TextInput::make('currency')
-                    ->required()
-                    ->maxLength(3)
-                    ->default('GHS'),
-                Forms\Components\Textarea::make('description')
-                    ->nullable(),
+                \Filament\Schemas\Components\Section::make('Scale Details')
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\Select::make('company_id')
+                            ->relationship('company', 'name')
+                            ->required(),
+                        Forms\Components\TextInput::make('name')
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('code')
+                            ->maxLength(255)
+                            ->nullable(),
+                        Forms\Components\TextInput::make('currency')
+                            ->required()
+                            ->maxLength(3)
+                            ->default('GHS'),
+                    ]),
+
+                \Filament\Schemas\Components\Section::make('Salary Range')
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\TextInput::make('min_basic')
+                            ->required()
+                            ->numeric(),
+                        Forms\Components\TextInput::make('max_basic')
+                            ->required()
+                            ->numeric(),
+                    ]),
+
+                \Filament\Schemas\Components\Section::make('Description')
+                    ->schema([
+                        Forms\Components\Textarea::make('description')
+                            ->nullable()
+                            ->columnSpanFull(),
+                    ]),
             ]);
     }
 
@@ -82,7 +101,11 @@ class SalaryScaleResource extends Resource
                     ->relationship('company', 'name'),
             ])
             ->actions([
-                EditAction::make(),
+                ActionGroup::make([
+                    ViewAction::make(),
+                    EditAction::make(),
+                    DeleteAction::make(),
+                ]),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
@@ -103,6 +126,7 @@ class SalaryScaleResource extends Resource
         return [
             'index' => Pages\ListSalaryScales::route('/'),
             'create' => Pages\CreateSalaryScale::route('/create'),
+            'view' => Pages\ViewSalaryScale::route('/{record}'),
             'edit' => Pages\EditSalaryScale::route('/{record}/edit'),
         ];
     }

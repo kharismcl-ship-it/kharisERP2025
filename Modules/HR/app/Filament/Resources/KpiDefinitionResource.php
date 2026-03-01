@@ -7,6 +7,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
@@ -84,6 +85,7 @@ class KpiDefinitionResource extends Resource
             ])
             ->actions([
                 ActionGroup::make([
+                    ViewAction::make(),
                     EditAction::make(),
                     DeleteAction::make(),
                 ]),
@@ -96,6 +98,7 @@ class KpiDefinitionResource extends Resource
         return [
             'index'  => Pages\ListKpiDefinitions::route('/'),
             'create' => Pages\CreateKpiDefinition::route('/create'),
+            'view'   => Pages\ViewKpiDefinition::route('/{record}'),
             'edit'   => Pages\EditKpiDefinition::route('/{record}/edit'),
         ];
     }

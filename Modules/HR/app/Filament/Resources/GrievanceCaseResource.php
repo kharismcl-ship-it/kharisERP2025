@@ -28,7 +28,7 @@ class GrievanceCaseResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'Employee Relations';
 
-    protected static ?int $navigationSort = 61;
+    protected static ?int $navigationSort = 65;
 
     protected static ?string $navigationLabel = 'Grievance Cases';
 
@@ -142,6 +142,7 @@ class GrievanceCaseResource extends Resource
         return [
             'index'  => Pages\ListGrievanceCases::route('/'),
             'create' => Pages\CreateGrievanceCase::route('/create'),
+            'view'   => Pages\ViewGrievanceCase::route('/{record}'),
             'edit'   => Pages\EditGrievanceCase::route('/{record}/edit'),
         ];
     }

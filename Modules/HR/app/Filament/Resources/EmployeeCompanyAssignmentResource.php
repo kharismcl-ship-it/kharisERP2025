@@ -2,11 +2,15 @@
 
 namespace Modules\HR\Filament\Resources;
 
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables;
@@ -18,36 +22,51 @@ class EmployeeCompanyAssignmentResource extends Resource
 {
     protected static ?string $model = EmployeeCompanyAssignment::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedArrowsRightLeft;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'HR';
+    protected static string|\UnitEnum|null $navigationGroup = 'Core HR';
+
+    protected static ?int $navigationSort = 14;
 
     public static function form(Schema $schema): Schema
     {
         return $schema
             ->components([
-                Forms\Components\Select::make('employee_id')
-                    ->relationship('employee', 'full_name')
-                    ->searchable()
-                    ->preload()
-                    ->required(),
-                Forms\Components\Select::make('company_id')
-                    ->relationship('company', 'name')
-                    ->searchable()
-                    ->preload()
-                    ->required(),
-                Forms\Components\DatePicker::make('start_date')
-                    ->required(),
-                Forms\Components\DatePicker::make('end_date'),
-                Forms\Components\TextInput::make('role')
-                    ->maxLength(255),
-                Forms\Components\DateTimePicker::make('assigned_at'),
-                Forms\Components\DateTimePicker::make('expires_at'),
-                Forms\Components\Textarea::make('assignment_reason')
-                    ->maxLength(65535)
-                    ->columnSpanFull(),
-                Forms\Components\Toggle::make('is_active')
-                    ->default(true),
+                Section::make('Assignment Details')
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\Select::make('employee_id')
+                            ->relationship('employee', 'full_name')
+                            ->searchable()
+                            ->preload()
+                            ->required(),
+                        Forms\Components\Select::make('company_id')
+                            ->relationship('company', 'name')
+                            ->searchable()
+                            ->preload()
+                            ->required(),
+                        Forms\Components\TextInput::make('role')
+                            ->maxLength(255),
+                        Forms\Components\Toggle::make('is_active')
+                            ->default(true),
+                    ]),
+
+                Section::make('Dates')
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\DatePicker::make('start_date')
+                            ->required(),
+                        Forms\Components\DatePicker::make('end_date'),
+                        Forms\Components\DateTimePicker::make('assigned_at'),
+                        Forms\Components\DateTimePicker::make('expires_at'),
+                    ]),
+
+                Section::make('Details')
+                    ->schema([
+                        Forms\Components\Textarea::make('assignment_reason')
+                            ->maxLength(65535)
+                            ->columnSpanFull(),
+                    ]),
             ]);
     }
 
@@ -90,7 +109,11 @@ class EmployeeCompanyAssignmentResource extends Resource
                 //
             ])
             ->actions([
-                EditAction::make(),
+                ActionGroup::make([
+                    ViewAction::make(),
+                    EditAction::make(),
+                    DeleteAction::make(),
+                ]),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
@@ -111,6 +134,7 @@ class EmployeeCompanyAssignmentResource extends Resource
         return [
             'index' => Pages\ListEmployeeCompanyAssignments::route('/'),
             'create' => Pages\CreateEmployeeCompanyAssignment::route('/create'),
+            'view' => Pages\ViewEmployeeCompanyAssignment::route('/{record}'),
             'edit' => Pages\EditEmployeeCompanyAssignment::route('/{record}/edit'),
         ];
     }

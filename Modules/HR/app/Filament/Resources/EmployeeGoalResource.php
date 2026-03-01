@@ -148,6 +148,7 @@ class EmployeeGoalResource extends Resource
         return [
             'index'  => Pages\ListEmployeeGoals::route('/'),
             'create' => Pages\CreateEmployeeGoal::route('/create'),
+            'view'   => Pages\ViewEmployeeGoal::route('/{record}'),
             'edit'   => Pages\EditEmployeeGoal::route('/{record}/edit'),
         ];
     }

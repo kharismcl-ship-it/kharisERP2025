@@ -7,6 +7,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
@@ -21,11 +22,11 @@ class PublicHolidayResource extends Resource
 {
     protected static ?string $model = PublicHoliday::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedCalendarDays;
+    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedCalendar;
 
     protected static string|\UnitEnum|null $navigationGroup = 'Workforce';
 
-    protected static ?int $navigationSort = 54;
+    protected static ?int $navigationSort = 55;
 
     protected static ?string $navigationLabel = 'Public Holidays';
 
@@ -69,6 +70,7 @@ class PublicHolidayResource extends Resource
             ])
             ->actions([
                 ActionGroup::make([
+                    ViewAction::make(),
                     EditAction::make(),
                     DeleteAction::make(),
                 ]),
@@ -81,6 +83,7 @@ class PublicHolidayResource extends Resource
         return [
             'index'  => Pages\ListPublicHolidays::route('/'),
             'create' => Pages\CreatePublicHoliday::route('/create'),
+            'view'   => Pages\ViewPublicHoliday::route('/{record}'),
             'edit'   => Pages\EditPublicHoliday::route('/{record}/edit'),
         ];
     }

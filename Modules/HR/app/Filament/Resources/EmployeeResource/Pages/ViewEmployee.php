@@ -195,7 +195,7 @@ class ViewEmployee extends ViewRecord
                         TextEntry::make('hire_date')
                             ->label('Hire Date')
                             ->date(),
-                        TextEntry::make('reportingTo.full_name')
+                        TextEntry::make('manager.full_name')
                             ->label('Reports To')
                             ->placeholder('Not assigned'),
                     ])
