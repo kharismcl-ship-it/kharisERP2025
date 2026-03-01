@@ -4,7 +4,9 @@ namespace Modules\Fleet\Filament;
 
 use Filament\Contracts\Plugin;
 use Filament\Panel;
+use Modules\Fleet\Filament\Pages\FleetCostReport;
 use Modules\Fleet\Filament\Pages\FleetDashboard;
+use Modules\Fleet\Filament\Pages\FuelEfficiencyReport;
 use Modules\Fleet\Filament\Resources\DriverAssignmentResource;
 use Modules\Fleet\Filament\Resources\FuelLogResource;
 use Modules\Fleet\Filament\Resources\MaintenanceRecordResource;
@@ -24,6 +26,8 @@ class FleetFilamentPlugin implements Plugin
         $panel
             ->pages([
                 FleetDashboard::class,
+                FleetCostReport::class,
+                FuelEfficiencyReport::class,
             ])
             ->resources([
                 VehicleResource::class,

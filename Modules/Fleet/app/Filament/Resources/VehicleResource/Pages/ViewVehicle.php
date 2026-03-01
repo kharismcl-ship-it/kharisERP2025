@@ -13,6 +13,7 @@ use Modules\Fleet\Filament\Resources\VehicleResource;
 use Modules\Fleet\Models\FuelLog;
 use Modules\Fleet\Models\MaintenanceRecord;
 use Modules\Fleet\Models\TripLog;
+use Modules\Fleet\Services\FleetService;
 
 class ViewVehicle extends ViewRecord
 {
@@ -30,7 +31,7 @@ class ViewVehicle extends ViewRecord
         return $schema->components([
             Section::make('Fleet Summary')
                 ->description('Activity KPIs for this vehicle')
-                ->columns(4)
+                ->columns(5)
                 ->schema([
                     TextEntry::make('total_maintenance_cost_ytd')
                         ->label('Maintenance Cost (YTD)')
@@ -79,6 +80,15 @@ class ViewVehicle extends ViewRecord
                                 0
                             ) . ' km'
                         ),
+
+                    TextEntry::make('health_score')
+                        ->label('Health Score')
+                        ->getStateUsing(fn ($record) => app(FleetService::class)->healthScore($record) . '%')
+                        ->color(function ($record) {
+                            $score = app(FleetService::class)->healthScore($record);
+                            return $score >= 80 ? 'success' : ($score >= 50 ? 'warning' : 'danger');
+                        })
+                        ->weight('bold'),
                 ]),
 
             Section::make('Vehicle Identity')

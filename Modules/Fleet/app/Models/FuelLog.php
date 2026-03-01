@@ -33,8 +33,19 @@ class FuelLog extends Model
     protected static function booted(): void
     {
         static::saving(function (self $log) {
+            // Auto-calculate total cost
             if ($log->litres && $log->price_per_litre && ! $log->isDirty('total_cost')) {
                 $log->total_cost = round($log->litres * $log->price_per_litre, 2);
+            }
+
+            // Odometer validation: mileage at fill cannot be less than vehicle's current mileage
+            if ($log->mileage_at_fill && $log->vehicle_id) {
+                $vehicle = Vehicle::find($log->vehicle_id);
+                if ($vehicle && $log->mileage_at_fill < $vehicle->current_mileage) {
+                    throw new \InvalidArgumentException(
+                        "Mileage at fill ({$log->mileage_at_fill} km) cannot be less than the vehicle's current mileage ({$vehicle->current_mileage} km)."
+                    );
+                }
             }
         });
     }

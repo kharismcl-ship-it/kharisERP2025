@@ -2,6 +2,7 @@
 
 namespace Modules\Fleet\Services;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Modules\Fleet\Models\FuelLog;
 use Modules\Fleet\Models\MaintenanceRecord;
@@ -97,6 +98,137 @@ class FleetService
             ->whereBetween('trip_date', [$from, $to])
             ->where('status', 'completed')
             ->sum('distance_km');
+    }
+
+    /**
+     * Calculate fuel efficiency (L/100km) for a vehicle using consecutive fill-up mileage gaps.
+     * Returns null if there are fewer than 2 fills with mileage data.
+     */
+    public function fuelEfficiency(Vehicle $vehicle): ?float
+    {
+        $fills = FuelLog::where('vehicle_id', $vehicle->id)
+            ->whereNotNull('mileage_at_fill')
+            ->orderBy('fill_date')
+            ->orderBy('id')
+            ->get(['litres', 'mileage_at_fill']);
+
+        if ($fills->count() < 2) {
+            return null;
+        }
+
+        $totalLitres   = 0.0;
+        $totalDistance = 0.0;
+
+        for ($i = 1; $i < $fills->count(); $i++) {
+            $distance = (float) $fills[$i]->mileage_at_fill - (float) $fills[$i - 1]->mileage_at_fill;
+            if ($distance > 0) {
+                $totalLitres   += (float) $fills[$i]->litres;
+                $totalDistance += $distance;
+            }
+        }
+
+        if ($totalDistance <= 0) {
+            return null;
+        }
+
+        return round(($totalLitres / $totalDistance) * 100, 2);
+    }
+
+    /**
+     * Fuel efficiency for all vehicles in a company (for reporting).
+     * Returns a collection of [ vehicle_id, vehicle_name, plate, efficiency_l100km, total_fills ].
+     */
+    public function companyFuelEfficiency(int $companyId, string $from, string $to): Collection
+    {
+        $vehicles = Vehicle::where('company_id', $companyId)->get();
+
+        return $vehicles->map(function (Vehicle $vehicle) use ($from, $to) {
+            $fills = FuelLog::where('vehicle_id', $vehicle->id)
+                ->whereNotNull('mileage_at_fill')
+                ->whereBetween('fill_date', [$from, $to])
+                ->orderBy('fill_date')
+                ->orderBy('id')
+                ->get(['litres', 'mileage_at_fill', 'total_cost']);
+
+            $efficiency    = null;
+            $totalLitres   = 0.0;
+            $totalDistance = 0.0;
+            $totalCost     = (float) $fills->sum('total_cost');
+
+            for ($i = 1; $i < $fills->count(); $i++) {
+                $distance = (float) $fills[$i]->mileage_at_fill - (float) $fills[$i - 1]->mileage_at_fill;
+                if ($distance > 0) {
+                    $totalLitres   += (float) $fills[$i]->litres;
+                    $totalDistance += $distance;
+                }
+            }
+
+            if ($totalDistance > 0) {
+                $efficiency = round(($totalLitres / $totalDistance) * 100, 2);
+            }
+
+            return (object) [
+                'vehicle_id'      => $vehicle->id,
+                'vehicle_name'    => $vehicle->name,
+                'plate'           => $vehicle->plate,
+                'efficiency'      => $efficiency,
+                'total_litres'    => round($totalLitres, 2),
+                'total_distance'  => round($totalDistance, 1),
+                'total_fuel_cost' => $totalCost,
+                'total_fills'     => $fills->count(),
+            ];
+        })->filter(fn ($v) => $v->total_fills > 0);
+    }
+
+    /**
+     * Vehicle health score: % of scheduled maintenance jobs actually completed (0–100).
+     */
+    public function healthScore(Vehicle $vehicle): int
+    {
+        $total = MaintenanceRecord::where('vehicle_id', $vehicle->id)
+            ->whereIn('status', ['scheduled', 'in_progress', 'completed'])
+            ->count();
+
+        if ($total === 0) {
+            return 100;
+        }
+
+        $completed = MaintenanceRecord::where('vehicle_id', $vehicle->id)
+            ->where('status', 'completed')
+            ->count();
+
+        return (int) round(($completed / $total) * 100);
+    }
+
+    /**
+     * Per-vehicle cost summary for a date range (fuel + maintenance).
+     */
+    public function costSummary(int $companyId, string $from, string $to): Collection
+    {
+        return Vehicle::where('company_id', $companyId)
+            ->get()
+            ->map(function (Vehicle $vehicle) use ($from, $to) {
+                $fuel = (float) FuelLog::where('vehicle_id', $vehicle->id)
+                    ->whereBetween('fill_date', [$from, $to])
+                    ->sum('total_cost');
+
+                $maintenance = (float) MaintenanceRecord::where('vehicle_id', $vehicle->id)
+                    ->where('status', 'completed')
+                    ->whereBetween('service_date', [$from, $to])
+                    ->sum('cost');
+
+                return (object) [
+                    'vehicle_id'      => $vehicle->id,
+                    'vehicle_name'    => $vehicle->name,
+                    'plate'           => $vehicle->plate,
+                    'fuel_cost'       => $fuel,
+                    'maintenance_cost'=> $maintenance,
+                    'total_cost'      => $fuel + $maintenance,
+                ];
+            })
+            ->filter(fn ($v) => $v->total_cost > 0)
+            ->sortByDesc('total_cost')
+            ->values();
     }
 
     private function recordFuelExpenseInFinance(Vehicle $vehicle, FuelLog $log): void

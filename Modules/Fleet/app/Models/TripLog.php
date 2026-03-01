@@ -48,6 +48,23 @@ class TripLog extends Model
             if ($trip->start_mileage && $trip->end_mileage && $trip->end_mileage > $trip->start_mileage) {
                 $trip->distance_km = round($trip->end_mileage - $trip->start_mileage, 2);
             }
+
+            // Odometer validation: start mileage cannot be less than vehicle's current mileage
+            if ($trip->start_mileage && $trip->vehicle_id) {
+                $vehicle = Vehicle::find($trip->vehicle_id);
+                if ($vehicle && $trip->start_mileage < $vehicle->current_mileage) {
+                    throw new \InvalidArgumentException(
+                        "Start mileage ({$trip->start_mileage} km) cannot be less than the vehicle's current mileage ({$vehicle->current_mileage} km)."
+                    );
+                }
+            }
+
+            // end_mileage must be >= start_mileage when provided
+            if ($trip->end_mileage && $trip->start_mileage && $trip->end_mileage < $trip->start_mileage) {
+                throw new \InvalidArgumentException(
+                    "End mileage ({$trip->end_mileage} km) cannot be less than start mileage ({$trip->start_mileage} km)."
+                );
+            }
         });
     }
 
