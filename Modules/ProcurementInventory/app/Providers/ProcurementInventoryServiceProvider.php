@@ -11,6 +11,8 @@ use Modules\ProcurementInventory\Models\ItemCategory;
 use Modules\ProcurementInventory\Models\PurchaseOrder;
 use Modules\ProcurementInventory\Models\StockLevel;
 use Modules\ProcurementInventory\Models\Vendor;
+use Illuminate\Console\Scheduling\Schedule;
+use Modules\ProcurementInventory\Console\Commands\ReorderAlertCommand;
 use Modules\ProcurementInventory\Policies\GoodsReceiptPolicy;
 use Modules\ProcurementInventory\Policies\ItemCategoryPolicy;
 use Modules\ProcurementInventory\Policies\ItemPolicy;
@@ -80,7 +82,9 @@ class ProcurementInventoryServiceProvider extends ServiceProvider
      */
     protected function registerCommands(): void
     {
-        // $this->commands([]);
+        $this->commands([
+            ReorderAlertCommand::class,
+        ]);
     }
 
     /**
@@ -88,10 +92,11 @@ class ProcurementInventoryServiceProvider extends ServiceProvider
      */
     protected function registerCommandSchedules(): void
     {
-        // $this->app->booted(function () {
-        //     $schedule = $this->app->make(Schedule::class);
-        //     $schedule->command('inspire')->hourly();
-        // });
+        $this->app->booted(function () {
+            $schedule = $this->app->make(Schedule::class);
+            // Daily reorder alert at 07:00
+            $schedule->command('procurement:reorder-alert')->dailyAt('07:00');
+        });
     }
 
     /**

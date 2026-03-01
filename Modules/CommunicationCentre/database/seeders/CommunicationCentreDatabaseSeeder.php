@@ -18,6 +18,7 @@ class CommunicationCentreDatabaseSeeder extends Seeder
             HostelCommTemplateSeeder::class,
             LeaveCommTemplateSeeder::class,
             FinanceCommTemplateSeeder::class,
+            ProcurementCommTemplateSeeder::class,
             CommPreferenceSeeder::class,
         ]);
     }
