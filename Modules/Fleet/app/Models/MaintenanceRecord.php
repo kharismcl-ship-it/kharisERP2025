@@ -22,6 +22,7 @@ class MaintenanceRecord extends Model
         'status',
         'notes',
         'finance_expense_id',
+        'purchase_order_id',
     ];
 
     protected $casts = [

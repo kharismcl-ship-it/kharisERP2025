@@ -2,16 +2,20 @@
 
 namespace Modules\Fleet\Filament\Resources;
 
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\BulkActionGroup;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
-use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use Modules\Fleet\Filament\Resources\DriverAssignmentResource\Pages;
@@ -30,26 +34,43 @@ class DriverAssignmentResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
-            Section::make()->schema([
-                Grid::make(2)->schema([
+            Section::make('Assignment Details')
+                ->description('Link a driver to a vehicle for a specified period')
+                ->columns(2)
+                ->schema([
                     Select::make('vehicle_id')
                         ->label('Vehicle')
                         ->relationship('vehicle', 'name')
                         ->searchable()
+                        ->preload()
                         ->required(),
                     Select::make('user_id')
-                        ->label('Driver (User)')
+                        ->label('Driver')
                         ->relationship('user', 'name')
                         ->searchable()
-                        ->nullable(),
+                        ->preload()
+                        ->required(),
+                    DatePicker::make('assigned_from')
+                        ->label('Assigned From')
+                        ->required()
+                        ->displayFormat('d M Y'),
+                    DatePicker::make('assigned_until')
+                        ->label('Assigned Until')
+                        ->nullable()
+                        ->displayFormat('d M Y')
+                        ->helperText('Leave blank if the assignment is ongoing'),
+                    Toggle::make('is_primary')
+                        ->label('Primary Driver')
+                        ->default(true)
+                        ->inline(false)
+                        ->helperText('Mark as the vehicle\'s primary assigned driver'),
                 ]),
-                Grid::make(3)->schema([
-                    DatePicker::make('assigned_from')->required(),
-                    DatePicker::make('assigned_until')->label('Assigned Until (leave blank = ongoing)')->nullable(),
-                    Toggle::make('is_primary')->label('Primary Driver')->default(true)->inline(false),
+
+            Section::make('Notes')
+                ->collapsible()
+                ->schema([
+                    Textarea::make('notes')->rows(3)->columnSpanFull()->placeholder('Any additional remarks...'),
                 ]),
-                Textarea::make('notes')->rows(2)->columnSpanFull(),
-            ]),
         ]);
     }
 
@@ -61,21 +82,22 @@ class DriverAssignmentResource extends Resource
                 TextColumn::make('vehicle.plate')->label('Plate'),
                 TextColumn::make('user.name')->label('Driver')->searchable(),
                 TextColumn::make('assigned_from')->date()->sortable(),
-                TextColumn::make('assigned_until')->date()->label('Until')->default('Ongoing'),
+                TextColumn::make('assigned_until')->date()->label('Until')->placeholder('Ongoing'),
                 IconColumn::make('is_primary')->label('Primary')->boolean(),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('vehicle_id')
+                SelectFilter::make('vehicle_id')
                     ->label('Vehicle')
                     ->relationship('vehicle', 'name'),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                ViewAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('assigned_from', 'desc');
@@ -86,6 +108,7 @@ class DriverAssignmentResource extends Resource
         return [
             'index'  => Pages\ListDriverAssignments::route('/'),
             'create' => Pages\CreateDriverAssignment::route('/create'),
+            'view'   => Pages\ViewDriverAssignment::route('/{record}'),
             'edit'   => Pages\EditDriverAssignment::route('/{record}/edit'),
         ];
     }

@@ -2,12 +2,16 @@
 
 namespace Modules\Fleet\Filament\Resources\VehicleResource\RelationManagers;
 
+use Filament\Actions\CreateAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\BulkActionGroup;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
-use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -21,10 +25,10 @@ class DriverAssignmentsRelationManager extends RelationManager
     {
         return $schema->components([
             Select::make('user_id')
-                ->label('Driver (User)')
+                ->label('Driver')
                 ->relationship('user', 'name')
                 ->searchable()
-                ->nullable(),
+                ->required(),
             DatePicker::make('assigned_from')->required(),
             DatePicker::make('assigned_until')->label('Assigned Until (leave blank for ongoing)')->nullable(),
             Toggle::make('is_primary')->label('Primary Driver')->default(true),
@@ -38,19 +42,19 @@ class DriverAssignmentsRelationManager extends RelationManager
             ->columns([
                 TextColumn::make('user.name')->label('Driver'),
                 TextColumn::make('assigned_from')->date()->sortable(),
-                TextColumn::make('assigned_until')->date()->label('Until')->default('Ongoing'),
+                TextColumn::make('assigned_until')->date()->label('Until')->placeholder('Ongoing'),
                 IconColumn::make('is_primary')->label('Primary')->boolean(),
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make(),
+                CreateAction::make(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('assigned_from', 'desc');

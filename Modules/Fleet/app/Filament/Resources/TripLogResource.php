@@ -2,16 +2,20 @@
 
 namespace Modules\Fleet\Filament\Resources;
 
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\BulkActionGroup;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\TimePicker;
-use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use Modules\Fleet\Filament\Resources\TripLogResource\Pages;
@@ -30,42 +34,86 @@ class TripLogResource extends Resource
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
-            Section::make()->schema([
-                Grid::make(2)->schema([
+            Section::make('Trip Identity')
+                ->description('Vehicle, driver, and trip date')
+                ->columns(2)
+                ->schema([
                     Select::make('vehicle_id')
                         ->label('Vehicle')
                         ->relationship('vehicle', 'name')
                         ->searchable()
+                        ->preload()
                         ->required(),
                     Select::make('driver_id')
                         ->label('Driver')
                         ->relationship('driver', 'name')
                         ->searchable()
+                        ->preload()
                         ->nullable(),
-                ]),
-                Grid::make(3)->schema([
-                    DatePicker::make('trip_date')->required(),
-                    TextInput::make('trip_reference')->label('Reference')->maxLength(50)->disabled(),
+                    DatePicker::make('trip_date')
+                        ->label('Trip Date')
+                        ->required()
+                        ->displayFormat('d M Y'),
                     Select::make('status')
+                        ->label('Status')
                         ->options(array_combine(TripLog::STATUSES, array_map('ucfirst', TripLog::STATUSES)))
-                        ->default('completed'),
+                        ->default('planned')
+                        ->required(),
                 ]),
-                Grid::make(2)->schema([
-                    TextInput::make('origin')->required()->maxLength(255),
-                    TextInput::make('destination')->required()->maxLength(255),
+
+            Section::make('Route')
+                ->description('Origin, destination, and purpose')
+                ->columns(2)
+                ->schema([
+                    TextInput::make('origin')
+                        ->label('Origin / From')
+                        ->required()
+                        ->maxLength(255)
+                        ->placeholder('e.g. Accra Head Office'),
+                    TextInput::make('destination')
+                        ->label('Destination / To')
+                        ->required()
+                        ->maxLength(255)
+                        ->placeholder('e.g. Kumasi Branch'),
+                    TextInput::make('purpose')
+                        ->label('Trip Purpose')
+                        ->maxLength(255)
+                        ->columnSpanFull()
+                        ->placeholder('e.g. Client meeting, goods delivery'),
                 ]),
-                TextInput::make('purpose')->maxLength(255)->columnSpanFull(),
-                Grid::make(3)->schema([
-                    TextInput::make('start_mileage')->label('Start Mileage (km)')->numeric()->step(0.01),
-                    TextInput::make('end_mileage')->label('End Mileage (km)')->numeric()->step(0.01),
-                    TextInput::make('distance_km')->label('Distance (km)')->numeric()->step(0.01)->disabled(),
+
+            Section::make('Mileage & Timing')
+                ->description('Odometer readings and departure / return times')
+                ->columns(3)
+                ->schema([
+                    TextInput::make('start_mileage')
+                        ->label('Start Mileage (km)')
+                        ->numeric()
+                        ->step(0.01)
+                        ->suffix('km'),
+                    TextInput::make('end_mileage')
+                        ->label('End Mileage (km)')
+                        ->numeric()
+                        ->step(0.01)
+                        ->suffix('km'),
+                    TextInput::make('distance_km')
+                        ->label('Distance (km)')
+                        ->numeric()
+                        ->step(0.01)
+                        ->suffix('km')
+                        ->disabled()
+                        ->helperText('Auto-calculated on save'),
+                    TimePicker::make('departure_time')
+                        ->label('Departure Time'),
+                    TimePicker::make('return_time')
+                        ->label('Return Time'),
                 ]),
-                Grid::make(2)->schema([
-                    TimePicker::make('departure_time')->label('Departure Time'),
-                    TimePicker::make('return_time')->label('Return Time'),
+
+            Section::make('Notes')
+                ->collapsible()
+                ->schema([
+                    Textarea::make('notes')->rows(3)->columnSpanFull()->placeholder('Any additional remarks...'),
                 ]),
-                Textarea::make('notes')->rows(2)->columnSpanFull(),
-            ]),
         ]);
     }
 
@@ -91,19 +139,20 @@ class TripLogResource extends Resource
                 TextColumn::make('driver.name')->label('Driver'),
             ])
             ->filters([
-                Tables\Filters\SelectFilter::make('status')
+                SelectFilter::make('status')
                     ->options(array_combine(TripLog::STATUSES, array_map('ucfirst', TripLog::STATUSES))),
-                Tables\Filters\SelectFilter::make('vehicle_id')
+                SelectFilter::make('vehicle_id')
                     ->label('Vehicle')
                     ->relationship('vehicle', 'name'),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                ViewAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('trip_date', 'desc');
@@ -114,6 +163,7 @@ class TripLogResource extends Resource
         return [
             'index'  => Pages\ListTripLogs::route('/'),
             'create' => Pages\CreateTripLog::route('/create'),
+            'view'   => Pages\ViewTripLog::route('/{record}'),
             'edit'   => Pages\EditTripLog::route('/{record}/edit'),
         ];
     }

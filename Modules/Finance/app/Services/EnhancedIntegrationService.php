@@ -383,72 +383,76 @@ class EnhancedIntegrationService
     }
 
     /**
-     * Record fuel expense for fleet
+     * Record fuel expense for fleet.
      *
-     * @param  mixed  $fuelLog
-     * @return void
+     * @param  \Modules\Fleet\Models\Vehicle   $vehicle
+     * @param  \Modules\Fleet\Models\FuelLog   $fuelLog
      */
-    public function recordFleetFuelExpense($fuelLog)
+    public function recordFleetFuelExpense($vehicle, $fuelLog): void
     {
-        // Create journal entries for the fuel expense
+        $amount = (float) ($fuelLog->total_cost ?? 0);
+        if ($amount <= 0) {
+            return;
+        }
+
         $journalEntry = JournalEntry::create([
-            'company_id' => $fuelLog->company_id,
-            'date' => $fuelLog->date,
-            'reference' => 'Fuel Log: '.$fuelLog->id,
-            'description' => 'Fleet fuel expense',
+            'company_id'  => $fuelLog->company_id,
+            'date'        => $fuelLog->fill_date,
+            'reference'   => 'FUEL-' . $fuelLog->id,
+            'description' => 'Fleet fuel — ' . ($vehicle->plate ?? $vehicle->name) . ' at ' . ($fuelLog->fuel_station ?? 'station'),
         ]);
 
-        // Debit fuel expense account
         \Modules\Finance\Models\JournalLine::create([
             'journal_entry_id' => $journalEntry->id,
-            'account_id' => $this->getAccountId('fuel_expense'),
-            'description' => 'Fleet Fuel Expense',
-            'debit' => $fuelLog->cost,
-            'credit' => 0,
+            'account_id'       => $this->getAccountId('fuel_expense', $fuelLog->company_id),
+            'description'      => 'Fuel expense — ' . ($vehicle->plate ?? $vehicle->name),
+            'debit'            => $amount,
+            'credit'           => 0,
         ]);
 
-        // Credit bank/cash account
         \Modules\Finance\Models\JournalLine::create([
             'journal_entry_id' => $journalEntry->id,
-            'account_id' => $this->getAccountId('bank'),
-            'description' => 'Payment for Fuel',
-            'debit' => 0,
-            'credit' => $fuelLog->cost,
+            'account_id'       => $this->getAccountId('bank', $fuelLog->company_id),
+            'description'      => 'Cash paid for fuel',
+            'debit'            => 0,
+            'credit'           => $amount,
         ]);
     }
 
     /**
-     * Record maintenance expense for fleet
+     * Record maintenance expense for fleet.
      *
-     * @param  mixed  $maintenanceRecord
-     * @return void
+     * @param  \Modules\Fleet\Models\Vehicle           $vehicle
+     * @param  \Modules\Fleet\Models\MaintenanceRecord $maintenanceRecord
      */
-    public function recordFleetMaintenanceExpense($maintenanceRecord)
+    public function recordFleetMaintenanceExpense($vehicle, $maintenanceRecord): void
     {
-        // Create journal entries for the maintenance expense
+        $amount = (float) ($maintenanceRecord->cost ?? 0);
+        if ($amount <= 0) {
+            return;
+        }
+
         $journalEntry = JournalEntry::create([
-            'company_id' => $maintenanceRecord->company_id,
-            'date' => $maintenanceRecord->date,
-            'reference' => 'Maintenance: '.$maintenanceRecord->id,
-            'description' => 'Fleet maintenance expense',
+            'company_id'  => $maintenanceRecord->company_id,
+            'date'        => $maintenanceRecord->service_date,
+            'reference'   => 'MNT-' . $maintenanceRecord->id,
+            'description' => 'Fleet maintenance — ' . ($vehicle->plate ?? $vehicle->name) . ' ' . $maintenanceRecord->type,
         ]);
 
-        // Debit maintenance expense account
         \Modules\Finance\Models\JournalLine::create([
             'journal_entry_id' => $journalEntry->id,
-            'account_id' => $this->getAccountId('maintenance_expense'),
-            'description' => 'Fleet Maintenance Expense',
-            'debit' => $maintenanceRecord->cost,
-            'credit' => 0,
+            'account_id'       => $this->getAccountId('maintenance_expense', $maintenanceRecord->company_id),
+            'description'      => 'Fleet maintenance — ' . ucfirst(str_replace('_', ' ', $maintenanceRecord->type)),
+            'debit'            => $amount,
+            'credit'           => 0,
         ]);
 
-        // Credit bank/cash account
         \Modules\Finance\Models\JournalLine::create([
             'journal_entry_id' => $journalEntry->id,
-            'account_id' => $this->getAccountId('bank'),
-            'description' => 'Payment for Maintenance',
-            'debit' => 0,
-            'credit' => $maintenanceRecord->cost,
+            'account_id'       => $this->getAccountId('bank', $maintenanceRecord->company_id),
+            'description'      => 'Cash paid for vehicle maintenance',
+            'debit'            => 0,
+            'credit'           => $amount,
         ]);
     }
 

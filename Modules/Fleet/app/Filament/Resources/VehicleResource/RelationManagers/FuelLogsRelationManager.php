@@ -2,16 +2,19 @@
 
 namespace Modules\Fleet\Filament\Resources\VehicleResource\RelationManagers;
 
+use Filament\Actions\CreateAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\BulkActionGroup;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
-use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Resources\RelationManagers\RelationManager;
-use App\Models\User;
 
 class FuelLogsRelationManager extends RelationManager
 {
@@ -21,10 +24,10 @@ class FuelLogsRelationManager extends RelationManager
     {
         return $schema->components([
             DatePicker::make('fill_date')->required(),
-            TextInput::make('litres')->required()->numeric()->step(0.001),
+            TextInput::make('litres')->required()->numeric()->step(0.001)->suffix('L'),
             TextInput::make('price_per_litre')->required()->numeric()->prefix('GHS')->step(0.0001),
             TextInput::make('total_cost')->numeric()->prefix('GHS')->step(0.01)->label('Total Cost'),
-            TextInput::make('mileage_at_fill')->label('Mileage at Fill')->numeric()->step(0.01),
+            TextInput::make('mileage_at_fill')->label('Mileage at Fill')->numeric()->step(0.01)->suffix('km'),
             TextInput::make('fuel_station')->label('Fuel Station')->maxLength(255),
             Select::make('driver_id')
                 ->label('Driver')
@@ -48,15 +51,15 @@ class FuelLogsRelationManager extends RelationManager
                 TextColumn::make('driver.name')->label('Driver'),
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make(),
+                CreateAction::make(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('fill_date', 'desc');

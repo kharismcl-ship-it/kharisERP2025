@@ -2,13 +2,17 @@
 
 namespace Modules\Fleet\Filament\Resources\VehicleResource\RelationManagers;
 
+use Filament\Actions\CreateAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\BulkActionGroup;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\TimePicker;
 use Filament\Schemas\Schema;
-use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -26,8 +30,8 @@ class TripLogsRelationManager extends RelationManager
             TextInput::make('origin')->required()->maxLength(255),
             TextInput::make('destination')->required()->maxLength(255),
             TextInput::make('purpose')->maxLength(255),
-            TextInput::make('start_mileage')->label('Start Mileage')->numeric()->step(0.01),
-            TextInput::make('end_mileage')->label('End Mileage')->numeric()->step(0.01),
+            TextInput::make('start_mileage')->label('Start Mileage')->numeric()->step(0.01)->suffix('km'),
+            TextInput::make('end_mileage')->label('End Mileage')->numeric()->step(0.01)->suffix('km'),
             TextInput::make('distance_km')->label('Distance (km)')->numeric()->step(0.01)->disabled(),
             TimePicker::make('departure_time')->label('Departure Time'),
             TimePicker::make('return_time')->label('Return Time'),
@@ -36,7 +40,7 @@ class TripLogsRelationManager extends RelationManager
                     TripLog::STATUSES,
                     array_map('ucfirst', TripLog::STATUSES)
                 ))
-                ->default('completed'),
+                ->default('planned'),
             Select::make('driver_id')
                 ->label('Driver')
                 ->relationship('driver', 'name')
@@ -66,15 +70,15 @@ class TripLogsRelationManager extends RelationManager
                 TextColumn::make('driver.name')->label('Driver'),
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make(),
+                CreateAction::make(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('trip_date', 'desc');

@@ -2,12 +2,16 @@
 
 namespace Modules\Fleet\Filament\Resources\VehicleResource\RelationManagers;
 
+use Filament\Actions\CreateAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\BulkActionGroup;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
-use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -28,9 +32,9 @@ class MaintenanceRecordsRelationManager extends RelationManager
                 ->required(),
             Textarea::make('description')->required()->columnSpanFull(),
             DatePicker::make('service_date')->required(),
-            TextInput::make('mileage_at_service')->label('Mileage at Service')->numeric()->step(0.01),
+            TextInput::make('mileage_at_service')->label('Mileage at Service')->numeric()->step(0.01)->suffix('km'),
             DatePicker::make('next_service_date')->label('Next Service Date'),
-            TextInput::make('next_service_mileage')->label('Next Service Mileage')->numeric()->step(0.01),
+            TextInput::make('next_service_mileage')->label('Next Service Mileage')->numeric()->step(0.01)->suffix('km'),
             TextInput::make('service_provider')->label('Service Provider')->maxLength(255),
             TextInput::make('cost')->numeric()->prefix('GHS')->step(0.01),
             Select::make('status')
@@ -39,7 +43,7 @@ class MaintenanceRecordsRelationManager extends RelationManager
                     'in_progress' => 'In Progress',
                     'completed'   => 'Completed',
                 ])
-                ->default('completed'),
+                ->default('scheduled'),
             Textarea::make('notes')->rows(2)->columnSpanFull(),
         ]);
     }
@@ -49,7 +53,9 @@ class MaintenanceRecordsRelationManager extends RelationManager
         return $table
             ->columns([
                 TextColumn::make('service_date')->date()->sortable(),
-                TextColumn::make('type')->badge(),
+                TextColumn::make('type')
+                    ->badge()
+                    ->formatStateUsing(fn ($state) => ucwords(str_replace('_', ' ', $state))),
                 TextColumn::make('description')->limit(40),
                 TextColumn::make('cost')->money('GHS')->sortable(),
                 TextColumn::make('status')->badge()
@@ -63,15 +69,15 @@ class MaintenanceRecordsRelationManager extends RelationManager
                 TextColumn::make('next_service_date')->date()->label('Next Service'),
             ])
             ->headerActions([
-                Tables\Actions\CreateAction::make(),
+                CreateAction::make(),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
             ])
             ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
                 ]),
             ])
             ->defaultSort('service_date', 'desc');
