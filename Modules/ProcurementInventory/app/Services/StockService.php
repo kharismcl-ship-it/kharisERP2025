@@ -5,6 +5,7 @@ namespace Modules\ProcurementInventory\Services;
 use Modules\ProcurementInventory\Models\GoodsReceipt;
 use Modules\ProcurementInventory\Models\PurchaseOrder;
 use Modules\ProcurementInventory\Models\StockLevel;
+use Modules\ProcurementInventory\Models\StockMovement;
 
 class StockService
 {
@@ -50,7 +51,7 @@ class StockService
 
     /**
      * Update stock on hand when a GoodsReceipt is confirmed.
-     * Also reduces quantity_on_order by the received amount.
+     * Also reduces quantity_on_order by the received amount and logs a movement.
      */
     public function updateFromReceipt(GoodsReceipt $receipt): void
     {
@@ -60,13 +61,58 @@ class StockService
             }
 
             $stock = $this->getOrCreate($receipt->company_id, $line->item_id);
+            $before = (float) $stock->quantity_on_hand;
 
             // Add received qty to on-hand
             $stock->increment('quantity_on_hand', (float) $line->quantity_received);
+            $after = (float) $stock->fresh()->quantity_on_hand;
 
             // Reduce on-order by received qty (floor at 0)
             $newOnOrder = max(0, (float) $stock->fresh()->quantity_on_order - (float) $line->quantity_received);
             $stock->update(['quantity_on_order' => $newOnOrder]);
+
+            // Log movement
+            StockMovement::create([
+                'company_id'      => $receipt->company_id,
+                'item_id'         => $line->item_id,
+                'type'            => 'receipt',
+                'quantity'        => (float) $line->quantity_received,
+                'quantity_before' => $before,
+                'quantity_after'  => $after,
+                'reference'       => $receipt->grn_number ?? ('GRN-' . $receipt->id),
+                'source_type'     => GoodsReceipt::class,
+                'source_id'       => $receipt->id,
+                'user_id'         => auth()->id(),
+                'note'            => 'Goods received against ' . ($receipt->purchaseOrder->po_number ?? 'PO'),
+            ]);
         }
+    }
+
+    /**
+     * Manually adjust stock on hand and log the movement.
+     */
+    public function adjust(int $companyId, int $itemId, float $adjustment, string $note = '', ?int $userId = null): StockLevel
+    {
+        $stock  = $this->getOrCreate($companyId, $itemId);
+        $before = (float) $stock->quantity_on_hand;
+        $after  = max(0, $before + $adjustment);
+
+        $stock->update([
+            'quantity_on_hand' => $after,
+            'last_counted_at'  => now(),
+        ]);
+
+        StockMovement::create([
+            'company_id'      => $companyId,
+            'item_id'         => $itemId,
+            'type'            => 'adjustment',
+            'quantity'        => $adjustment,
+            'quantity_before' => $before,
+            'quantity_after'  => $after,
+            'user_id'         => $userId ?? auth()->id(),
+            'note'            => $note,
+        ]);
+
+        return $stock->fresh();
     }
 }

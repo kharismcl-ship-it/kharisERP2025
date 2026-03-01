@@ -12,6 +12,7 @@ use Filament\Tables\Table;
 use Modules\ProcurementInventory\Filament\Resources\PurchaseOrderResource;
 use Modules\ProcurementInventory\Filament\Resources\StockLevelResource\Pages;
 use Modules\ProcurementInventory\Models\StockLevel;
+use Modules\ProcurementInventory\Services\StockService;
 
 class StockLevelResource extends Resource
 {
@@ -116,13 +117,14 @@ class StockLevelResource extends Resource
                             ->required(),
                     ])
                     ->action(function (StockLevel $record, array $data) {
-                        $newQty = max(0, (float) $record->quantity_on_hand + (float) $data['adjustment']);
-                        $record->update([
-                            'quantity_on_hand' => $newQty,
-                            'last_counted_at'  => now(),
-                        ]);
+                        $updated = app(StockService::class)->adjust(
+                            $record->company_id,
+                            $record->item_id,
+                            (float) $data['adjustment'],
+                            $data['note']
+                        );
                         Notification::make()
-                            ->title('Stock adjusted to ' . number_format($newQty, 2))
+                            ->title('Stock adjusted to ' . number_format((float) $updated->quantity_on_hand, 2))
                             ->success()
                             ->send();
                     }),
