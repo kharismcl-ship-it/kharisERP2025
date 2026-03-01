@@ -11,6 +11,8 @@ use Modules\ProcurementInventory\Models\ItemCategory;
 use Modules\ProcurementInventory\Models\PurchaseOrder;
 use Modules\ProcurementInventory\Models\StockLevel;
 use Modules\ProcurementInventory\Models\Vendor;
+use Modules\ProcurementInventory\Models\Warehouse;
+use Modules\ProcurementInventory\Models\WarehouseTransfer;
 use Illuminate\Console\Scheduling\Schedule;
 use Modules\ProcurementInventory\Console\Commands\ReorderAlertCommand;
 use Modules\ProcurementInventory\Policies\GoodsReceiptPolicy;
@@ -19,8 +21,11 @@ use Modules\ProcurementInventory\Policies\ItemPolicy;
 use Modules\ProcurementInventory\Policies\PurchaseOrderPolicy;
 use Modules\ProcurementInventory\Policies\StockLevelPolicy;
 use Modules\ProcurementInventory\Policies\VendorPolicy;
+use Modules\ProcurementInventory\Policies\WarehousePolicy;
+use Modules\ProcurementInventory\Policies\WarehouseTransferPolicy;
 use Modules\ProcurementInventory\Services\ProcurementService;
 use Modules\ProcurementInventory\Services\StockService;
+use Modules\ProcurementInventory\Services\WarehouseTransferService;
 use Nwidart\Modules\Traits\PathNamespace;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -65,6 +70,7 @@ class ProcurementInventoryServiceProvider extends ServiceProvider
 
         $this->app->singleton(StockService::class);
         $this->app->singleton(ProcurementService::class);
+        $this->app->singleton(WarehouseTransferService::class);
     }
 
     protected function registerPolicies(): void
@@ -75,6 +81,8 @@ class ProcurementInventoryServiceProvider extends ServiceProvider
         Gate::policy(PurchaseOrder::class, PurchaseOrderPolicy::class);
         Gate::policy(GoodsReceipt::class, GoodsReceiptPolicy::class);
         Gate::policy(StockLevel::class, StockLevelPolicy::class);
+        Gate::policy(Warehouse::class, WarehousePolicy::class);
+        Gate::policy(WarehouseTransfer::class, WarehouseTransferPolicy::class);
     }
 
     /**

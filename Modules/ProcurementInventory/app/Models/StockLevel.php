@@ -16,6 +16,7 @@ class StockLevel extends Model
     protected $fillable = [
         'company_id',
         'item_id',
+        'warehouse_id',
         'quantity_on_hand',
         'quantity_reserved',
         'quantity_on_order',
@@ -37,6 +38,11 @@ class StockLevel extends Model
     public function item(): BelongsTo
     {
         return $this->belongsTo(Item::class);
+    }
+
+    public function warehouse(): BelongsTo
+    {
+        return $this->belongsTo(Warehouse::class);
     }
 
     public function getAvailableQuantityAttribute(): float

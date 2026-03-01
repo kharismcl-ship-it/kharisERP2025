@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\Company;
+use Modules\Farms\Events\CropCycleStarted;
 use Modules\Farms\Models\CropActivity;
 use Modules\Farms\Models\CropInputApplication;
 use Modules\Farms\Models\CropScoutingRecord;
@@ -39,6 +40,15 @@ class CropCycle extends Model
     ];
 
     const STATUSES = ['preparing', 'growing', 'harvested', 'failed'];
+
+    protected static function booted(): void
+    {
+        static::updated(function (self $cycle) {
+            if ($cycle->wasChanged('status') && $cycle->status === 'growing') {
+                CropCycleStarted::dispatch($cycle);
+            }
+        });
+    }
 
     public function farm(): BelongsTo
     {

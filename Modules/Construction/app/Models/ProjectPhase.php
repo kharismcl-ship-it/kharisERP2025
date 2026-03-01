@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\Company;
 use Modules\Construction\Events\ProjectMilestoneCompleted;
+use Modules\Construction\Events\ProjectPhaseApproved;
 
 class ProjectPhase extends Model
 {
@@ -41,10 +42,16 @@ class ProjectPhase extends Model
     protected static function booted(): void
     {
         static::updated(function (self $phase) {
-            if ($phase->isDirty('status') && $phase->status === 'completed') {
-                $project = $phase->project;
-                if ($project) {
-                    ProjectMilestoneCompleted::dispatch($project, $phase);
+            if ($phase->isDirty('status')) {
+                if ($phase->status === 'in_progress') {
+                    ProjectPhaseApproved::dispatch($phase);
+                }
+
+                if ($phase->status === 'completed') {
+                    $project = $phase->project;
+                    if ($project) {
+                        ProjectMilestoneCompleted::dispatch($project, $phase);
+                    }
                 }
             }
         });

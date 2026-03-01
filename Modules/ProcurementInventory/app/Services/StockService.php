@@ -2,34 +2,40 @@
 
 namespace Modules\ProcurementInventory\Services;
 
+use Modules\ProcurementInventory\Events\StockLevelLow;
 use Modules\ProcurementInventory\Models\GoodsReceipt;
 use Modules\ProcurementInventory\Models\PurchaseOrder;
 use Modules\ProcurementInventory\Models\StockLevel;
 use Modules\ProcurementInventory\Models\StockMovement;
+use Modules\ProcurementInventory\Models\Warehouse;
 
 class StockService
 {
     /**
-     * Get or create a StockLevel record for an item/company pair.
+     * Get or create a StockLevel record for an item/company(/warehouse) tuple.
+     * Pass $warehouseId = null for company-wide (non-warehouse) stock.
      */
-    public function getOrCreate(int $companyId, int $itemId): StockLevel
+    public function getOrCreate(int $companyId, int $itemId, ?int $warehouseId = null): StockLevel
     {
         return StockLevel::firstOrCreate(
-            ['company_id' => $companyId, 'item_id' => $itemId],
+            ['company_id' => $companyId, 'item_id' => $itemId, 'warehouse_id' => $warehouseId],
             ['quantity_on_hand' => 0, 'quantity_reserved' => 0, 'quantity_on_order' => 0]
         );
     }
 
     /**
      * Increase quantity_on_order when a PO is approved/ordered.
+     * Uses destination_warehouse_id if set on the PO.
      */
     public function incrementOnOrder(PurchaseOrder $po): void
     {
+        $warehouseId = $po->destination_warehouse_id;
+
         foreach ($po->lines as $line) {
             if (! $line->item_id) {
                 continue;
             }
-            $stock = $this->getOrCreate($po->company_id, $line->item_id);
+            $stock = $this->getOrCreate($po->company_id, $line->item_id, $warehouseId);
             $stock->increment('quantity_on_order', (float) $line->quantity);
         }
     }
@@ -39,11 +45,13 @@ class StockService
      */
     public function decrementOnOrder(PurchaseOrder $po): void
     {
+        $warehouseId = $po->destination_warehouse_id;
+
         foreach ($po->lines as $line) {
             if (! $line->item_id) {
                 continue;
             }
-            $stock = $this->getOrCreate($po->company_id, $line->item_id);
+            $stock     = $this->getOrCreate($po->company_id, $line->item_id, $warehouseId);
             $remaining = max(0, (float) $stock->quantity_on_order - (float) $line->quantity);
             $stock->update(['quantity_on_order' => $remaining]);
         }
@@ -51,16 +59,18 @@ class StockService
 
     /**
      * Update stock on hand when a GoodsReceipt is confirmed.
-     * Also reduces quantity_on_order by the received amount and logs a movement.
+     * Goods go into the warehouse specified on the receipt (or no warehouse if null).
      */
     public function updateFromReceipt(GoodsReceipt $receipt): void
     {
+        $warehouseId = $receipt->warehouse_id;
+
         foreach ($receipt->lines as $line) {
             if (! $line->item_id || (float) $line->quantity_received <= 0) {
                 continue;
             }
 
-            $stock = $this->getOrCreate($receipt->company_id, $line->item_id);
+            $stock  = $this->getOrCreate($receipt->company_id, $line->item_id, $warehouseId);
             $before = (float) $stock->quantity_on_hand;
 
             // Add received qty to on-hand
@@ -71,10 +81,11 @@ class StockService
             $newOnOrder = max(0, (float) $stock->fresh()->quantity_on_order - (float) $line->quantity_received);
             $stock->update(['quantity_on_order' => $newOnOrder]);
 
-            // Log movement
+            // Log movement — tagged to destination warehouse
             StockMovement::create([
                 'company_id'      => $receipt->company_id,
                 'item_id'         => $line->item_id,
+                'to_warehouse_id' => $warehouseId,
                 'type'            => 'receipt',
                 'quantity'        => (float) $line->quantity_received,
                 'quantity_before' => $before,
@@ -85,15 +96,102 @@ class StockService
                 'user_id'         => auth()->id(),
                 'note'            => 'Goods received against ' . ($receipt->purchaseOrder->po_number ?? 'PO'),
             ]);
+
+            // Check reorder threshold even after receipt (stock may still be below minimum)
+            $stock->refresh();
+            if ($stock->needsReorder()) {
+                StockLevelLow::dispatch($stock, $stock->item);
+            }
         }
+    }
+
+    /**
+     * Transfer stock from one warehouse to another.
+     * Decrements source warehouse stock and increments destination warehouse stock.
+     * Logs two StockMovements (out + in) linked by the same reference.
+     *
+     * @throws \Exception if source stock is insufficient
+     */
+    public function transfer(
+        int $companyId,
+        int $fromWarehouseId,
+        int $toWarehouseId,
+        int $itemId,
+        float $qty,
+        string $reference = '',
+        ?int $userId = null
+    ): void {
+        if ($qty <= 0) {
+            throw new \InvalidArgumentException('Transfer quantity must be greater than zero.');
+        }
+
+        // --- Source warehouse: deduct ---
+        $fromStock  = $this->getOrCreate($companyId, $itemId, $fromWarehouseId);
+        $fromBefore = (float) $fromStock->quantity_on_hand;
+
+        if ($fromBefore < $qty) {
+            $fromWarehouse = Warehouse::find($fromWarehouseId);
+            throw new \Exception(
+                "Insufficient stock in {$fromWarehouse?->name}: available {$fromBefore}, requested {$qty}."
+            );
+        }
+
+        $fromAfter = $fromBefore - $qty;
+        $fromStock->update(['quantity_on_hand' => $fromAfter]);
+
+        StockMovement::create([
+            'company_id'        => $companyId,
+            'item_id'           => $itemId,
+            'from_warehouse_id' => $fromWarehouseId,
+            'to_warehouse_id'   => $toWarehouseId,
+            'type'              => 'transfer',
+            'quantity'          => -$qty,
+            'quantity_before'   => $fromBefore,
+            'quantity_after'    => $fromAfter,
+            'reference'         => $reference,
+            'user_id'           => $userId ?? auth()->id(),
+            'note'              => "Transfer out to warehouse #{$toWarehouseId}",
+        ]);
+
+        // Check if source warehouse is now below reorder threshold
+        $fromStock->refresh();
+        if ($fromStock->needsReorder()) {
+            StockLevelLow::dispatch($fromStock, $fromStock->item);
+        }
+
+        // --- Destination warehouse: add ---
+        $toStock  = $this->getOrCreate($companyId, $itemId, $toWarehouseId);
+        $toBefore = (float) $toStock->quantity_on_hand;
+        $toAfter  = $toBefore + $qty;
+        $toStock->update(['quantity_on_hand' => $toAfter]);
+
+        StockMovement::create([
+            'company_id'        => $companyId,
+            'item_id'           => $itemId,
+            'from_warehouse_id' => $fromWarehouseId,
+            'to_warehouse_id'   => $toWarehouseId,
+            'type'              => 'transfer',
+            'quantity'          => $qty,
+            'quantity_before'   => $toBefore,
+            'quantity_after'    => $toAfter,
+            'reference'         => $reference,
+            'user_id'           => $userId ?? auth()->id(),
+            'note'              => "Transfer in from warehouse #{$fromWarehouseId}",
+        ]);
     }
 
     /**
      * Manually adjust stock on hand and log the movement.
      */
-    public function adjust(int $companyId, int $itemId, float $adjustment, string $note = '', ?int $userId = null): StockLevel
-    {
-        $stock  = $this->getOrCreate($companyId, $itemId);
+    public function adjust(
+        int $companyId,
+        int $itemId,
+        float $adjustment,
+        string $note = '',
+        ?int $userId = null,
+        ?int $warehouseId = null
+    ): StockLevel {
+        $stock  = $this->getOrCreate($companyId, $itemId, $warehouseId);
         $before = (float) $stock->quantity_on_hand;
         $after  = max(0, $before + $adjustment);
 
@@ -105,6 +203,7 @@ class StockService
         StockMovement::create([
             'company_id'      => $companyId,
             'item_id'         => $itemId,
+            'to_warehouse_id' => $warehouseId,
             'type'            => 'adjustment',
             'quantity'        => $adjustment,
             'quantity_before' => $before,
@@ -113,6 +212,13 @@ class StockService
             'note'            => $note,
         ]);
 
-        return $stock->fresh();
+        $fresh = $stock->fresh();
+
+        // Alert if stock has dropped below reorder threshold
+        if ($adjustment < 0 && $fresh->needsReorder()) {
+            StockLevelLow::dispatch($fresh, $fresh->item);
+        }
+
+        return $fresh;
     }
 }

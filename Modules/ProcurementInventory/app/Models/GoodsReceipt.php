@@ -22,6 +22,7 @@ class GoodsReceipt extends Model
         'grn_number',
         'receipt_date',
         'received_by',
+        'warehouse_id',
         'status',
         'notes',
     ];
@@ -67,6 +68,11 @@ class GoodsReceipt extends Model
     public function receivedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'received_by');
+    }
+
+    public function warehouse(): BelongsTo
+    {
+        return $this->belongsTo(Warehouse::class);
     }
 
     public function lines(): HasMany

@@ -13,6 +13,8 @@ class StockMovement extends Model
     protected $fillable = [
         'company_id',
         'item_id',
+        'from_warehouse_id',
+        'to_warehouse_id',
         'type',
         'quantity',
         'quantity_before',
@@ -57,5 +59,15 @@ class StockMovement extends Model
     public function source(): MorphTo
     {
         return $this->morphTo();
+    }
+
+    public function fromWarehouse(): BelongsTo
+    {
+        return $this->belongsTo(Warehouse::class, 'from_warehouse_id');
+    }
+
+    public function toWarehouse(): BelongsTo
+    {
+        return $this->belongsTo(Warehouse::class, 'to_warehouse_id');
     }
 }

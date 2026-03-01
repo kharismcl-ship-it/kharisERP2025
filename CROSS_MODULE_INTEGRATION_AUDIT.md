@@ -16,7 +16,7 @@
 | Hostels | DONE | DONE | DONE | DONE | N/A | 100% |
 | HR | DONE | DONE | N/A | N/A | N/A | 100% |
 | PaymentsChannel | N/A (internal) | DONE | CORE | N/A | N/A | 100% |
-| ProcurementInventory | DONE | DONE | N/A | CORE | PARTIAL | 80% |
+| ProcurementInventory | DONE | DONE | N/A | CORE | DONE | 100% |
 | Finance | DONE | CORE | DONE | DONE | DONE | 100% |
 | Farms | DONE | DONE | DONE | DONE | N/A | 100% |
 | Fleet | DONE | DONE | N/A | DONE | N/A | 95% |
@@ -148,6 +148,18 @@
 - CommTemplate: `farms_sale_confirmation` added to FarmsCommTemplateSeeder
 - Seeder bug fix: all existing seeders (Finance, Construction, Fleet, MP, MW) used `slug` instead of `code` — corrected to `code` matching CommTemplate table schema
 - Wired: Farms + Finance EventServiceProviders; FarmsDatabaseSeeder now calls FarmsCommTemplateSeeder
+
+### 2026-03-01 — ProcurementInventory Comms + Cross-Module Event Dispatch (80% → 100%)
+- Migration: CropCycle model now dispatches `CropCycleStarted` on status → growing
+- Migration: ProjectPhase model now dispatches `ProjectPhaseApproved` on status → in_progress
+- Created `StockLevelLow` event — holds `StockLevel + Item`
+- `StockService::updateFromReceipt()` — checks `needsReorder()` after each line; dispatches `StockLevelLow`
+- `StockService::adjust()` — dispatches `StockLevelLow` when negative adjustment crosses reorder threshold
+- Created `SendPOApprovedNotification` → `procurement_po_approved` email to vendor on `PurchaseOrderApproved`
+- Created `SendLowStockAlert` → `procurement_low_stock_alert` email on `StockLevelLow`
+- Updated `ProcurementInventory EventServiceProvider` — added comms listeners for own events
+- CommTemplates: `procurement_po_approved`, `procurement_po_approved_sms`, `procurement_low_stock_alert`, `procurement_low_stock_alert_sms`
+- `ProcurementInventoryDatabaseSeeder` now calls `ProcurementCommTemplateSeeder`
 
 ### 2026-03-01 — Hostels Procurement (SILOED → DONE)
 - Migration: `item_id` nullable FK on `hostel_inventory_items` → `items`

@@ -29,6 +29,7 @@ class PurchaseOrder extends Model
         'currency',
         'payment_terms',
         'delivery_address',
+        'destination_warehouse_id',
         'notes',
         'approved_by',
         'approved_at',
@@ -105,6 +106,11 @@ class PurchaseOrder extends Model
     public function goodsReceipts(): HasMany
     {
         return $this->hasMany(GoodsReceipt::class);
+    }
+
+    public function destinationWarehouse(): BelongsTo
+    {
+        return $this->belongsTo(Warehouse::class, 'destination_warehouse_id');
     }
 
     public function recalculateTotals(): void

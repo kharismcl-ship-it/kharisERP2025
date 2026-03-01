@@ -24,6 +24,15 @@ class EventServiceProvider extends ServiceProvider
         \Modules\HR\Events\NewEmployeeOnboarded::class => [
             \Modules\ProcurementInventory\Listeners\CreateOnboardingItemsPO::class,
         ],
+        \Modules\ProcurementInventory\Events\PurchaseOrderApproved::class => [
+            \Modules\ProcurementInventory\Listeners\SendPOApprovedNotification::class,
+        ],
+        \Modules\ProcurementInventory\Events\StockLevelLow::class => [
+            \Modules\ProcurementInventory\Listeners\SendLowStockAlert::class,
+        ],
+        \Modules\ProcurementInventory\Events\WarehouseTransferCompleted::class => [
+            \Modules\ProcurementInventory\Listeners\SendWarehouseTransferAlert::class,
+        ],
     ];
 
     /**
