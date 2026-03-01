@@ -8,8 +8,14 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (! Schema::hasTable('construction_material_usages')) {
+            return;
+        }
+
         Schema::table('construction_material_usages', function (Blueprint $table) {
-            $table->unsignedBigInteger('item_id')->nullable()->after('company_id');
+            if (! Schema::hasColumn('construction_material_usages', 'item_id')) {
+                $table->unsignedBigInteger('item_id')->nullable()->after('company_id');
+            }
 
             if (Schema::hasTable('items')) {
                 $table->foreign('item_id')->references('id')->on('items')->nullOnDelete();
@@ -19,11 +25,17 @@ return new class extends Migration
 
     public function down(): void
     {
+        if (! Schema::hasTable('construction_material_usages')) {
+            return;
+        }
+
         Schema::table('construction_material_usages', function (Blueprint $table) {
             if (Schema::hasTable('items')) {
                 $table->dropForeign(['item_id']);
             }
-            $table->dropColumn('item_id');
+            if (Schema::hasColumn('construction_material_usages', 'item_id')) {
+                $table->dropColumn('item_id');
+            }
         });
     }
 };

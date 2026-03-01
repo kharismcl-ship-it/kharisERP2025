@@ -10,7 +10,7 @@ return new class extends Migration
     {
         if (Schema::hasTable('mp_paper_grades') && ! Schema::hasColumn('mp_paper_grades', 'unit_selling_price')) {
             Schema::table('mp_paper_grades', function (Blueprint $table) {
-                $table->decimal('unit_selling_price', 15, 4)->nullable()->after('basis_weight');
+                $table->decimal('unit_selling_price', 15, 4)->nullable()->after('description');
                 $table->decimal('min_order_quantity', 10, 3)->nullable()->after('unit_selling_price');
             });
         }

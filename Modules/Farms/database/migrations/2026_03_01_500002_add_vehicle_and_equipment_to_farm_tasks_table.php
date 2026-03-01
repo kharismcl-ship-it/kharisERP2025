@@ -10,11 +10,17 @@ return new class extends Migration
     {
         Schema::table('farm_tasks', function (Blueprint $table) {
             // Farm-owned equipment (tractors, implements, etc.) from FarmEquipment model
-            $table->unsignedBigInteger('farm_equipment_id')->nullable()->after('assigned_to_worker_id');
-            $table->foreign('farm_equipment_id')->references('id')->on('farm_equipment')->nullOnDelete();
+            if (! Schema::hasColumn('farm_tasks', 'farm_equipment_id')) {
+                $table->unsignedBigInteger('farm_equipment_id')->nullable()->after('assigned_to_worker_id');
+            }
+            if (Schema::hasTable('farm_equipment')) {
+                $table->foreign('farm_equipment_id')->references('id')->on('farm_equipment')->nullOnDelete();
+            }
 
             // Company fleet vehicle (transport tasks) — only add FK if Fleet module exists
-            $table->unsignedBigInteger('vehicle_id')->nullable()->after('farm_equipment_id');
+            if (! Schema::hasColumn('farm_tasks', 'vehicle_id')) {
+                $table->unsignedBigInteger('vehicle_id')->nullable()->after('farm_equipment_id');
+            }
             if (Schema::hasTable('vehicles')) {
                 $table->foreign('vehicle_id')->references('id')->on('vehicles')->nullOnDelete();
             }
@@ -24,7 +30,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('farm_tasks', function (Blueprint $table) {
-            $table->dropForeign(['farm_equipment_id']);
+            if (Schema::hasTable('farm_equipment')) {
+                $table->dropForeign(['farm_equipment_id']);
+            }
             if (Schema::hasTable('vehicles')) {
                 $table->dropForeign(['vehicle_id']);
             }

@@ -10,7 +10,7 @@ return new class extends Migration
     {
         if (Schema::hasTable('trip_logs') && ! Schema::hasColumn('trip_logs', 'fare_amount')) {
             Schema::table('trip_logs', function (Blueprint $table) {
-                $table->decimal('fare_amount', 15, 2)->nullable()->after('end_odometer');
+                $table->decimal('fare_amount', 15, 2)->nullable()->after('end_mileage');
                 $table->string('client_name')->nullable()->after('fare_amount');
                 $table->string('client_phone')->nullable()->after('client_name');
                 $table->string('client_email')->nullable()->after('client_phone');
