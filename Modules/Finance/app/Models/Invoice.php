@@ -5,6 +5,7 @@ namespace Modules\Finance\Models;
 use App\Models\Company;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Finance\Events\InvoiceCreated;
 
 class Invoice extends Model
 {
@@ -55,6 +56,10 @@ class Invoice extends Model
         'sub_total' => 'decimal:2',
         'tax_total' => 'decimal:2',
         'total' => 'decimal:2',
+    ];
+
+    protected $dispatchesEvents = [
+        'created' => InvoiceCreated::class,
     ];
 
     /**

@@ -5,6 +5,7 @@ namespace Modules\Finance\Models;
 use App\Models\Company;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Finance\Events\PaymentReceiptReady;
 
 class Payment extends Model
 {
@@ -29,6 +30,16 @@ class Payment extends Model
         'amount' => 'decimal:2',
         'payment_date' => 'date',
     ];
+
+    protected static function booted(): void
+    {
+        static::created(function (self $payment) {
+            $invoice = $payment->invoice;
+            if ($invoice) {
+                PaymentReceiptReady::dispatch($payment, $invoice);
+            }
+        });
+    }
 
     /**
      * Get the company that owns this payment.

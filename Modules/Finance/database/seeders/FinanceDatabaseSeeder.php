@@ -13,6 +13,7 @@ class FinanceDatabaseSeeder extends Seeder
     {
         $this->call([
             ChartOfAccountsSeeder::class,
+            FinanceCommTemplateSeeder::class,
         ]);
     }
 }

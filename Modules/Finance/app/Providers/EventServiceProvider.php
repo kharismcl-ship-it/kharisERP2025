@@ -12,6 +12,16 @@ class EventServiceProvider extends ServiceProvider
      * @var array<string, array<int, string>>
      */
     protected $listen = [
+        // Finance outbound communications — CommunicationCentre integration
+        \Modules\Finance\Events\InvoiceCreated::class => [
+            \Modules\Finance\Listeners\Finance\SendInvoiceNotification::class,
+        ],
+        \Modules\Finance\Events\InvoiceMarkedOverdue::class => [
+            \Modules\Finance\Listeners\Finance\SendInvoiceOverdueNotification::class,
+        ],
+        \Modules\Finance\Events\PaymentReceiptReady::class => [
+            \Modules\Finance\Listeners\Finance\SendPaymentReceiptNotification::class,
+        ],
         \Modules\Hostels\Events\BookingPaymentCompleted::class => [
             \Modules\Finance\Listeners\Hostel\CreateInvoiceForBooking::class,
         ],
