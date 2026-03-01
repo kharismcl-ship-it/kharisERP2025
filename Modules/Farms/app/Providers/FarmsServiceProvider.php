@@ -13,7 +13,13 @@ use Modules\Farms\Models\FarmTask;
 use Modules\Farms\Models\FarmWorker;
 use Modules\Farms\Models\CropInputApplication;
 use Modules\Farms\Models\CropScoutingRecord;
+use Modules\Farms\Models\CropVariety;
 use Modules\Farms\Models\Farm;
+use Modules\Farms\Models\FarmEquipment;
+use Modules\Farms\Models\FarmProduceInventory;
+use Modules\Farms\Models\FarmWeatherLog;
+use Modules\Farms\Models\LivestockEvent;
+use Modules\Farms\Models\SoilTestRecord;
 use Modules\Farms\Models\FarmExpense;
 use Modules\Farms\Models\FarmPlot;
 use Modules\Farms\Models\HarvestRecord;
@@ -25,11 +31,17 @@ use Modules\Farms\Models\LivestockWeightRecord;
 use Modules\Farms\Policies\CropActivityPolicy;
 use Modules\Farms\Policies\CropCyclePolicy;
 use Modules\Farms\Policies\FarmBudgetPolicy;
+use Modules\Farms\Policies\FarmEquipmentPolicy;
+use Modules\Farms\Policies\FarmProduceInventoryPolicy;
 use Modules\Farms\Policies\FarmSalePolicy;
 use Modules\Farms\Policies\FarmTaskPolicy;
+use Modules\Farms\Policies\FarmWeatherLogPolicy;
 use Modules\Farms\Policies\FarmWorkerPolicy;
 use Modules\Farms\Policies\CropInputApplicationPolicy;
 use Modules\Farms\Policies\CropScoutingRecordPolicy;
+use Modules\Farms\Policies\CropVarietyPolicy;
+use Modules\Farms\Policies\LivestockEventPolicy;
+use Modules\Farms\Policies\SoilTestRecordPolicy;
 use Modules\Farms\Policies\FarmExpensePolicy;
 use Modules\Farms\Policies\FarmPlotPolicy;
 use Modules\Farms\Policies\FarmPolicy;
@@ -107,6 +119,13 @@ class FarmsServiceProvider extends ServiceProvider
         // Phase 5 — financial integration
         Gate::policy(FarmSale::class, FarmSalePolicy::class);
         Gate::policy(FarmBudget::class, FarmBudgetPolicy::class);
+        // Phase 6 — Farmbrite parity features
+        Gate::policy(FarmProduceInventory::class, FarmProduceInventoryPolicy::class);
+        Gate::policy(LivestockEvent::class, LivestockEventPolicy::class);
+        Gate::policy(FarmEquipment::class, FarmEquipmentPolicy::class);
+        Gate::policy(FarmWeatherLog::class, FarmWeatherLogPolicy::class);
+        Gate::policy(SoilTestRecord::class, SoilTestRecordPolicy::class);
+        Gate::policy(CropVariety::class, CropVarietyPolicy::class);
     }
 
     /**

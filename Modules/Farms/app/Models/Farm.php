@@ -70,4 +70,24 @@ class Farm extends Model
     {
         return $this->hasMany(FarmExpense::class);
     }
+
+    public function equipment(): HasMany
+    {
+        return $this->hasMany(FarmEquipment::class);
+    }
+
+    public function weatherLogs(): HasMany
+    {
+        return $this->hasMany(FarmWeatherLog::class);
+    }
+
+    public function soilTestRecords(): HasMany
+    {
+        return $this->hasMany(SoilTestRecord::class);
+    }
+
+    public function produceInventories(): HasMany
+    {
+        return $this->hasMany(FarmProduceInventory::class);
+    }
 }

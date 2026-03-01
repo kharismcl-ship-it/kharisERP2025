@@ -8,14 +8,20 @@ use Modules\Farms\Filament\Pages\FarmDashboard;
 use Modules\Farms\Filament\Resources\CropActivityResource;
 use Modules\Farms\Filament\Resources\CropCycleResource;
 use Modules\Farms\Filament\Resources\CropScoutingResource;
+use Modules\Farms\Filament\Resources\CropVarietyResource;
 use Modules\Farms\Filament\Resources\FarmBudgetResource;
+use Modules\Farms\Filament\Resources\FarmEquipmentResource;
 use Modules\Farms\Filament\Resources\FarmExpenseResource;
+use Modules\Farms\Filament\Resources\FarmProduceInventoryResource;
 use Modules\Farms\Filament\Resources\FarmResource;
 use Modules\Farms\Filament\Resources\FarmSaleResource;
 use Modules\Farms\Filament\Resources\FarmTaskResource;
+use Modules\Farms\Filament\Resources\FarmWeatherLogResource;
 use Modules\Farms\Filament\Resources\FarmWorkerResource;
 use Modules\Farms\Filament\Resources\LivestockBatchResource;
+use Modules\Farms\Filament\Resources\LivestockEventResource;
 use Modules\Farms\Filament\Resources\LivestockHealthRecordResource;
+use Modules\Farms\Filament\Resources\SoilTestRecordResource;
 
 class FarmsFilamentPlugin implements Plugin
 {
@@ -38,6 +44,13 @@ class FarmsFilamentPlugin implements Plugin
             FarmSaleResource::class,
             FarmBudgetResource::class,
             FarmExpenseResource::class,
+            // Phase 6 — Farmbrite parity
+            FarmProduceInventoryResource::class,
+            LivestockEventResource::class,
+            FarmEquipmentResource::class,
+            FarmWeatherLogResource::class,
+            SoilTestRecordResource::class,
+            CropVarietyResource::class,
         ]);
     }
 

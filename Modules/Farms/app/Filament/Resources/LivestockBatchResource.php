@@ -168,6 +168,7 @@ class LivestockBatchResource extends Resource
             \Modules\Farms\Filament\Resources\LivestockBatchResource\RelationManagers\WeightRecordsRelationManager::class,
             \Modules\Farms\Filament\Resources\LivestockBatchResource\RelationManagers\FeedRecordsRelationManager::class,
             \Modules\Farms\Filament\Resources\LivestockBatchResource\RelationManagers\MortalityLogsRelationManager::class,
+            \Modules\Farms\Filament\Resources\LivestockBatchResource\RelationManagers\LivestockEventsRelationManager::class,
         ];
     }
 

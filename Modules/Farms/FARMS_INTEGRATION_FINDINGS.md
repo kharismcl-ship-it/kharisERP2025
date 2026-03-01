@@ -72,16 +72,21 @@ Update `FarmsHarvestDueAlertCommand` and `FarmsLivestockHealthReminderCommand` t
 
 ---
 
-## 4. Farmbrite Parity — Still Missing
+## 4. Farmbrite Parity — COMPLETE
 
-| Farmbrite Feature | Status | Priority |
+| Farmbrite Feature | Status | Notes |
 |---|---|---|
-| Produce inventory (harvested stock before sale) | NOT BUILT | Medium |
-| Animal events ledger (births, purchases, transfers) | NOT BUILT | Medium |
-| Farm equipment / asset register | NOT BUILT | Low |
-| Weather / rainfall logs per farm | NOT BUILT | Low |
-| Soil test records per plot | NOT BUILT | Low |
-| Crop variety library / seed catalogue | NOT BUILT | Low |
+| Produce inventory (harvested stock before sale) | DONE | FarmProduceInventory model + resource + RelationManager on Farm |
+| Animal events ledger (births, purchases, transfers) | DONE | LivestockEvent model + resource + RelationManager on LivestockBatch |
+| Farm equipment / asset register | DONE | FarmEquipment model + resource + RelationManager on Farm |
+| Weather / rainfall logs per farm | DONE | FarmWeatherLog model + resource + RelationManager on Farm |
+| Soil test records per plot | DONE | SoilTestRecord model + resource + RelationManager on Farm |
+| Crop variety library / seed catalogue | DONE | CropVariety model + resource (company-scoped seed catalogue) |
+
+### Integration compliance (cross-module rules enforced):
+- `CropInputApplication.item_id` → `ProcurementInventory\Models\Item` (nullable FK + relationship)
+- `FarmTask.farm_equipment_id` → `FarmEquipment` (FK)
+- `FarmTask.vehicle_id` → `Fleet\Models\Vehicle` (nullable FK, only when Fleet module present)
 
 ---
 

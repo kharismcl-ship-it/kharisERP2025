@@ -11,7 +11,7 @@ class FarmTask extends Model
 
     protected $fillable = [
         'farm_id', 'farm_plot_id', 'crop_cycle_id', 'livestock_batch_id',
-        'assigned_to_worker_id', 'company_id',
+        'assigned_to_worker_id', 'farm_equipment_id', 'vehicle_id', 'company_id',
         'title', 'description', 'task_type', 'priority',
         'due_date', 'completed_at', 'notes',
     ];
@@ -57,6 +57,23 @@ class FarmTask extends Model
     public function company(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Company::class);
+    }
+
+    /**
+     * Farm-owned equipment assigned for this task (from FarmEquipment register).
+     */
+    public function farmEquipment(): BelongsTo
+    {
+        return $this->belongsTo(FarmEquipment::class, 'farm_equipment_id');
+    }
+
+    /**
+     * Optional Fleet vehicle assigned for transport tasks.
+     * Null when Fleet module not installed or not applicable.
+     */
+    public function vehicle(): BelongsTo
+    {
+        return $this->belongsTo(\Modules\Fleet\Models\Vehicle::class, 'vehicle_id');
     }
 
     public function getIsOverdueAttribute(): bool

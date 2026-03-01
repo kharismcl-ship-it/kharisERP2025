@@ -72,6 +72,11 @@ class LivestockBatch extends Model
         return $this->hasMany(LivestockMortalityLog::class);
     }
 
+    public function events(): HasMany
+    {
+        return $this->hasMany(LivestockEvent::class);
+    }
+
     public function getTotalFeedCostAttribute(): float
     {
         return (float) $this->feedRecords()->sum('total_cost');

@@ -102,6 +102,9 @@ class FarmResource extends Resource
             RelationManagers\HarvestRecordsRelationManager::class,
             RelationManagers\FarmExpensesRelationManager::class,
             RelationManagers\FarmPlotsRelationManager::class,
+            RelationManagers\FarmEquipmentRelationManager::class,
+            RelationManagers\WeatherLogsRelationManager::class,
+            RelationManagers\SoilTestRecordsRelationManager::class,
         ];
     }
 
