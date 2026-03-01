@@ -8,7 +8,9 @@ use Modules\HR\Console\Commands\SyncEmployeeUsers;
 use Modules\HR\Console\Commands\TestCompanyAssignment;
 use Modules\HR\Models\Employee;
 use Modules\HR\Observers\EmployeeObserver;
+use Modules\HR\Services\AnnouncementService;
 use Modules\HR\Services\CompanyAssignmentService;
+use Modules\HR\Services\PayrollService;
 use Nwidart\Modules\Traits\PathNamespace;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -57,6 +59,14 @@ class HRServiceProvider extends ServiceProvider
         // Register the CompanyAssignmentService
         $this->app->singleton(CompanyAssignmentService::class, function ($app) {
             return new CompanyAssignmentService;
+        });
+
+        $this->app->singleton(PayrollService::class, function ($app) {
+            return new PayrollService;
+        });
+
+        $this->app->singleton(AnnouncementService::class, function ($app) {
+            return new AnnouncementService;
         });
     }
 
