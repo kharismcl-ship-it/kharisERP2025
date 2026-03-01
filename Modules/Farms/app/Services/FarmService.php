@@ -11,6 +11,9 @@ use Modules\Farms\Models\FarmTask;
 use Modules\Farms\Models\FarmWorker;
 use Modules\Farms\Models\HarvestRecord;
 use Modules\Farms\Models\LivestockBatch;
+use Modules\Finance\Models\Account;
+use Modules\Finance\Models\JournalEntry;
+use Modules\Finance\Models\JournalLine;
 
 class FarmService
 {
@@ -210,6 +213,106 @@ class FarmService
             ->whereDate('due_date', '<', now())
             ->orderBy('due_date')
             ->get();
+    }
+
+    // ── Finance GL Integration ─────────────────────────────────────────────
+
+    /**
+     * Post a single FarmExpense to the Finance General Ledger as a journal entry.
+     * DR: Expense account  /  CR: Cash/Bank account
+     * Returns null if Finance module is unavailable or amount is zero.
+     */
+    public function createExpenseJournalEntry(FarmExpense $expense): ?JournalEntry
+    {
+        if (! class_exists(JournalEntry::class) || ! $expense->amount || $expense->amount <= 0) {
+            return null;
+        }
+
+        $entry = JournalEntry::create([
+            'company_id'  => $expense->company_id,
+            'date'        => $expense->expense_date,
+            'reference'   => 'FARM-EXP-' . $expense->id,
+            'description' => "Farm expense: {$expense->category} — {$expense->farm?->name}",
+        ]);
+
+        // DR Expense account
+        JournalLine::create([
+            'journal_entry_id' => $entry->id,
+            'account_id'       => $this->resolveAccountId('expense', $expense->company_id),
+            'debit'            => $expense->amount,
+            'credit'           => 0,
+        ]);
+
+        // CR Cash/Bank account
+        JournalLine::create([
+            'journal_entry_id' => $entry->id,
+            'account_id'       => $this->resolveAccountId('cash', $expense->company_id),
+            'debit'            => 0,
+            'credit'           => $expense->amount,
+        ]);
+
+        return $entry;
+    }
+
+    /**
+     * Batch-post all FarmExpenses for a farm within a date range to Finance GL.
+     * Skips expenses that already have a journal_entry_reference set.
+     */
+    public function postAllExpensesToFinance(Farm $farm, string $from, string $to): int
+    {
+        if (! class_exists(JournalEntry::class)) {
+            return 0;
+        }
+
+        $expenses = FarmExpense::where('farm_id', $farm->id)
+            ->whereBetween('expense_date', [$from, $to])
+            ->get();
+
+        $posted = 0;
+        foreach ($expenses as $expense) {
+            if ($this->createExpenseJournalEntry($expense)) {
+                $posted++;
+            }
+        }
+
+        return $posted;
+    }
+
+    /**
+     * Resolve a Finance account ID by semantic type (expense, cash, revenue, receivable).
+     * Mirrors IntegrationService::getAccountId() pattern.
+     */
+    private function resolveAccountId(string $type, ?int $companyId): ?int
+    {
+        $map = [
+            'expense'    => ['code' => 'EXP',  'type' => 'expense'],
+            'cash'       => ['code' => 'CASH', 'type' => 'asset'],
+            'revenue'    => ['code' => 'REV',  'type' => 'income'],
+            'receivable' => ['code' => 'AR',   'type' => 'asset'],
+        ];
+
+        $hint = $map[$type] ?? null;
+
+        $query = Account::query()->when($companyId, fn ($q) => $q->where('company_id', $companyId));
+
+        if ($hint) {
+            $account = (clone $query)->where('code', $hint['code'])->first()
+                    ?? (clone $query)->where('type', $hint['type'])->first();
+            if ($account) {
+                return $account->id;
+            }
+        }
+
+        // Last-resort: create a minimal account so the journal doesn't fail
+        if ($companyId) {
+            $fallbackCode = strtoupper($type);
+            return Account::firstOrCreate(
+                ['company_id' => $companyId, 'code' => $fallbackCode],
+                ['name' => ucfirst($type) . ' Account', 'type' => $hint['type'] ?? 'asset']
+            )->id;
+        }
+
+        return null;
     }
 
     // ── Phase 5 — Financial Integration ───────────────────────────────────

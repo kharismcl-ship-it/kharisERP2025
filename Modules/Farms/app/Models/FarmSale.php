@@ -4,9 +4,12 @@ namespace Modules\Farms\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Modules\PaymentsChannel\Traits\HasPayments;
 
 class FarmSale extends Model
 {
+    use HasPayments;
+
     protected $table = 'farm_sales';
 
     protected $fillable = [
@@ -59,5 +62,31 @@ class FarmSale extends Model
     public function company(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Company::class);
+    }
+
+    // HasPayments overrides
+    public function getPaymentDescription(): string
+    {
+        return "Farm Sale: {$this->product_name} ({$this->quantity} {$this->unit}) — {$this->farm?->name}";
+    }
+
+    public function getPaymentAmount(): float
+    {
+        return (float) $this->total_amount;
+    }
+
+    public function getPaymentCurrency(): string
+    {
+        return 'GHS';
+    }
+
+    public function getPaymentCustomerName(): ?string
+    {
+        return $this->buyer_name;
+    }
+
+    public function getPaymentCustomerPhone(): ?string
+    {
+        return $this->buyer_contact;
     }
 }

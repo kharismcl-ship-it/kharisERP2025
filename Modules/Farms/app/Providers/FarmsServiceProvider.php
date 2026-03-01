@@ -117,6 +117,7 @@ class FarmsServiceProvider extends ServiceProvider
         $this->commands([
             \Modules\Farms\Console\Commands\FarmsHarvestDueAlertCommand::class,
             \Modules\Farms\Console\Commands\FarmsLivestockHealthReminderCommand::class,
+            \Modules\Farms\Console\Commands\FarmsTaskOverdueAlertCommand::class,
         ]);
     }
 
@@ -131,6 +132,8 @@ class FarmsServiceProvider extends ServiceProvider
             $schedule->command('farms:harvest-due-alerts')->dailyAt('07:00');
             // Run livestock health reminders daily at 7:30am
             $schedule->command('farms:livestock-health-reminders')->dailyAt('07:30');
+            // Run task overdue alerts daily at 8:00am
+            $schedule->command('farms:task-overdue-alerts')->dailyAt('08:00');
         });
     }
 
