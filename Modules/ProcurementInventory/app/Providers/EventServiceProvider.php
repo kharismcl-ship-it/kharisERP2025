@@ -11,7 +11,20 @@ class EventServiceProvider extends ServiceProvider
      *
      * @var array<string, array<int, string>>
      */
-    protected $listen = [];
+    protected $listen = [
+        \Modules\Fleet\Events\MaintenancePartsRequested::class => [
+            \Modules\ProcurementInventory\Listeners\CreateMaintenancePartsPO::class,
+        ],
+        \Modules\Farms\Events\CropCycleStarted::class => [
+            \Modules\ProcurementInventory\Listeners\CreateCropCycleInputPO::class,
+        ],
+        \Modules\Construction\Events\ProjectPhaseApproved::class => [
+            \Modules\ProcurementInventory\Listeners\CreateProjectMaterialsPO::class,
+        ],
+        \Modules\HR\Events\NewEmployeeOnboarded::class => [
+            \Modules\ProcurementInventory\Listeners\CreateOnboardingItemsPO::class,
+        ],
+    ];
 
     /**
      * Indicates if events should be discovered.
