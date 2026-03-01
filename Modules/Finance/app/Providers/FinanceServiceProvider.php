@@ -61,6 +61,7 @@ class FinanceServiceProvider extends ServiceProvider
             \Modules\Finance\Console\Commands\SyncProcurementToExpensesCommand::class,
             \Modules\Finance\Console\Commands\SyncFleetToExpensesCommand::class,
             \Modules\Finance\Console\Commands\SyncHRToExpensesCommand::class,
+            \Modules\Finance\Console\Commands\MarkOverdueInvoicesCommand::class,
         ]);
     }
 
@@ -69,10 +70,10 @@ class FinanceServiceProvider extends ServiceProvider
      */
     protected function registerCommandSchedules(): void
     {
-        // $this->app->booted(function () {
-        //     $schedule = $this->app->make(Schedule::class);
-        //     $schedule->command('inspire')->hourly();
-        // });
+        $this->app->booted(function () {
+            $schedule = $this->app->make(\Illuminate\Console\Scheduling\Schedule::class);
+            $schedule->command('finance:mark-overdue')->dailyAt('01:00');
+        });
     }
 
     /**
