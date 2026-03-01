@@ -4,6 +4,10 @@ namespace Modules\Finance\Filament;
 
 use Filament\Contracts\Plugin;
 use Filament\Panel;
+use Modules\Finance\Filament\Pages\ArAgingReport;
+use Modules\Finance\Filament\Pages\FinanceDashboard;
+use Modules\Finance\Filament\Pages\IncomeStatement;
+use Modules\Finance\Filament\Pages\TrialBalance;
 use Modules\Finance\Filament\Resources\AccountResource;
 use Modules\Finance\Filament\Resources\InvoiceLineResource;
 use Modules\Finance\Filament\Resources\InvoiceResource;
@@ -58,7 +62,12 @@ class FinanceFilamentPlugin implements Plugin
             ]);
         }
 
-        $panel->pages([]);
+        $panel->pages([
+            FinanceDashboard::class,
+            TrialBalance::class,
+            IncomeStatement::class,
+            ArAgingReport::class,
+        ]);
     }
 
     public function boot(Panel $panel): void
