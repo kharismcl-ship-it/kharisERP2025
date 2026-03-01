@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\Company;
 use App\Models\User;
+use Modules\Fleet\Events\FuelLogged;
 
 class FuelLog extends Model
 {
@@ -47,6 +48,10 @@ class FuelLog extends Model
                     );
                 }
             }
+        });
+
+        static::created(function (self $log) {
+            FuelLogged::dispatch($log);
         });
     }
 

@@ -19,11 +19,11 @@
 | ProcurementInventory | DONE | DONE | N/A | CORE | PARTIAL | 80% |
 | Finance | **MISSING** | CORE | DONE | DONE | STUB | 85% |
 | Farms | DONE | PARTIAL | DONE | DONE | N/A | 85% |
-| Fleet | DONE | PARTIAL | N/A | **MISSING** | N/A | 75% |
+| Fleet | DONE | DONE | N/A | DONE | N/A | 95% |
 | Core | PARTIAL | PARTIAL | N/A | N/A | N/A | 70% |
 | Construction | **MISSING** | **STUB** | **MISSING** | **MISSING** | CORE | 20% |
-| ManufacturingPaper | **MISSING** | **STUB** | **MISSING** | **MISSING** | N/A | 5% |
-| ManufacturingWater | **MISSING** | **MISSING** | **MISSING** | **MISSING** | N/A | 5% |
+| ManufacturingPaper | DONE | DONE | N/A | DONE | N/A | 90% |
+| ManufacturingWater | DONE | DONE | N/A | DONE | N/A | 90% |
 
 ---
 
@@ -57,7 +57,7 @@
 **Scope:**
 - `MaintenanceRecord`: add `item_id` nullable FK → `ProcurementInventory\Models\Item`
 - Finance GL posting for maintenance is partially stubbed
-**Status:** PENDING
+**Status:** ✅ IMPLEMENTED (2026-03-01)
 
 ---
 
@@ -68,7 +68,7 @@
 - Raw material input → link to `item_id` (ProcurementInventory)
 - QA failure / equipment fault → CommunicationCentre alert
 - Finance listener `CreateInvoiceForBatch`: implement
-**Status:** PENDING
+**Status:** ✅ IMPLEMENTED (2026-03-01)
 
 ---
 
@@ -78,7 +78,7 @@
 - Distribution sale → Finance Invoice
 - Chemical consumption → `item_id` FK (ProcurementInventory)
 - Tank level / QA alerts → CommunicationCentre
-**Status:** PENDING
+**Status:** ✅ IMPLEMENTED (2026-03-01)
 
 ---
 
@@ -109,6 +109,36 @@
 - Created `ProjectStatusListener` → CommunicationService for milestone/overrun/completion
 - CommTemplates: `construction_project_milestone`, `construction_budget_overrun`, `construction_project_completed`
 - Registered all in Construction + Finance providers
+
+### 2026-03-01 — Fleet Integration (GAP-3)
+- Migration: `item_id` nullable FK on `maintenance_records` → `items`
+- Model: `MaintenanceRecord` — added `item_id` to fillable + `item()` relationship; dispatches `MaintenanceCompleted` on status → completed
+- Model: `FuelLog` — dispatches `FuelLogged` on creation
+- Events: `MaintenanceCompleted`, `FuelLogged`
+- Listener: `Fleet\Listeners\SendMaintenanceCompletedAlert` → `fleet_maintenance_completed` email
+- Finance GL: `RecordFleetExpenses` — fully implemented (DR 6100 Fuel / DR 6110 Maintenance; CR 1120 Bank)
+- CommTemplates: `fleet_maintenance_completed`
+- Wired: Fleet + Finance EventServiceProviders
+
+### 2026-03-01 — ManufacturingPaper Integration (GAP-4)
+- Model: `MpProductionBatch` — dispatches `MpBatchCompleted` on status → completed
+- Model: `MpQualityRecord` — dispatches `MpQualityFailed` on `passed === false`
+- Events: `MpBatchCompleted`, `MpQualityFailed`
+- Listeners: `SendBatchCompletionAlert` → `mp_batch_completed` email; `SendQualityFailureAlert` → `mp_quality_failed` email
+- Finance GL: `CreateInvoiceForBatch` — DR 1140 Finished Goods / CR 5010 COGS on batch completion
+- CommTemplates: `mp_batch_completed`, `mp_quality_failed`
+- Wired: ManufacturingPaper + Finance EventServiceProviders
+
+### 2026-03-01 — ManufacturingWater Integration (GAP-5)
+- Migration: `item_id` nullable FK on `mw_chemical_usages` → `items`
+- Model: `MwChemicalUsage` — added `item_id` to fillable + `item()` relationship
+- Model: `MwDistributionRecord` — dispatches `MwDistributionCompleted` on creation
+- Model: `MwWaterTestRecord` — dispatches `MwWaterTestFailed` on `passed === false`
+- Events: `MwDistributionCompleted`, `MwWaterTestFailed`
+- Listeners: `SendDistributionCompletedAlert` → `mw_distribution_completed` email; `SendWaterTestFailureAlert` → `mw_water_test_failed` email
+- Finance: `CreateInvoiceForWaterDistribution` — AR invoice + DR 1110 AR / CR 4300 Water Revenue
+- CommTemplates: `mw_distribution_completed`, `mw_water_test_failed`
+- Wired: ManufacturingWater + Finance EventServiceProviders
 
 ---
 

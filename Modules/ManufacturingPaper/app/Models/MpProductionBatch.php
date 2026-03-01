@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
+use Modules\ManufacturingPaper\Events\MpBatchCompleted;
 
 class MpProductionBatch extends Model
 {
@@ -47,6 +48,12 @@ class MpProductionBatch extends Model
         static::creating(function (self $batch) {
             if (empty($batch->batch_number)) {
                 $batch->batch_number = 'MP-' . strtoupper(Str::random(8));
+            }
+        });
+
+        static::updated(function (self $batch) {
+            if ($batch->wasChanged('status') && $batch->status === 'completed') {
+                MpBatchCompleted::dispatch($batch);
             }
         });
     }

@@ -5,6 +5,7 @@ namespace Modules\ManufacturingWater\Models;
 use App\Models\Company;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Modules\ProcurementInventory\Models\Item;
 
 class MwChemicalUsage extends Model
 {
@@ -23,6 +24,7 @@ class MwChemicalUsage extends Model
         'purpose',
         'batch_number',
         'notes',
+        'item_id',
     ];
 
     protected $casts = [
@@ -39,6 +41,11 @@ class MwChemicalUsage extends Model
                 $usage->total_cost = round($usage->quantity * $usage->unit_cost, 2);
             }
         });
+    }
+
+    public function item(): BelongsTo
+    {
+        return $this->belongsTo(Item::class);
     }
 
     public function plant(): BelongsTo

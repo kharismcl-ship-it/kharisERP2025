@@ -5,6 +5,7 @@ namespace Modules\ManufacturingWater\Models;
 use App\Models\Company;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Modules\ManufacturingWater\Events\MwWaterTestFailed;
 
 class MwWaterTestRecord extends Model
 {
@@ -40,6 +41,15 @@ class MwWaterTestRecord extends Model
     ];
 
     const TEST_TYPES = ['raw', 'treated', 'final', 'distribution'];
+
+    protected static function booted(): void
+    {
+        static::created(function (self $record) {
+            if ($record->passed === false) {
+                MwWaterTestFailed::dispatch($record);
+            }
+        });
+    }
 
     public function plant(): BelongsTo
     {

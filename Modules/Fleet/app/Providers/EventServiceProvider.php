@@ -11,7 +11,13 @@ class EventServiceProvider extends ServiceProvider
      *
      * @var array<string, array<int, string>>
      */
-    protected $listen = [];
+    protected $listen = [
+        // Fleet comms — CommunicationCentre integration
+        \Modules\Fleet\Events\MaintenanceCompleted::class => [
+            \Modules\Fleet\Listeners\SendMaintenanceCompletedAlert::class,
+        ],
+        // FuelLogged has no comms listener — only Finance GL via Finance EventServiceProvider
+    ];
 
     /**
      * Indicates if events should be discovered.

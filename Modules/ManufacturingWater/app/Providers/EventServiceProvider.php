@@ -11,7 +11,15 @@ class EventServiceProvider extends ServiceProvider
      *
      * @var array<string, array<int, string>>
      */
-    protected $listen = [];
+    protected $listen = [
+        // ManufacturingWater comms — CommunicationCentre integration
+        \Modules\ManufacturingWater\Events\MwDistributionCompleted::class => [
+            \Modules\ManufacturingWater\Listeners\SendDistributionCompletedAlert::class,
+        ],
+        \Modules\ManufacturingWater\Events\MwWaterTestFailed::class => [
+            \Modules\ManufacturingWater\Listeners\SendWaterTestFailureAlert::class,
+        ],
+    ];
 
     /**
      * Indicates if events should be discovered.

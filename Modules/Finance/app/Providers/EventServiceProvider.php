@@ -51,6 +51,21 @@ class EventServiceProvider extends ServiceProvider
         \Modules\Construction\Events\ProjectMilestoneCompleted::class => [
             \Modules\Finance\Listeners\Construction\CreateInvoiceForProject::class,
         ],
+        // Fleet Finance integration — expense GL posting
+        \Modules\Fleet\Events\FuelLogged::class => [
+            [\Modules\Finance\Listeners\Fleet\RecordFleetExpenses::class, 'handleFuelLog'],
+        ],
+        \Modules\Fleet\Events\MaintenanceCompleted::class => [
+            [\Modules\Finance\Listeners\Fleet\RecordFleetExpenses::class, 'handleMaintenanceRecord'],
+        ],
+        // ManufacturingPaper Finance integration — production cost GL posting
+        \Modules\ManufacturingPaper\Events\MpBatchCompleted::class => [
+            \Modules\Finance\Listeners\Manufacturing\CreateInvoiceForBatch::class,
+        ],
+        // ManufacturingWater Finance integration — distribution invoice + GL posting
+        \Modules\ManufacturingWater\Events\MwDistributionCompleted::class => [
+            \Modules\Finance\Listeners\ManufacturingWater\CreateInvoiceForWaterDistribution::class,
+        ],
     ];
 
     /**

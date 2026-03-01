@@ -11,7 +11,15 @@ class EventServiceProvider extends ServiceProvider
      *
      * @var array<string, array<int, string>>
      */
-    protected $listen = [];
+    protected $listen = [
+        // ManufacturingPaper comms — CommunicationCentre integration
+        \Modules\ManufacturingPaper\Events\MpBatchCompleted::class => [
+            \Modules\ManufacturingPaper\Listeners\SendBatchCompletionAlert::class,
+        ],
+        \Modules\ManufacturingPaper\Events\MpQualityFailed::class => [
+            \Modules\ManufacturingPaper\Listeners\SendQualityFailureAlert::class,
+        ],
+    ];
 
     /**
      * Indicates if events should be discovered.

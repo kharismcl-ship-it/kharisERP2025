@@ -5,6 +5,7 @@ namespace Modules\ManufacturingPaper\Models;
 use App\Models\Company;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Modules\ManufacturingPaper\Events\MpQualityFailed;
 
 class MpQualityRecord extends Model
 {
@@ -39,6 +40,15 @@ class MpQualityRecord extends Model
         'roughness'       => 'decimal:2',
         'basis_weight'    => 'decimal:2',
     ];
+
+    protected static function booted(): void
+    {
+        static::created(function (self $record) {
+            if ($record->passed === false) {
+                MpQualityFailed::dispatch($record);
+            }
+        });
+    }
 
     public function batch(): BelongsTo
     {

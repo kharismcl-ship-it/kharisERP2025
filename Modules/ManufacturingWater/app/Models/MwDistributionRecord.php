@@ -6,6 +6,7 @@ use App\Models\Company;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Str;
+use Modules\ManufacturingWater\Events\MwDistributionCompleted;
 
 class MwDistributionRecord extends Model
 {
@@ -43,6 +44,10 @@ class MwDistributionRecord extends Model
             if ($record->volume_liters && $record->unit_price) {
                 $record->total_amount = round($record->volume_liters * $record->unit_price, 2);
             }
+        });
+
+        static::created(function (self $record) {
+            MwDistributionCompleted::dispatch($record);
         });
     }
 
