@@ -163,7 +163,12 @@ class LivestockBatchResource extends Resource
 
     public static function getRelations(): array
     {
-        return [];
+        return [
+            \Modules\Farms\Filament\Resources\LivestockBatchResource\RelationManagers\HealthRecordsRelationManager::class,
+            \Modules\Farms\Filament\Resources\LivestockBatchResource\RelationManagers\WeightRecordsRelationManager::class,
+            \Modules\Farms\Filament\Resources\LivestockBatchResource\RelationManagers\FeedRecordsRelationManager::class,
+            \Modules\Farms\Filament\Resources\LivestockBatchResource\RelationManagers\MortalityLogsRelationManager::class,
+        ];
     }
 
     public static function getPages(): array

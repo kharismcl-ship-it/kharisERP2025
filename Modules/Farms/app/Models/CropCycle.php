@@ -6,6 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\Company;
+use Modules\Farms\Models\CropActivity;
+use Modules\Farms\Models\CropInputApplication;
+use Modules\Farms\Models\CropScoutingRecord;
 
 class CropCycle extends Model
 {
@@ -60,6 +63,31 @@ class CropCycle extends Model
     public function expenses(): HasMany
     {
         return $this->hasMany(FarmExpense::class);
+    }
+
+    public function activities(): HasMany
+    {
+        return $this->hasMany(CropActivity::class);
+    }
+
+    public function inputApplications(): HasMany
+    {
+        return $this->hasMany(CropInputApplication::class);
+    }
+
+    public function scoutingRecords(): HasMany
+    {
+        return $this->hasMany(CropScoutingRecord::class);
+    }
+
+    public function getTotalInputCostAttribute(): float
+    {
+        return (float) $this->inputApplications()->sum('total_cost');
+    }
+
+    public function getTotalActivityCostAttribute(): float
+    {
+        return (float) $this->activities()->sum('cost');
     }
 
     public function getTotalHarvestedAttribute(): float

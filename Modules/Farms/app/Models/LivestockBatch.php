@@ -4,6 +4,7 @@ namespace Modules\Farms\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\Company;
 
 class LivestockBatch extends Model
@@ -49,6 +50,31 @@ class LivestockBatch extends Model
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
+    }
+
+    public function healthRecords(): HasMany
+    {
+        return $this->hasMany(LivestockHealthRecord::class);
+    }
+
+    public function weightRecords(): HasMany
+    {
+        return $this->hasMany(LivestockWeightRecord::class);
+    }
+
+    public function feedRecords(): HasMany
+    {
+        return $this->hasMany(LivestockFeedRecord::class);
+    }
+
+    public function mortalityLogs(): HasMany
+    {
+        return $this->hasMany(LivestockMortalityLog::class);
+    }
+
+    public function getTotalFeedCostAttribute(): float
+    {
+        return (float) $this->feedRecords()->sum('total_cost');
     }
 
     public function getMortalityRateAttribute(): float

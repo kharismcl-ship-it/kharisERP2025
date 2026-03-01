@@ -5,18 +5,32 @@ namespace Modules\Farms\Providers;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
+use Modules\Farms\Models\CropActivity;
 use Modules\Farms\Models\CropCycle;
+use Modules\Farms\Models\CropInputApplication;
+use Modules\Farms\Models\CropScoutingRecord;
 use Modules\Farms\Models\Farm;
 use Modules\Farms\Models\FarmExpense;
 use Modules\Farms\Models\FarmPlot;
 use Modules\Farms\Models\HarvestRecord;
 use Modules\Farms\Models\LivestockBatch;
+use Modules\Farms\Models\LivestockFeedRecord;
+use Modules\Farms\Models\LivestockHealthRecord;
+use Modules\Farms\Models\LivestockMortalityLog;
+use Modules\Farms\Models\LivestockWeightRecord;
+use Modules\Farms\Policies\CropActivityPolicy;
 use Modules\Farms\Policies\CropCyclePolicy;
+use Modules\Farms\Policies\CropInputApplicationPolicy;
+use Modules\Farms\Policies\CropScoutingRecordPolicy;
 use Modules\Farms\Policies\FarmExpensePolicy;
 use Modules\Farms\Policies\FarmPlotPolicy;
 use Modules\Farms\Policies\FarmPolicy;
 use Modules\Farms\Policies\HarvestRecordPolicy;
 use Modules\Farms\Policies\LivestockBatchPolicy;
+use Modules\Farms\Policies\LivestockFeedRecordPolicy;
+use Modules\Farms\Policies\LivestockHealthRecordPolicy;
+use Modules\Farms\Policies\LivestockMortalityLogPolicy;
+use Modules\Farms\Policies\LivestockWeightRecordPolicy;
 use Modules\Farms\Services\FarmService;
 use Nwidart\Modules\Traits\PathNamespace;
 use RecursiveDirectoryIterator;
@@ -70,6 +84,15 @@ class FarmsServiceProvider extends ServiceProvider
         Gate::policy(LivestockBatch::class, LivestockBatchPolicy::class);
         Gate::policy(HarvestRecord::class, HarvestRecordPolicy::class);
         Gate::policy(FarmExpense::class, FarmExpensePolicy::class);
+        // Phase 2 — livestock detail records
+        Gate::policy(LivestockHealthRecord::class, LivestockHealthRecordPolicy::class);
+        Gate::policy(LivestockWeightRecord::class, LivestockWeightRecordPolicy::class);
+        Gate::policy(LivestockFeedRecord::class, LivestockFeedRecordPolicy::class);
+        Gate::policy(LivestockMortalityLog::class, LivestockMortalityLogPolicy::class);
+        // Phase 3 — crop detail records
+        Gate::policy(CropActivity::class, CropActivityPolicy::class);
+        Gate::policy(CropInputApplication::class, CropInputApplicationPolicy::class);
+        Gate::policy(CropScoutingRecord::class, CropScoutingRecordPolicy::class);
     }
 
     /**

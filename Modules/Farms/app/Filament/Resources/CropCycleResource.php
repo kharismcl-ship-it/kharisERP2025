@@ -179,6 +179,9 @@ class CropCycleResource extends Resource
         return [
             RelationManagers\HarvestRecordsRelationManager::class,
             RelationManagers\FarmExpensesRelationManager::class,
+            RelationManagers\ActivitiesRelationManager::class,
+            RelationManagers\InputApplicationsRelationManager::class,
+            RelationManagers\ScoutingRecordsRelationManager::class,
         ];
     }
 
