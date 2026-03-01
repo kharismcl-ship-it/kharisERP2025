@@ -5,6 +5,8 @@ namespace Modules\Farms\Services;
 use Modules\Farms\Models\CropCycle;
 use Modules\Farms\Models\Farm;
 use Modules\Farms\Models\FarmExpense;
+use Modules\Farms\Models\FarmTask;
+use Modules\Farms\Models\FarmWorker;
 use Modules\Farms\Models\HarvestRecord;
 use Modules\Farms\Models\LivestockBatch;
 
@@ -172,5 +174,58 @@ class FarmService
             return null;
         }
         return round($totalFeedKg / $weightGained, 2);
+    }
+
+    // ── Phase 4 — Farm Tasks & HR Workers ─────────────────────────────────
+
+    /**
+     * Total labour cost for a crop cycle (activity worker costs).
+     */
+    public function labourCostForCycle(CropCycle $cycle): float
+    {
+        return (float) $cycle->activities()->sum('cost');
+    }
+
+    /**
+     * All open (incomplete) tasks for a farm.
+     */
+    public function openTasksByFarm(Farm $farm): \Illuminate\Database\Eloquent\Collection
+    {
+        return FarmTask::where('farm_id', $farm->id)
+            ->whereNull('completed_at')
+            ->orderBy('due_date')
+            ->get();
+    }
+
+    /**
+     * All overdue tasks for a farm (past due date and not completed).
+     */
+    public function overdueTasksByFarm(Farm $farm): \Illuminate\Database\Eloquent\Collection
+    {
+        return FarmTask::where('farm_id', $farm->id)
+            ->whereNull('completed_at')
+            ->whereNotNull('due_date')
+            ->whereDate('due_date', '<', now())
+            ->orderBy('due_date')
+            ->get();
+    }
+
+    /**
+     * List workers for a farm who are currently on leave (HR integration).
+     */
+    public function workersOnLeave(Farm $farm): array
+    {
+        $workers = FarmWorker::where('farm_id', $farm->id)
+            ->whereNotNull('employee_id')
+            ->with('employee')
+            ->get();
+
+        return $workers->filter(function ($worker) {
+            return \Modules\HR\Models\LeaveRequest::where('employee_id', $worker->employee_id)
+                ->where('status', 'approved')
+                ->whereDate('start_date', '<=', now())
+                ->whereDate('end_date', '>=', now())
+                ->exists();
+        })->values()->all();
     }
 }

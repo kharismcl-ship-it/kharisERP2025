@@ -9,6 +9,8 @@ use Modules\Farms\Filament\Resources\CropCycleResource;
 use Modules\Farms\Filament\Resources\CropScoutingResource;
 use Modules\Farms\Filament\Resources\FarmExpenseResource;
 use Modules\Farms\Filament\Resources\FarmResource;
+use Modules\Farms\Filament\Resources\FarmTaskResource;
+use Modules\Farms\Filament\Resources\FarmWorkerResource;
 use Modules\Farms\Filament\Resources\LivestockBatchResource;
 use Modules\Farms\Filament\Resources\LivestockHealthRecordResource;
 
@@ -28,6 +30,8 @@ class FarmsFilamentPlugin implements Plugin
             LivestockHealthRecordResource::class,
             CropActivityResource::class,
             CropScoutingResource::class,
+            FarmWorkerResource::class,
+            FarmTaskResource::class,
             FarmExpenseResource::class,
         ]);
     }
