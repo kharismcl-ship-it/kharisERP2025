@@ -35,6 +35,10 @@ class PurchaseOrder extends Model
         'ordered_at',
         'received_at',
         'finance_invoice_id',
+        'hostel_id',
+        'project_id',
+        'farm_id',
+        'module_tag',
     ];
 
     protected $casts = [

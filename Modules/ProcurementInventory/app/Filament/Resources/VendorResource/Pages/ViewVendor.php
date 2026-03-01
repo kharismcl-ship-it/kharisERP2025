@@ -9,6 +9,7 @@ use Filament\Resources\Pages\ViewRecord;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Modules\ProcurementInventory\Filament\Resources\VendorResource;
+use Modules\ProcurementInventory\Models\PurchaseOrder;
 
 class ViewVendor extends ViewRecord
 {
@@ -70,6 +71,56 @@ class ViewVendor extends ViewRecord
                 ->collapsible()
                 ->schema([
                     TextEntry::make('notes')->placeholder('None'),
+                ]),
+
+            Section::make('Procurement Summary')
+                ->columns(3)
+                ->schema([
+                    TextEntry::make('total_pos')
+                        ->label('Total POs')
+                        ->getStateUsing(fn ($record) => $record->purchaseOrders()->count()),
+
+                    TextEntry::make('open_pos')
+                        ->label('Open POs')
+                        ->getStateUsing(fn ($record) => $record->purchaseOrders()
+                            ->whereIn('status', ['submitted', 'approved', 'ordered', 'partially_received'])
+                            ->count()),
+
+                    TextEntry::make('total_spend')
+                        ->label('Total Spend (GHS)')
+                        ->getStateUsing(fn ($record) => number_format(
+                            $record->purchaseOrders()
+                                ->whereIn('status', ['received', 'closed'])
+                                ->sum('total'),
+                            2
+                        )),
+
+                    TextEntry::make('mtd_spend')
+                        ->label('Spend This Month (GHS)')
+                        ->getStateUsing(fn ($record) => number_format(
+                            $record->purchaseOrders()
+                                ->whereIn('status', ['received', 'closed'])
+                                ->whereMonth('po_date', now()->month)
+                                ->whereYear('po_date', now()->year)
+                                ->sum('total'),
+                            2
+                        )),
+
+                    TextEntry::make('ytd_spend')
+                        ->label('Spend This Year (GHS)')
+                        ->getStateUsing(fn ($record) => number_format(
+                            $record->purchaseOrders()
+                                ->whereIn('status', ['received', 'closed'])
+                                ->whereYear('po_date', now()->year)
+                                ->sum('total'),
+                            2
+                        )),
+
+                    TextEntry::make('last_po_date')
+                        ->label('Last PO Date')
+                        ->getStateUsing(fn ($record) => optional(
+                            $record->purchaseOrders()->latest('po_date')->first()
+                        )->po_date?->format('d M Y') ?? '—'),
                 ]),
 
             Section::make('Audit')

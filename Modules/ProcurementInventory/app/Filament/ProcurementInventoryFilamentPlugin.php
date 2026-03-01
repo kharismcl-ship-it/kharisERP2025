@@ -4,6 +4,7 @@ namespace Modules\ProcurementInventory\Filament;
 
 use Filament\Contracts\Plugin;
 use Filament\Panel;
+use Modules\ProcurementInventory\Filament\Pages\ProcurementDashboard;
 use Modules\ProcurementInventory\Filament\Resources\GoodsReceiptResource;
 use Modules\ProcurementInventory\Filament\Resources\ItemCategoryResource;
 use Modules\ProcurementInventory\Filament\Resources\ItemResource;
@@ -26,6 +27,10 @@ class ProcurementInventoryFilamentPlugin implements Plugin
 
     public function register(Panel $panel): void
     {
+        $panel->pages([
+            ProcurementDashboard::class,
+        ]);
+
         $panel->resources([
             ItemCategoryResource::class,
             ItemResource::class,
