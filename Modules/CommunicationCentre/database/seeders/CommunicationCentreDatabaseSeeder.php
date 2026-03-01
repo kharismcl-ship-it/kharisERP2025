@@ -19,6 +19,7 @@ class CommunicationCentreDatabaseSeeder extends Seeder
             LeaveCommTemplateSeeder::class,
             FinanceCommTemplateSeeder::class,
             ProcurementCommTemplateSeeder::class,
+            FleetCommTemplateSeeder::class,
             CommPreferenceSeeder::class,
         ]);
     }

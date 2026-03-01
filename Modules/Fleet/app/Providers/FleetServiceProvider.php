@@ -2,9 +2,12 @@
 
 namespace Modules\Fleet\Providers;
 
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
+use Modules\Fleet\Console\Commands\FleetDocumentExpiryAlertCommand;
+use Modules\Fleet\Console\Commands\FleetServiceDueAlertCommand;
 use Modules\Fleet\Models\DriverAssignment;
 use Modules\Fleet\Models\FuelLog;
 use Modules\Fleet\Models\MaintenanceRecord;
@@ -74,7 +77,10 @@ class FleetServiceProvider extends ServiceProvider
      */
     protected function registerCommands(): void
     {
-        // $this->commands([]);
+        $this->commands([
+            FleetDocumentExpiryAlertCommand::class,
+            FleetServiceDueAlertCommand::class,
+        ]);
     }
 
     /**
@@ -82,10 +88,11 @@ class FleetServiceProvider extends ServiceProvider
      */
     protected function registerCommandSchedules(): void
     {
-        // $this->app->booted(function () {
-        //     $schedule = $this->app->make(Schedule::class);
-        //     $schedule->command('inspire')->hourly();
-        // });
+        $this->app->booted(function () {
+            $schedule = $this->app->make(Schedule::class);
+            $schedule->command('fleet:document-expiry-alert')->dailyAt('08:00');
+            $schedule->command('fleet:service-due-alert')->dailyAt('08:30');
+        });
     }
 
     /**
