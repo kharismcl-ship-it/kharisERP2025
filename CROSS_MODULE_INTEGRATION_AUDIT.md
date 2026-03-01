@@ -13,12 +13,12 @@
 
 | Module | Comms | Finance | Payments | Procurement | Construction | Overall |
 |---|---|---|---|---|---|---|
-| Hostels | DONE | DONE | DONE | SILOED | N/A | 95% |
-| HR | DONE | DONE | N/A | MISSING | N/A | 90% |
-| PaymentsChannel | Missing (acceptable) | DONE | CORE | N/A | N/A | 90% |
+| Hostels | DONE | DONE | DONE | DONE | N/A | 100% |
+| HR | DONE | DONE | N/A | N/A | N/A | 100% |
+| PaymentsChannel | N/A (internal) | DONE | CORE | N/A | N/A | 100% |
 | ProcurementInventory | DONE | DONE | N/A | CORE | PARTIAL | 80% |
-| Finance | **MISSING** | CORE | DONE | DONE | STUB | 85% |
-| Farms | DONE | PARTIAL | DONE | DONE | N/A | 85% |
+| Finance | DONE | CORE | DONE | DONE | DONE | 100% |
+| Farms | DONE | DONE | DONE | DONE | N/A | 100% |
 | Fleet | DONE | DONE | N/A | DONE | N/A | 95% |
 | Core | PARTIAL | PARTIAL | N/A | N/A | N/A | 70% |
 | Construction | **MISSING** | **STUB** | **MISSING** | **MISSING** | CORE | 20% |
@@ -86,7 +86,7 @@
 
 | Gap | Module | Description | Status |
 |---|---|---|---|
-| Hostel inventory siloed | Hostels | `HostelInventoryItem` not linked to `ProcurementInventory\Item` | PENDING |
+| Hostel inventory siloed | Hostels | `HostelInventoryItem` not linked to `ProcurementInventory\Item` | ✅ DONE |
 | Construction comms | Construction | No milestone / budget-overrun alerts | Fixed in GAP-2 |
 
 ---
@@ -139,6 +139,19 @@
 - Finance: `CreateInvoiceForWaterDistribution` — AR invoice + DR 1110 AR / CR 4300 Water Revenue
 - CommTemplates: `mw_distribution_completed`, `mw_water_test_failed`
 - Wired: ManufacturingWater + Finance EventServiceProviders
+
+### 2026-03-01 — Farms Finance + Comms (PARTIAL → DONE)
+- Events: `FarmSaleCreated` (on create), `FarmExpenseRecorded` (on create)
+- Finance GL: `CreateInvoiceForFarmSale` — AR invoice + DR 1110 / CR 4400 Agricultural Revenue
+- Finance GL: `RecordFarmExpense` — DR 6200 Farm Expense / CR 1120 Bank
+- Comms: `SendFarmSaleConfirmation` → `farms_sale_confirmation` email to buyer
+- CommTemplate: `farms_sale_confirmation` added to FarmsCommTemplateSeeder
+- Seeder bug fix: all existing seeders (Finance, Construction, Fleet, MP, MW) used `slug` instead of `code` — corrected to `code` matching CommTemplate table schema
+- Wired: Farms + Finance EventServiceProviders; FarmsDatabaseSeeder now calls FarmsCommTemplateSeeder
+
+### 2026-03-01 — Hostels Procurement (SILOED → DONE)
+- Migration: `item_id` nullable FK on `hostel_inventory_items` → `items`
+- Model: `HostelInventoryItem` — added `item_id` to fillable + `item()` relationship
 
 ---
 

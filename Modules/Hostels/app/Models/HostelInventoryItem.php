@@ -11,6 +11,7 @@ class HostelInventoryItem extends Model
 
     protected $fillable = [
         'hostel_id',
+        'item_id',
         'name',
         'category',
         'description',
@@ -30,6 +31,11 @@ class HostelInventoryItem extends Model
     public function hostel()
     {
         return $this->belongsTo(Hostel::class);
+    }
+
+    public function item()
+    {
+        return $this->belongsTo(\Modules\ProcurementInventory\Models\Item::class);
     }
 
     public function transactions()

@@ -11,6 +11,8 @@ class FarmsDatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // $this->call([]);
+        $this->call([
+            FarmsCommTemplateSeeder::class,
+        ]);
     }
 }

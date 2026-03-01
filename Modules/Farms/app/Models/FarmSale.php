@@ -4,6 +4,7 @@ namespace Modules\Farms\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Modules\Farms\Events\FarmSaleCreated;
 use Modules\PaymentsChannel\Traits\HasPayments;
 
 class FarmSale extends Model
@@ -36,6 +37,10 @@ class FarmSale extends Model
             if (! $sale->isDirty('total_amount')) {
                 $sale->total_amount = round($sale->quantity * $sale->unit_price, 2);
             }
+        });
+
+        static::created(function (self $sale) {
+            FarmSaleCreated::dispatch($sale);
         });
     }
 

@@ -118,8 +118,36 @@ EOD,
             ],
         ];
 
+        // Sale confirmation template
+        $templates[] = [
+            'code'        => 'farms_sale_confirmation',
+            'channel'     => 'email',
+            'name'        => 'Farms: Sale Confirmation',
+            'subject'     => 'Farm Sale Confirmation — {{product_name}}',
+            'body'        => <<<'EOD'
+Dear {{buyer_name}},
+
+Thank you for your purchase. Please find your sale confirmation below.
+
+Farm:         {{farm_name}}
+Product:      {{product_name}} ({{product_type}})
+Quantity:     {{quantity}} {{unit}}
+Unit Price:   {{currency}} {{unit_price}}
+Total Amount: {{currency}} {{total_amount}}
+Sale Date:    {{sale_date}}
+
+An invoice will be issued for payment within 14 days.
+
+Thank you for your business.
+
+Best regards,
+Farm Management
+EOD,
+            'description' => 'Sent to buyer when a farm sale record is created.',
+        ];
+
         foreach ($templates as $data) {
-            CommTemplate::firstOrCreate(['code' => $data['code']], $data);
+            CommTemplate::updateOrCreate(['code' => $data['code']], $data);
         }
 
         $this->command->info('Farms comm templates seeded: ' . count($templates) . ' templates.');

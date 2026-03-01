@@ -17,6 +17,10 @@ class EventServiceProvider extends ServiceProvider
         PaymentSucceeded::class => [
             FarmSalePaymentListener::class,
         ],
+        // Farm sale comms — CommunicationCentre integration
+        \Modules\Farms\Events\FarmSaleCreated::class => [
+            \Modules\Farms\Listeners\SendFarmSaleConfirmation::class,
+        ],
     ];
 
     /**

@@ -66,6 +66,13 @@ class EventServiceProvider extends ServiceProvider
         \Modules\ManufacturingWater\Events\MwDistributionCompleted::class => [
             \Modules\Finance\Listeners\ManufacturingWater\CreateInvoiceForWaterDistribution::class,
         ],
+        // Farms Finance integration — sale invoice + expense GL
+        \Modules\Farms\Events\FarmSaleCreated::class => [
+            \Modules\Finance\Listeners\Farms\CreateInvoiceForFarmSale::class,
+        ],
+        \Modules\Farms\Events\FarmExpenseRecorded::class => [
+            \Modules\Finance\Listeners\Farms\RecordFarmExpense::class,
+        ],
     ];
 
     /**

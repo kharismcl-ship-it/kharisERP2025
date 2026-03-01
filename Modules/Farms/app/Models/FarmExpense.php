@@ -5,6 +5,7 @@ namespace Modules\Farms\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\Company;
+use Modules\Farms\Events\FarmExpenseRecorded;
 
 class FarmExpense extends Model
 {
@@ -26,6 +27,13 @@ class FarmExpense extends Model
     ];
 
     const CATEGORIES = ['seeds', 'fertilizer', 'pesticides', 'labour', 'equipment', 'irrigation', 'other'];
+
+    protected static function booted(): void
+    {
+        static::created(function (self $expense) {
+            FarmExpenseRecorded::dispatch($expense);
+        });
+    }
 
     public function farm(): BelongsTo
     {
