@@ -334,30 +334,51 @@ class EnhancedIntegrationService
      */
     public function recordProcurementExpense($purchaseOrder)
     {
-        // Create journal entries for the procurement expense
+        $companyId = $purchaseOrder->company_id;
+        $total     = (float) $purchaseOrder->total;
+
+        // Create AP vendor invoice in Finance
+        $vendorName = $purchaseOrder->vendor->name ?? 'Unknown Vendor';
+        $invoice = \Modules\Finance\Models\Invoice::create([
+            'company_id'     => $companyId,
+            'type'           => 'vendor',
+            'vendor_id'      => $purchaseOrder->vendor_id,
+            'customer_name'  => $vendorName,
+            'customer_type'  => 'vendor',
+            'invoice_number' => 'AP-'.$purchaseOrder->po_number,
+            'invoice_date'   => now()->toDateString(),
+            'due_date'       => now()->addDays(30)->toDateString(),
+            'status'         => 'draft',
+            'sub_total'      => (float) $purchaseOrder->subtotal,
+            'tax_total'      => (float) $purchaseOrder->tax_total,
+            'total'          => $total,
+        ]);
+
+        // Link back to PO
+        $purchaseOrder->update(['finance_invoice_id' => $invoice->id]);
+
+        // Journal: DR Inventory (1300) / Procurement Expense (5500), CR Accounts Payable (2110)
         $journalEntry = JournalEntry::create([
-            'company_id' => $purchaseOrder->company_id,
-            'date' => now(),
-            'reference' => 'PO: '.$purchaseOrder->po_number,
-            'description' => 'Procurement expense for Purchase Order: '.$purchaseOrder->po_number,
+            'company_id'  => $companyId,
+            'date'        => now(),
+            'reference'   => 'AP-'.$purchaseOrder->po_number,
+            'description' => "AP invoice — PO {$purchaseOrder->po_number} from {$vendorName}",
         ]);
 
-        // Debit expense account
+        $inventoryAccount = $this->getAccountId('inventory', $companyId);
         \Modules\Finance\Models\JournalLine::create([
             'journal_entry_id' => $journalEntry->id,
-            'account_id' => $this->getAccountId('procurement_expense'),
-            'description' => 'Procurement Expense',
-            'debit' => $purchaseOrder->total_amount,
-            'credit' => 0,
+            'account_id'       => $inventoryAccount,
+            'debit'            => $total,
+            'credit'           => 0,
         ]);
 
-        // Credit accounts payable
+        $apAccount = $this->getAccountId('accounts_payable', $companyId);
         \Modules\Finance\Models\JournalLine::create([
             'journal_entry_id' => $journalEntry->id,
-            'account_id' => $this->getAccountId('accounts_payable'),
-            'description' => 'Accounts Payable for Purchase Order',
-            'debit' => 0,
-            'credit' => $purchaseOrder->total_amount,
+            'account_id'       => $apAccount,
+            'debit'            => 0,
+            'credit'           => $total,
         ]);
     }
 
@@ -552,15 +573,17 @@ class EnhancedIntegrationService
      */
     private function getAccountId(string $accountType, ?int $companyId = null)
     {
+        // Codes match ChartOfAccountsSeeder COA
         $map = [
-            'accounts_receivable' => ['code' => 'AR', 'type' => 'asset', 'name_like' => 'Receivable'],
-            'accounts_payable' => ['code' => 'AP', 'type' => 'liability', 'name_like' => 'Payable'],
-            'revenue' => ['code' => 'REV', 'type' => 'income', 'name_like' => 'Revenue'],
-            'bank' => ['code' => 'BANK', 'type' => 'asset', 'name_like' => 'Bank'],
-            'procurement_expense' => ['code' => 'PROCEXP', 'type' => 'expense', 'name_like' => 'Procurement'],
-            'fuel_expense' => ['code' => 'FUELEXP', 'type' => 'expense', 'name_like' => 'Fuel'],
-            'maintenance_expense' => ['code' => 'MAINTEXP', 'type' => 'expense', 'name_like' => 'Maintenance'],
-            'salary_expense' => ['code' => 'SALARYEXP', 'type' => 'expense', 'name_like' => 'Salary'],
+            'accounts_receivable' => ['code' => '1200', 'type' => 'asset',     'name_like' => 'Receivable'],
+            'accounts_payable'    => ['code' => '2110', 'type' => 'liability', 'name_like' => 'Payable'],
+            'revenue'             => ['code' => '4100', 'type' => 'income',    'name_like' => 'Revenue'],
+            'bank'                => ['code' => '1120', 'type' => 'asset',     'name_like' => 'Bank'],
+            'inventory'           => ['code' => '1300', 'type' => 'asset',     'name_like' => 'Inventory'],
+            'procurement_expense' => ['code' => '5500', 'type' => 'expense',   'name_like' => 'Procurement'],
+            'fuel_expense'        => ['code' => '5410', 'type' => 'expense',   'name_like' => 'Fuel'],
+            'maintenance_expense' => ['code' => '5340', 'type' => 'expense',   'name_like' => 'Maintenance'],
+            'salary_expense'      => ['code' => '5210', 'type' => 'expense',   'name_like' => 'Salaries'],
         ];
 
         $hint = $map[$accountType] ?? null;

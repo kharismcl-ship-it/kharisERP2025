@@ -2,22 +2,37 @@
 
 namespace Modules\Finance\Listeners\ProcurementInventory;
 
+use Illuminate\Support\Facades\Log;
 use Modules\Finance\Services\EnhancedIntegrationService;
+use Modules\ProcurementInventory\Events\PurchaseOrderApproved;
 
 class RecordPurchaseOrderExpense
 {
-    /**
-     * Handle the event.
-     *
-     * @param  mixed  $event
-     * @return void
-     */
-    public function handle($event)
+    public function handle(PurchaseOrderApproved $event): void
     {
-        // When a purchase order is approved, record it as an expense
-        $integrationService = app(EnhancedIntegrationService::class);
+        $po = $event->purchaseOrder->load('vendor', 'lines');
 
-        // This would be implemented when the ProcurementInventory module is fully developed
-        // $integrationService->recordProcurementExpense($event->purchaseOrder);
+        if ($po->finance_invoice_id) {
+            Log::info('RecordPurchaseOrderExpense: AP invoice already exists', [
+                'po_id'              => $po->id,
+                'finance_invoice_id' => $po->finance_invoice_id,
+            ]);
+
+            return;
+        }
+
+        try {
+            app(EnhancedIntegrationService::class)->recordProcurementExpense($po);
+
+            Log::info('RecordPurchaseOrderExpense: AP invoice and journal created', [
+                'po_id'     => $po->id,
+                'po_number' => $po->po_number,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('RecordPurchaseOrderExpense: failed', [
+                'po_id' => $po->id,
+                'error' => $e->getMessage(),
+            ]);
+        }
     }
 }

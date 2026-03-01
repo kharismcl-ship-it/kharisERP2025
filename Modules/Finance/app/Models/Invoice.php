@@ -13,8 +13,15 @@ class Invoice extends Model
     /**
      * The attributes that are mass assignable.
      */
+    public const TYPES = [
+        'customer' => 'Customer Invoice (AR)',
+        'vendor'   => 'Vendor Invoice (AP)',
+    ];
+
     protected $fillable = [
         'company_id',
+        'type',
+        'vendor_id',
         'customer_name',
         'customer_type',
         'customer_id',

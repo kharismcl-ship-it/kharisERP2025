@@ -30,6 +30,12 @@ class EventServiceProvider extends ServiceProvider
         \Modules\HR\Events\PayrollFinalized::class => [
             \Modules\Finance\Listeners\HR\RecordPayrollExpense::class,
         ],
+        \Modules\ProcurementInventory\Events\PurchaseOrderApproved::class => [
+            \Modules\Finance\Listeners\ProcurementInventory\RecordPurchaseOrderExpense::class,
+        ],
+        \Modules\ProcurementInventory\Events\GoodsReceived::class => [
+            \Modules\Finance\Listeners\ProcurementInventory\PostInventoryOnGoodsReceived::class,
+        ],
     ];
 
     /**

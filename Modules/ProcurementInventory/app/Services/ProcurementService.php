@@ -5,6 +5,8 @@ namespace Modules\ProcurementInventory\Services;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Modules\ProcurementInventory\Events\GoodsReceived;
+use Modules\ProcurementInventory\Events\PurchaseOrderApproved;
 use Modules\ProcurementInventory\Models\GoodsReceipt;
 use Modules\ProcurementInventory\Models\GoodsReceiptLine;
 use Modules\ProcurementInventory\Models\PurchaseOrder;
@@ -42,6 +44,8 @@ class ProcurementService
             // Track ordered qty against stock
             $this->stockService->incrementOnOrder($po->load('lines'));
         });
+
+        event(new PurchaseOrderApproved($po->fresh()));
 
         return $po->fresh();
     }
@@ -129,6 +133,8 @@ class ProcurementService
             // Update PO receipt status
             $po->load('lines');
             $po->updateReceiptStatus();
+
+            event(new GoodsReceived($grn->fresh()));
 
             // Create Finance payable invoice when PO is fully/partially received
             $this->createFinanceInvoice($po->fresh());
