@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Modules\Hostels\Database\factories\BookingFactory;
+use Modules\Hostels\Events\BookingCancelled;
+use Modules\Hostels\Events\BookingConfirmed;
 use Modules\Hostels\Events\HostelOccupantCheckedIn;
 use Modules\PaymentsChannel\Services\PaymentService;
 use Modules\PaymentsChannel\Traits\HasPayments;
@@ -577,6 +579,8 @@ class Booking extends Model
             $this->bed->update(['status' => 'available']);
         }
 
+        event(new BookingCancelled($this, $refundAmount));
+
         return [
             'success' => true,
             'refund_amount' => $refundAmount,
@@ -774,6 +778,8 @@ class Booking extends Model
                 $this->bed->update(['status' => 'reserved']);
             }
         });
+
+        event(new BookingConfirmed($this));
 
         return [
             'success' => true,

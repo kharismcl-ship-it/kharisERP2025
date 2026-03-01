@@ -15,6 +15,12 @@ class EventServiceProvider extends ServiceProvider
         \Modules\Hostels\Events\BookingPaymentCompleted::class => [
             \Modules\Finance\Listeners\Hostel\CreateInvoiceForBooking::class,
         ],
+        \Modules\Hostels\Events\BookingConfirmed::class => [
+            \Modules\Finance\Listeners\Hostel\UpdateInvoiceOnBookingConfirmed::class,
+        ],
+        \Modules\Hostels\Events\BookingCancelled::class => [
+            \Modules\Finance\Listeners\Hostel\CancelInvoiceOnBookingCancelled::class,
+        ],
         \Modules\PaymentsChannel\Events\PaymentSucceeded::class => [
             \Modules\Finance\Listeners\Payments\RecordPaymentOnSuccess::class,
         ],
