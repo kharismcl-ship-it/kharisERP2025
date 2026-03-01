@@ -27,6 +27,9 @@ class EventServiceProvider extends ServiceProvider
         \Modules\Core\Events\PaymentCompleted::class => [
             \Modules\Finance\Listeners\ProcessUnifiedPayment::class,
         ],
+        \Modules\HR\Events\PayrollFinalized::class => [
+            \Modules\Finance\Listeners\HR\RecordPayrollExpense::class,
+        ],
     ];
 
     /**

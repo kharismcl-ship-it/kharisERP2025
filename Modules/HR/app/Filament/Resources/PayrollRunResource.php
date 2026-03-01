@@ -17,6 +17,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Modules\HR\Events\PayrollFinalized;
 use Modules\HR\Filament\Resources\PayrollRunResource\Pages;
 use Modules\HR\Filament\Resources\PayrollRunResource\RelationManagers\PayrollLinesRelationManager;
 use Modules\HR\Models\PayrollRun;
@@ -183,6 +184,7 @@ class PayrollRunResource extends Resource
                         ->visible(fn (PayrollRun $record) => $record->status === 'finalized')
                         ->action(function (PayrollRun $record) {
                             $record->update(['status' => 'paid']);
+                            event(new PayrollFinalized($record));
                             Notification::make()->title('Payroll marked as paid')->success()->send();
                         }),
                     DeleteAction::make(),
