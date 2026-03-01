@@ -47,12 +47,28 @@ class FarmsLivestockHealthReminderCommand extends Command
             ];
 
             try {
-                $comms->sendFromTemplate(
-                    'farms_livestock_health_reminder_email',
-                    $params,
-                    ['email' => $farm->contact_email ?? null],
-                    $record->company_id
-                );
+                if ($farm->contact_email) {
+                    $comms->sendToContact(
+                        channel: 'email',
+                        toEmail: $farm->contact_email,
+                        toPhone: null,
+                        subject: null,
+                        templateCode: 'farms_livestock_health_reminder_email',
+                        data: $params
+                    );
+                }
+
+                if ($farm->owner_phone) {
+                    $comms->sendToContact(
+                        channel: 'sms',
+                        toEmail: null,
+                        toPhone: $farm->owner_phone,
+                        subject: null,
+                        templateCode: 'farms_livestock_health_reminder_sms',
+                        data: $params
+                    );
+                }
+
                 $sent++;
             } catch (\Throwable $e) {
                 $this->error("Failed health reminder for {$batch->batch_reference} ({$farm->name}): " . $e->getMessage());

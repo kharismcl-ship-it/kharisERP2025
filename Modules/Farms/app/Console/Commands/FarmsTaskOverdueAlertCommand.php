@@ -44,12 +44,28 @@ class FarmsTaskOverdueAlertCommand extends Command
             ];
 
             try {
-                $comms->sendFromTemplate(
-                    'farms_task_overdue_email',
-                    $params,
-                    ['email' => $farm->contact_email ?? null],
-                    $task->company_id
-                );
+                if ($farm->contact_email) {
+                    $comms->sendToContact(
+                        channel: 'email',
+                        toEmail: $farm->contact_email,
+                        toPhone: null,
+                        subject: null,
+                        templateCode: 'farms_task_overdue_email',
+                        data: $params
+                    );
+                }
+
+                if ($farm->owner_phone) {
+                    $comms->sendToContact(
+                        channel: 'sms',
+                        toEmail: null,
+                        toPhone: $farm->owner_phone,
+                        subject: null,
+                        templateCode: 'farms_task_overdue_sms',
+                        data: $params
+                    );
+                }
+
                 $sent++;
             } catch (\Throwable $e) {
                 $this->error("Failed to send alert for task #{$task->id} ({$farm->name}): " . $e->getMessage());

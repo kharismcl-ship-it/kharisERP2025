@@ -51,12 +51,28 @@ class FarmsHarvestDueAlertCommand extends Command
             ];
 
             try {
-                $comms->sendFromTemplate(
-                    'farms_harvest_due_email',
-                    $params,
-                    ['email' => $farm->contact_email ?? null],
-                    $cycle->company_id
-                );
+                if ($farm->contact_email) {
+                    $comms->sendToContact(
+                        channel: 'email',
+                        toEmail: $farm->contact_email,
+                        toPhone: null,
+                        subject: null,
+                        templateCode: 'farms_harvest_due_email',
+                        data: $params
+                    );
+                }
+
+                if ($farm->owner_phone) {
+                    $comms->sendToContact(
+                        channel: 'sms',
+                        toEmail: null,
+                        toPhone: $farm->owner_phone,
+                        subject: null,
+                        templateCode: 'farms_harvest_due_sms',
+                        data: $params
+                    );
+                }
+
                 $sent++;
             } catch (\Throwable $e) {
                 $this->error("Failed to send alert for {$cycle->crop_name} ({$farm->name}): " . $e->getMessage());

@@ -17,6 +17,7 @@ class MpProductionBatch extends Model
         'plant_id',
         'production_line_id',
         'paper_grade_id',
+        'item_id',
         'company_id',
         'batch_number',
         'quantity_planned',
@@ -89,5 +90,10 @@ class MpProductionBatch extends Model
     public function qualityRecords(): HasMany
     {
         return $this->hasMany(MpQualityRecord::class, 'production_batch_id');
+    }
+
+    public function item(): BelongsTo
+    {
+        return $this->belongsTo(\Modules\ProcurementInventory\Models\Item::class, 'item_id');
     }
 }

@@ -13,6 +13,9 @@ class ProcurementInventoryDatabaseSeeder extends Seeder
     {
         $this->call([
             ProcurementCommTemplateSeeder::class,
+            ItemCategorySeeder::class,
+            VendorSeeder::class,
+            ItemSeeder::class,
         ]);
     }
 }
