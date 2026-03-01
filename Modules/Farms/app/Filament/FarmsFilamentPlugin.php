@@ -52,11 +52,13 @@ class FarmsFilamentPlugin implements Plugin
             SoilTestRecordResource::class,
             CropVarietyResource::class,
         ]);
+
+        $panel->pages([FarmDashboard::class]);
     }
 
     public function boot(Panel $panel): void
     {
-        $panel->pages([FarmDashboard::class]);
+        //
     }
 
     public static function make(): static

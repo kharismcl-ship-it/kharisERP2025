@@ -40,7 +40,7 @@ class LivestockEventResource extends Resource
                 ->schema([
                     Select::make('livestock_batch_id')
                         ->label('Livestock Batch')
-                        ->relationship('livestockBatch', 'batch_name')
+                        ->relationship('livestockBatch', 'batch_reference')
                         ->searchable()
                         ->preload()
                         ->required(),
@@ -102,7 +102,7 @@ class LivestockEventResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('farm.name')->label('Farm')->sortable(),
-                TextColumn::make('livestockBatch.batch_name')->label('Batch')->searchable(),
+                TextColumn::make('livestockBatch.batch_reference')->label('Batch')->searchable(),
 
                 TextColumn::make('event_type')
                     ->badge()

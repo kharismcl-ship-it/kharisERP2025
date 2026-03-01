@@ -68,7 +68,7 @@ class CompanyResource extends Resource
                             ->dehydrated(true),
                         Forms\Components\Select::make('type')
                             ->options([
-                                'main' => 'Main Company',
+                                'hq' => 'HQ',
                                 'subsidiary' => 'Subsidiary',
 
                             ])

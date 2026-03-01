@@ -37,7 +37,7 @@ class ViewFarmWorker extends ViewRecord
 
                     TextEntry::make('farm.name')->label('Farm'),
 
-                    TextEntry::make('employee.job_title')
+                    TextEntry::make('employee.jobPosition.name')
                         ->label('HR Job Title')
                         ->placeholder('Not linked to HR'),
 

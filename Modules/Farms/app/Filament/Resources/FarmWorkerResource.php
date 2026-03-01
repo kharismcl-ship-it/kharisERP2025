@@ -107,7 +107,7 @@ class FarmWorkerResource extends Resource
 
                 TextColumn::make('farm.name')->label('Farm')->sortable(),
 
-                TextColumn::make('employee.job_title')
+                TextColumn::make('employee.jobPosition.name')
                     ->label('HR Job Title')
                     ->placeholder('—'),
 
