@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Modules\Farms\Models\CropActivity;
 use Modules\Farms\Models\CropCycle;
+use Modules\Farms\Models\FarmBudget;
+use Modules\Farms\Models\FarmSale;
 use Modules\Farms\Models\FarmTask;
 use Modules\Farms\Models\FarmWorker;
 use Modules\Farms\Models\CropInputApplication;
@@ -22,6 +24,8 @@ use Modules\Farms\Models\LivestockMortalityLog;
 use Modules\Farms\Models\LivestockWeightRecord;
 use Modules\Farms\Policies\CropActivityPolicy;
 use Modules\Farms\Policies\CropCyclePolicy;
+use Modules\Farms\Policies\FarmBudgetPolicy;
+use Modules\Farms\Policies\FarmSalePolicy;
 use Modules\Farms\Policies\FarmTaskPolicy;
 use Modules\Farms\Policies\FarmWorkerPolicy;
 use Modules\Farms\Policies\CropInputApplicationPolicy;
@@ -100,6 +104,9 @@ class FarmsServiceProvider extends ServiceProvider
         // Phase 4 — farm tasks & HR workers
         Gate::policy(FarmWorker::class, FarmWorkerPolicy::class);
         Gate::policy(FarmTask::class, FarmTaskPolicy::class);
+        // Phase 5 — financial integration
+        Gate::policy(FarmSale::class, FarmSalePolicy::class);
+        Gate::policy(FarmBudget::class, FarmBudgetPolicy::class);
     }
 
     /**

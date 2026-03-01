@@ -4,7 +4,9 @@ namespace Modules\Farms\Services;
 
 use Modules\Farms\Models\CropCycle;
 use Modules\Farms\Models\Farm;
+use Modules\Farms\Models\FarmBudget;
 use Modules\Farms\Models\FarmExpense;
+use Modules\Farms\Models\FarmSale;
 use Modules\Farms\Models\FarmTask;
 use Modules\Farms\Models\FarmWorker;
 use Modules\Farms\Models\HarvestRecord;
@@ -208,6 +210,66 @@ class FarmService
             ->whereDate('due_date', '<', now())
             ->orderBy('due_date')
             ->get();
+    }
+
+    // ── Phase 5 — Financial Integration ───────────────────────────────────
+
+    /**
+     * Create a Finance invoice from a FarmSale and link it back.
+     */
+    public function createSaleInvoice(FarmSale $sale): ?\Modules\Finance\Models\Invoice
+    {
+        // Guard: Finance module must be available
+        if (! class_exists(\Modules\Finance\Models\Invoice::class)) {
+            return null;
+        }
+
+        $invoice = \Modules\Finance\Models\Invoice::create([
+            'company_id'   => $sale->company_id,
+            'invoice_date' => $sale->sale_date,
+            'due_date'     => $sale->sale_date->addDays(30),
+            'status'       => 'draft',
+            'notes'        => "Farm sale: {$sale->product_name} ({$sale->farm->name})",
+        ]);
+
+        // Add invoice line
+        \Modules\Finance\Models\InvoiceLine::create([
+            'invoice_id'  => $invoice->id,
+            'description' => "{$sale->quantity} {$sale->unit} of {$sale->product_name}",
+            'quantity'    => $sale->quantity,
+            'unit_price'  => $sale->unit_price,
+            'amount'      => $sale->total_amount,
+        ]);
+
+        $sale->update(['invoice_id' => $invoice->id, 'payment_status' => 'pending']);
+
+        return $invoice;
+    }
+
+    /**
+     * Budget vs actual summary for a farm, optionally for a specific year.
+     */
+    public function budgetVsActual(Farm $farm, ?int $year = null): array
+    {
+        $year  = $year ?? now()->year;
+        $budgets = FarmBudget::where('farm_id', $farm->id)
+            ->where('budget_year', $year)
+            ->get();
+
+        $totalBudgeted = $budgets->sum('budgeted_amount');
+        $totalActual   = $budgets->sum('actual_amount');
+        $variance      = $totalActual - $totalBudgeted;
+        $variancePct   = $totalBudgeted > 0
+            ? round(($variance / $totalBudgeted) * 100, 1)
+            : null;
+
+        $byCategory = $budgets->groupBy('category')->map(fn ($group) => [
+            'budgeted' => $group->sum('budgeted_amount'),
+            'actual'   => $group->sum('actual_amount'),
+            'variance' => $group->sum('actual_amount') - $group->sum('budgeted_amount'),
+        ])->toArray();
+
+        return compact('totalBudgeted', 'totalActual', 'variance', 'variancePct', 'byCategory');
     }
 
     /**

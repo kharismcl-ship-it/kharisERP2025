@@ -7,8 +7,10 @@ use Filament\Panel;
 use Modules\Farms\Filament\Resources\CropActivityResource;
 use Modules\Farms\Filament\Resources\CropCycleResource;
 use Modules\Farms\Filament\Resources\CropScoutingResource;
+use Modules\Farms\Filament\Resources\FarmBudgetResource;
 use Modules\Farms\Filament\Resources\FarmExpenseResource;
 use Modules\Farms\Filament\Resources\FarmResource;
+use Modules\Farms\Filament\Resources\FarmSaleResource;
 use Modules\Farms\Filament\Resources\FarmTaskResource;
 use Modules\Farms\Filament\Resources\FarmWorkerResource;
 use Modules\Farms\Filament\Resources\LivestockBatchResource;
@@ -32,6 +34,8 @@ class FarmsFilamentPlugin implements Plugin
             CropScoutingResource::class,
             FarmWorkerResource::class,
             FarmTaskResource::class,
+            FarmSaleResource::class,
+            FarmBudgetResource::class,
             FarmExpenseResource::class,
         ]);
     }
