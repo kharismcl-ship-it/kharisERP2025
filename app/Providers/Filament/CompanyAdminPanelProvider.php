@@ -29,6 +29,7 @@ use Modules\Hostels\Filament\HostelsFilamentPlugin;
 use Modules\ManufacturingPaper\Filament\ManufacturingPaperFilamentPlugin;
 use Modules\ManufacturingWater\Filament\ManufacturingWaterFilamentPlugin;
 use Modules\ProcurementInventory\Filament\ProcurementInventoryFilamentPlugin;
+use Modules\Sales\Filament\SalesFilamentPlugin;
 
 class CompanyAdminPanelProvider extends PanelProvider
 {
@@ -98,6 +99,7 @@ class CompanyAdminPanelProvider extends PanelProvider
                 FarmsFilamentPlugin::make(),
                 ManufacturingPaperFilamentPlugin::make(),
                 ManufacturingWaterFilamentPlugin::make(),
+                SalesFilamentPlugin::make(),
             ])
 
             ->authMiddleware([

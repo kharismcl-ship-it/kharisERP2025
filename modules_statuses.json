@@ -10,5 +10,6 @@
     "Fleet": true,
     "Finance": true,
     "CommunicationCentre": true,
-    "PaymentsChannel": true
+    "PaymentsChannel": true,
+    "Sales": true
 }

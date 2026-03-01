@@ -25,6 +25,10 @@ class TripLog extends Model
         'return_time',
         'status',
         'notes',
+        'fare_amount',
+        'client_name',
+        'client_phone',
+        'client_email',
     ];
 
     protected $casts = [
@@ -32,6 +36,7 @@ class TripLog extends Model
         'start_mileage'=> 'decimal:2',
         'end_mileage'  => 'decimal:2',
         'distance_km'  => 'decimal:2',
+        'fare_amount'  => 'decimal:2',
     ];
 
     const STATUSES = ['planned', 'in_progress', 'completed', 'cancelled'];

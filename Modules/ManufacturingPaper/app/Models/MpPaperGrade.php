@@ -19,13 +19,17 @@ class MpPaperGrade extends Model
         'color',
         'category',
         'description',
+        'unit_selling_price',
+        'min_order_quantity',
         'is_active',
     ];
 
     protected $casts = [
-        'is_active' => 'boolean',
-        'gsm'       => 'decimal:2',
-        'width_mm'  => 'decimal:2',
+        'is_active'          => 'boolean',
+        'gsm'                => 'decimal:2',
+        'width_mm'           => 'decimal:2',
+        'unit_selling_price' => 'decimal:4',
+        'min_order_quantity' => 'decimal:3',
     ];
 
     const CATEGORIES = ['printing', 'writing', 'packaging', 'tissue', 'specialty', 'newsprint', 'kraft'];

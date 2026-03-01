@@ -22,6 +22,9 @@ class MwDistributionRecord extends Model
         'total_amount',
         'vehicle_info',
         'distribution_reference',
+        'customer_name',
+        'customer_phone',
+        'customer_email',
         'notes',
     ];
 
