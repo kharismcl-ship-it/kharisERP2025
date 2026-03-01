@@ -62,6 +62,8 @@ class FinanceServiceProvider extends ServiceProvider
             \Modules\Finance\Console\Commands\SyncFleetToExpensesCommand::class,
             \Modules\Finance\Console\Commands\SyncHRToExpensesCommand::class,
             \Modules\Finance\Console\Commands\MarkOverdueInvoicesCommand::class,
+            \Modules\Finance\Console\Commands\GenerateRecurringInvoicesCommand::class,
+            \Modules\Finance\Console\Commands\DepreciationAccrualCommand::class,
         ]);
     }
 
@@ -73,6 +75,8 @@ class FinanceServiceProvider extends ServiceProvider
         $this->app->booted(function () {
             $schedule = $this->app->make(\Illuminate\Console\Scheduling\Schedule::class);
             $schedule->command('finance:mark-overdue')->dailyAt('01:00');
+            $schedule->command('finance:generate-recurring-invoices')->dailyAt('06:00');
+            $schedule->command('finance:accrue-depreciation')->monthlyOn(1, '02:00');
         });
     }
 

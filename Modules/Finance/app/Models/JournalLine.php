@@ -17,6 +17,7 @@ class JournalLine extends Model
         'account_id',
         'debit',
         'credit',
+        'cost_centre_id',
     ];
 
     /**
@@ -41,5 +42,10 @@ class JournalLine extends Model
     public function account()
     {
         return $this->belongsTo(Account::class, 'account_id');
+    }
+
+    public function costCentre()
+    {
+        return $this->belongsTo(CostCentre::class, 'cost_centre_id');
     }
 }

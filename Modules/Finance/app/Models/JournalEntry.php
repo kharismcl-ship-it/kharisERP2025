@@ -18,13 +18,16 @@ class JournalEntry extends Model
         'date',
         'reference',
         'description',
+        'period_id',
+        'is_locked',
     ];
 
     /**
      * The attributes that should be cast.
      */
     protected $casts = [
-        'date' => 'date',
+        'date'      => 'date',
+        'is_locked' => 'boolean',
     ];
 
     /**
@@ -41,5 +44,10 @@ class JournalEntry extends Model
     public function lines()
     {
         return $this->hasMany(JournalLine::class, 'journal_entry_id');
+    }
+
+    public function period()
+    {
+        return $this->belongsTo(AccountingPeriod::class, 'period_id');
     }
 }
