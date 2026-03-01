@@ -49,6 +49,8 @@ class BookingResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'Hostels';
 
+    protected static ?int $navigationSort = 6;
+
     public static function form(Schema $schema): Schema
     {
         return $schema
@@ -728,8 +730,6 @@ class BookingResource extends Resource
                     ->sortable()
                     ->toggleable(),
 
-                
-
                 TextColumn::make('booking_type')
                     ->label('Booking Type')
                     ->searchable()
@@ -823,7 +823,7 @@ class BookingResource extends Resource
                 ActionGroup::make([
                     EditAction::make(),
                     ViewAction::make(),
-                
+
                     \Filament\Actions\Action::make('approve')
                         ->label('Approve')
                         ->icon('heroicon-o-check')
@@ -894,7 +894,7 @@ class BookingResource extends Resource
                         ->visible(fn (Booking $booking) => $booking->status === 'confirmed' && ! $booking->hostel_occupant_id),
                     DeleteAction::make(),
                 ]),
-            
+
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

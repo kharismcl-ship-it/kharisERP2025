@@ -3,7 +3,22 @@
 namespace Modules\ProcurementInventory\Providers;
 
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
+use Modules\ProcurementInventory\Models\GoodsReceipt;
+use Modules\ProcurementInventory\Models\Item;
+use Modules\ProcurementInventory\Models\ItemCategory;
+use Modules\ProcurementInventory\Models\PurchaseOrder;
+use Modules\ProcurementInventory\Models\StockLevel;
+use Modules\ProcurementInventory\Models\Vendor;
+use Modules\ProcurementInventory\Policies\GoodsReceiptPolicy;
+use Modules\ProcurementInventory\Policies\ItemCategoryPolicy;
+use Modules\ProcurementInventory\Policies\ItemPolicy;
+use Modules\ProcurementInventory\Policies\PurchaseOrderPolicy;
+use Modules\ProcurementInventory\Policies\StockLevelPolicy;
+use Modules\ProcurementInventory\Policies\VendorPolicy;
+use Modules\ProcurementInventory\Services\ProcurementService;
+use Modules\ProcurementInventory\Services\StockService;
 use Nwidart\Modules\Traits\PathNamespace;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -34,6 +49,7 @@ class ProcurementInventoryServiceProvider extends ServiceProvider
         $this->registerTranslations();
         $this->registerConfig();
         $this->registerViews();
+        $this->registerPolicies();
         $this->loadMigrationsFrom(module_path($this->name, 'database/migrations'));
     }
 
@@ -44,6 +60,19 @@ class ProcurementInventoryServiceProvider extends ServiceProvider
     {
         $this->app->register(EventServiceProvider::class);
         $this->app->register(RouteServiceProvider::class);
+
+        $this->app->singleton(StockService::class);
+        $this->app->singleton(ProcurementService::class);
+    }
+
+    protected function registerPolicies(): void
+    {
+        Gate::policy(ItemCategory::class, ItemCategoryPolicy::class);
+        Gate::policy(Item::class, ItemPolicy::class);
+        Gate::policy(Vendor::class, VendorPolicy::class);
+        Gate::policy(PurchaseOrder::class, PurchaseOrderPolicy::class);
+        Gate::policy(GoodsReceipt::class, GoodsReceiptPolicy::class);
+        Gate::policy(StockLevel::class, StockLevelPolicy::class);
     }
 
     /**

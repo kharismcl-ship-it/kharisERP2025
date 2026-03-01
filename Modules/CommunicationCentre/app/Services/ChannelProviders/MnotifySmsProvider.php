@@ -18,22 +18,27 @@ class MnotifySmsProvider implements ChannelProviderInterface
             $config = $message->providerConfig->config ?? [];
 
             // Validate required configuration
-            if (empty($config['api_key']) || empty($config['sender_id'])) {
+            if (empty($config['api_key']) || empty($config['sender_id'] ?? $config['sender_sender_id'] ?? null)) {
                 throw new \Exception('mNotify configuration is incomplete. Missing api_key or sender_id.');
             }
 
             // Prepare API endpoint
-            $url = 'https://api.mnotify.com/smsapi?key='.$config['api_key'];
+            $url = 'https://api.mnotify.com/api/sms/quick?key='.$config['api_key'];
 
-            // Prepare payload
+            // Prepare JSON payload according to mNotify API documentation
+            $senderId = $config['sender_id'] ?? $config['sender_sender_id'] ?? 'mNotify';
             $payload = [
-                'to' => $message->to_phone,
-                'sender_id' => $config['sender_id'],
+                'recipient' => [$message->to_phone], // Must be an array
+                'sender' => $senderId,
                 'message' => $message->body,
+                'is_schedule' => false,
+                'schedule_date' => '',
             ];
 
-            // Send the request
-            $response = Http::asForm()
+            // Send the request with JSON content type
+            $response = Http::withHeaders([
+                'Content-Type' => 'application/json',
+            ])
                 ->timeout(30)
                 ->post($url, $payload);
 
@@ -41,16 +46,21 @@ class MnotifySmsProvider implements ChannelProviderInterface
             if ($response->successful()) {
                 $responseData = $response->json();
 
-                if (isset($responseData['code']) && $responseData['code'] == '1000') {
+                // Check for successful response according to mNotify API documentation
+                if (isset($responseData['status']) && $responseData['status'] === 'success') {
                     // Update message with provider details
                     $message->update([
                         'status' => 'sent',
                         'sent_at' => now(),
-                        'provider_message_id' => $responseData['message_id'] ?? null,
+                        'provider_message_id' => $responseData['data']['message_id'] ?? null,
                     ]);
                 } else {
                     // Handle API error
-                    throw new \Exception('mNotify API returned an error: '.($responseData['message'] ?? 'Unknown error'));
+                    $errorMessage = $responseData['message'] ?? 'Unknown error';
+                    if (isset($responseData['errors'])) {
+                        $errorMessage .= ' - '.json_encode($responseData['errors']);
+                    }
+                    throw new \Exception('mNotify API returned an error: '.$errorMessage);
                 }
             } else {
                 // Handle HTTP error

@@ -3,7 +3,19 @@
 namespace Modules\Construction\Providers;
 
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
+use Modules\Construction\Models\ConstructionProject;
+use Modules\Construction\Models\Contractor;
+use Modules\Construction\Models\MaterialUsage;
+use Modules\Construction\Models\ProjectPhase;
+use Modules\Construction\Models\ProjectTask;
+use Modules\Construction\Policies\ConstructionProjectPolicy;
+use Modules\Construction\Policies\ContractorPolicy;
+use Modules\Construction\Policies\MaterialUsagePolicy;
+use Modules\Construction\Policies\ProjectPhasePolicy;
+use Modules\Construction\Policies\ProjectTaskPolicy;
+use Modules\Construction\Services\ConstructionService;
 use Nwidart\Modules\Traits\PathNamespace;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -35,6 +47,7 @@ class ConstructionServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->name, 'database/migrations'));
+        $this->registerPolicies();
     }
 
     /**
@@ -44,6 +57,16 @@ class ConstructionServiceProvider extends ServiceProvider
     {
         $this->app->register(EventServiceProvider::class);
         $this->app->register(RouteServiceProvider::class);
+        $this->app->singleton(ConstructionService::class);
+    }
+
+    protected function registerPolicies(): void
+    {
+        Gate::policy(ConstructionProject::class, ConstructionProjectPolicy::class);
+        Gate::policy(Contractor::class, ContractorPolicy::class);
+        Gate::policy(ProjectPhase::class, ProjectPhasePolicy::class);
+        Gate::policy(ProjectTask::class, ProjectTaskPolicy::class);
+        Gate::policy(MaterialUsage::class, MaterialUsagePolicy::class);
     }
 
     /**

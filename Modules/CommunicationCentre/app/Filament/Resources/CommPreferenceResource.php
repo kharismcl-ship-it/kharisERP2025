@@ -35,11 +35,22 @@ class CommPreferenceResource extends Resource
                 Forms\Components\TextInput::make('notifiable_id')
                     ->required(),
                 Forms\Components\Select::make('channel')
-                    ->options([
-                        'email' => 'Email',
-                        'sms' => 'SMS',
-                        'whatsapp' => 'WhatsApp',
-                    ])
+                    ->options(function () {
+                        $channels = config('communicationcentre.channels', []);
+                        $channelLabels = [
+                            'email' => 'Email',
+                            'sms' => 'SMS',
+                            'whatsapp' => 'WhatsApp',
+                            'database' => 'Database',
+                        ];
+
+                        $options = [];
+                        foreach ($channels as $channel) {
+                            $options[$channel] = $channelLabels[$channel] ?? ucfirst($channel);
+                        }
+
+                        return $options;
+                    })
                     ->required(),
                 Forms\Components\Toggle::make('is_enabled')
                     ->required(),

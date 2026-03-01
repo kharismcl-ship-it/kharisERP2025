@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Modules\Hostels\Policies;
 
+use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Foundation\Auth\User as AuthUser;
 use Modules\Hostels\Models\PricingPolicy;
-use Illuminate\Auth\Access\HandlesAuthorization;
 
 class PricingPolicyPolicy
 {
     use HandlesAuthorization;
-    
+
     public function viewAny(AuthUser $authUser): bool
     {
         return $authUser->can('ViewAny:PricingPolicy');
@@ -66,5 +66,4 @@ class PricingPolicyPolicy
     {
         return $authUser->can('Reorder:PricingPolicy');
     }
-
 }

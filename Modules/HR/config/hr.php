@@ -22,7 +22,7 @@ return [
     | are added to the system, using their email address.
     |
     */
-    'auto_create_user_accounts' => true,
+    'auto_create_user_accounts' => false,
 
     /*
     |--------------------------------------------------------------------------

@@ -17,12 +17,14 @@ class CommTemplate extends Model
         'company_id',
         'code',
         'channel',
+        'provider',
         'name',
         'subject',
         'body',
         'description',
         'is_active',
         'provider_config_id',
+        'language',
     ];
 
     /**

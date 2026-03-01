@@ -72,6 +72,43 @@ class CommTemplateSeeder extends Seeder
                 'is_active' => true,
             ],
 
+            [
+                'code'        => 'hostel_occupant_welcome_sms',
+                'channel'     => 'sms',
+                'name'        => 'Hostel Occupant Welcome SMS',
+                'subject'     => null,
+                'body'        => 'Welcome {{name}}! Your hostel portal account has been created. Login with your email: {{email}}. Contact management for assistance.',
+                'description' => 'SMS sent to new hostel occupants when their portal account is created',
+                'is_active'   => true,
+            ],
+            [
+                'code'        => 'hostel_occupant_reactivated_sms',
+                'channel'     => 'sms',
+                'name'        => 'Hostel Occupant Account Reactivated SMS',
+                'subject'     => null,
+                'body'        => 'Hello {{name}}, your hostel portal account has been reactivated. You can now login with your existing credentials. Contact management for assistance.',
+                'description' => 'SMS sent to returning hostel occupants when their portal account is reactivated',
+                'is_active'   => true,
+            ],
+            [
+                'code'        => 'hostel_deposit_reminder',
+                'channel'     => 'sms',
+                'name'        => 'Hostel Deposit Reminder',
+                'subject'     => null,
+                'body'        => 'Dear {{name}}, your security deposit of GHS {{deposit_amount}} for {{hostel_name}} (Ref: {{booking_reference}}) is still pending. Please make payment at your earliest convenience.',
+                'description' => 'Automated reminder for pending hostel deposit payments',
+                'is_active'   => true,
+            ],
+            [
+                'code'        => 'hostel_overdue_charge_reminder',
+                'channel'     => 'sms',
+                'name'        => 'Hostel Overdue Charge Reminder',
+                'subject'     => null,
+                'body'        => 'Dear {{name}}, your outstanding balance of GHS {{outstanding_amount}} at {{hostel_name}} (Ref: {{booking_reference}}) is overdue. Please make payment to avoid service interruption.',
+                'description' => 'Automated reminder for overdue hostel charges',
+                'is_active'   => true,
+            ],
+
             // WhatsApp templates
             [
                 'code' => 'maintenance_request',

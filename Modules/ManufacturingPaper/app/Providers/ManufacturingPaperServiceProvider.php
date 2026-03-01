@@ -3,7 +3,19 @@
 namespace Modules\ManufacturingPaper\Providers;
 
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
+use Modules\ManufacturingPaper\Models\MpEquipmentLog;
+use Modules\ManufacturingPaper\Models\MpPaperGrade;
+use Modules\ManufacturingPaper\Models\MpPlant;
+use Modules\ManufacturingPaper\Models\MpProductionBatch;
+use Modules\ManufacturingPaper\Models\MpQualityRecord;
+use Modules\ManufacturingPaper\Policies\MpEquipmentLogPolicy;
+use Modules\ManufacturingPaper\Policies\MpPaperGradePolicy;
+use Modules\ManufacturingPaper\Policies\MpPlantPolicy;
+use Modules\ManufacturingPaper\Policies\MpProductionBatchPolicy;
+use Modules\ManufacturingPaper\Policies\MpQualityRecordPolicy;
+use Modules\ManufacturingPaper\Services\ManufacturingPaperService;
 use Nwidart\Modules\Traits\PathNamespace;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -35,6 +47,16 @@ class ManufacturingPaperServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->name, 'database/migrations'));
+        $this->registerPolicies();
+    }
+
+    protected function registerPolicies(): void
+    {
+        Gate::policy(MpPlant::class, MpPlantPolicy::class);
+        Gate::policy(MpProductionBatch::class, MpProductionBatchPolicy::class);
+        Gate::policy(MpPaperGrade::class, MpPaperGradePolicy::class);
+        Gate::policy(MpQualityRecord::class, MpQualityRecordPolicy::class);
+        Gate::policy(MpEquipmentLog::class, MpEquipmentLogPolicy::class);
     }
 
     /**
@@ -44,6 +66,7 @@ class ManufacturingPaperServiceProvider extends ServiceProvider
     {
         $this->app->register(EventServiceProvider::class);
         $this->app->register(RouteServiceProvider::class);
+        $this->app->singleton(ManufacturingPaperService::class);
     }
 
     /**

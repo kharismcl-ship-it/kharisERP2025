@@ -16,6 +16,7 @@ class CommunicationCentreDatabaseSeeder extends Seeder
             CommProviderConfigSeeder::class,
             CommTemplateSeeder::class,
             HostelCommTemplateSeeder::class,
+            LeaveCommTemplateSeeder::class,
             CommPreferenceSeeder::class,
         ]);
     }

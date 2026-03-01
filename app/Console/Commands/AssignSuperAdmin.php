@@ -4,87 +4,100 @@ namespace App\Console\Commands;
 
 use App\Models\User;
 use Illuminate\Console\Command;
-use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\DB;
 
 class AssignSuperAdmin extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'shield:super-admin-gate 
-                            {--user-id= : The ID of the user to assign as super admin}
-                            {--email= : The email of the user to assign as super admin}
-                            {--panel=admin : The panel ID to use for configuration}';
+    protected $signature = 'shield:super-admin-gate
+                            {--user-id= : ID of the user}
+                            {--email=   : Email of the user}';
 
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Assign super admin role to a user using Filament Shield\'s configuration';
+    protected $description = 'Assign a global (unscoped) super_admin role to a user so they can access all panels and all companies';
 
-    /**
-     * Execute the console command.
-     */
     public function handle(): void
     {
-        $userId = $this->option('user-id');
-        $email = $this->option('email');
-        $panel = $this->option('panel');
-
-        if (! $userId && ! $email) {
-            $this->error('Please provide either --user-id or --email option');
-
-            return;
-        }
-
-        // Find user by ID or email
-        $user = null;
-        if ($userId) {
-            $user = User::find($userId);
-        } elseif ($email) {
-            $user = User::where('email', $email)->first();
-        }
-
+        $user = $this->resolveUser();
         if (! $user) {
-            $this->error('User not found');
-
             return;
         }
 
-        // Get Filament Shield configuration
-        $shieldConfig = config('filament-shield');
+        $teamKey    = config('permission.column_names.team_foreign_key', 'team_id');
+        $tableNames = config('permission.table_names');
 
-        if (! $shieldConfig) {
-            $this->error('Filament Shield configuration not found');
+        // 1. Ensure a global (team_id = NULL) super_admin role exists in the roles table
+        //    We must bypass Spatie's team scope by querying the DB directly.
+        $globalRoleId = DB::table($tableNames['roles'])
+            ->where('name', 'super_admin')
+            ->where('guard_name', 'web')
+            ->whereNull($teamKey)
+            ->value('id');
 
-            return;
+        if (! $globalRoleId) {
+            $globalRoleId = DB::table($tableNames['roles'])->insertGetId([
+                'name'       => 'super_admin',
+                'guard_name' => 'web',
+                $teamKey     => null,   // NULL = global, no company scope
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+            $this->info("Created global super_admin role (id={$globalRoleId}).");
+        } else {
+            $this->info("Global super_admin role already exists (id={$globalRoleId}).");
         }
 
-        $superAdminRoleName = $shieldConfig['super_admin']['name'] ?? 'super_admin';
-
-        // Ensure super_admin role exists with proper company_id (null for super admin)
-        $superAdminRole = Role::firstOrCreate(
-            ['name' => $superAdminRoleName, 'guard_name' => 'web'],
-            ['name' => $superAdminRoleName, 'guard_name' => 'web', 'company_id' => null]
+        // 2. Assign the global role to the user (team_id = NULL)
+        DB::table($tableNames['model_has_roles'])->updateOrInsert(
+            [
+                'role_id'    => $globalRoleId,
+                'model_id'   => $user->id,
+                'model_type' => get_class($user),
+                $teamKey     => null,
+            ],
+            [
+                'role_id'    => $globalRoleId,
+                'model_id'   => $user->id,
+                'model_type' => get_class($user),
+                $teamKey     => null,
+            ]
         );
 
-        // Remove any existing roles that might conflict
-        $user->roles()->where('company_id', '!=', null)->detach();
+        // 3. Verify
+        $ok = DB::table($tableNames['model_has_roles'])
+            ->where('role_id', $globalRoleId)
+            ->where('model_id', $user->id)
+            ->where('model_type', get_class($user))
+            ->whereNull($teamKey)
+            ->exists();
 
-        // Assign the super admin role
-        $user->assignRole($superAdminRole);
-
-        $this->info("Super admin role '{$superAdminRoleName}' assigned to user: {$user->email} (ID: {$user->id})");
-        $this->info("Using Filament Shield configuration from panel: {$panel}");
-
-        // Check if gate-based super admin is enabled
-        if ($shieldConfig['super_admin']['define_via_gate'] ?? false) {
-            $this->info('Gate-based super admin configuration is active');
+        if ($ok) {
+            $this->info("✓ {$user->email} is now a global super_admin.");
+            $this->info('  They can access the admin panel and all company-admin tenants.');
+            $this->info('  The EnsureGlobalSuperAdminRole middleware will propagate');
+            $this->info('  per-company super_admin assignments automatically on first login.');
         } else {
-            $this->info('Role-based super admin configuration is active');
+            $this->error('❌ Role assignment failed — check DB constraints.');
         }
+    }
+
+    private function resolveUser(): ?User
+    {
+        $userId = $this->option('user-id');
+        $email  = $this->option('email');
+
+        if (! $userId && ! $email) {
+            $this->error('Provide --user-id or --email.');
+            return null;
+        }
+
+        $user = $userId
+            ? User::find($userId)
+            : User::where('email', $email)->first();
+
+        if (! $user) {
+            $this->error('User not found.');
+            return null;
+        }
+
+        return $user;
     }
 }

@@ -49,6 +49,13 @@ class HostelsFilamentPlugin implements Plugin
 
     public function register(Panel $panel): void
     {
+        if (function_exists('module') && ! app()->environment('testing')) {
+            $mod = module('Hostels', true);
+            if ($mod && method_exists($mod, 'isEnabled') && ! $mod->isEnabled()) {
+                return;
+            }
+        }
+
         // Split resources between admin and company panels
         if ($panel->getId() === 'admin') {
             // Admin panel resources (HQ/management)
@@ -82,21 +89,22 @@ class HostelsFilamentPlugin implements Plugin
                 RoomInventoryAssignmentResource::class,
                 VisitorLogResource::class,
             ]);
+
         } elseif ($panel->getId() === 'company-admin') {
             // Company panel resources (operational/tenant-specific)
             $panel->resources([
-                HostelOccupantResource::class,
-                BookingResource::class,
-                DepositResource::class,
-                HostelBillingCycleResource::class,
-                HostelChargeResource::class,
-                HostelHousekeepingResource::class,
-                MaintenanceRequestResource::class,
-                MaintenanceRecordResource::class,
-                IncidentResource::class,
-                HostelStaffAttendanceResource::class,
-                RoomInventoryAssignmentResource::class,
-                VisitorLogResource::class,
+                // HostelOccupantResource::class,
+                // BookingResource::class,
+                // DepositResource::class,
+                // HostelBillingCycleResource::class,
+                // HostelChargeResource::class,
+                // HostelHousekeepingResource::class,
+                // MaintenanceRequestResource::class,
+                // MaintenanceRecordResource::class,
+                // IncidentResource::class,
+                // HostelStaffAttendanceResource::class,
+                // // RoomInventoryAssignmentResource::class,
+                // VisitorLogResource::class,
             ]);
         }
 
@@ -105,6 +113,7 @@ class HostelsFilamentPlugin implements Plugin
             CheckInOutCalendar::class,
             RoomAvailabilityCalendar::class,
         ]);
+
     }
 
     public function boot(Panel $panel): void

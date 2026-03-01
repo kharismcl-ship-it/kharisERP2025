@@ -5,12 +5,16 @@ namespace Modules\HR\Filament\Resources;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Modules\HR\Filament\Forms\Components\LeaveAttachmentForm;
 use Modules\HR\Filament\Resources\LeaveRequestResource\Pages;
 use Modules\HR\Models\LeaveRequest;
 
@@ -30,8 +34,11 @@ class LeaveRequestResource extends Resource
                     ->relationship('company', 'name')
                     ->required(),
                 Forms\Components\Select::make('employee_id')
-                    ->relationship('employee', 'full_name')
+                    ->label('Employee')
+                    ->relationship('employee', 'first_name')
+                    ->getOptionLabelFromRecordUsing(fn (\Modules\HR\Models\Employee $record) => $record->first_name.' '.$record->last_name)
                     ->searchable()
+                    ->native(false)
                     ->preload()
                     ->required(),
                 Forms\Components\Select::make('leave_type_id')
@@ -40,9 +47,54 @@ class LeaveRequestResource extends Resource
                     ->preload()
                     ->required(),
                 Forms\Components\DatePicker::make('start_date')
-                    ->required(),
+                    ->required()
+                    ->live()
+                    ->afterStateUpdated(function (Set $set, Get $get) {
+                        $startDate = $get('start_date');
+                        $endDate = $get('end_date');
+
+                        if ($startDate && $endDate) {
+                            $start = \Carbon\Carbon::parse($startDate);
+                            $end = \Carbon\Carbon::parse($endDate);
+                            $totalDays = $start->diffInDays($end) + 1; // Inclusive of both dates
+                            $set('total_days', $totalDays);
+                        }
+                    }),
                 Forms\Components\DatePicker::make('end_date')
-                    ->required(),
+                    ->required()
+                    ->live()
+                    ->afterStateUpdated(function (Set $set, Get $get) {
+                        $startDate = $get('start_date');
+                        $endDate = $get('end_date');
+
+                        if ($startDate && $endDate) {
+                            $start = \Carbon\Carbon::parse($startDate);
+                            $end = \Carbon\Carbon::parse($endDate);
+                            $totalDays = $start->diffInDays($end) + 1; // Inclusive of both dates
+                            $set('total_days', $totalDays);
+                        }
+                    }),
+
+                Forms\Components\TextInput::make('total_days')
+                    ->default(0)
+                    ->readOnly()
+                    ->rules([
+                        function (Get $get) {
+                            return function (string $attribute, $value, \Closure $fail) use ($get) {
+                                $leaveTypeId = $get('leave_type_id');
+                                $totalDays = (float) $value;
+
+                                if ($leaveTypeId && $totalDays > 0) {
+                                    $leaveType = \Modules\HR\Models\LeaveType::find($leaveTypeId);
+
+                                    if ($leaveType && $totalDays > $leaveType->max_days_per_year) {
+                                        $fail("The requested {$totalDays} days exceed the maximum of {$leaveType->max_days_per_year} days allowed for {$leaveType->name}.");
+                                    }
+                                }
+                            };
+                        },
+                    ]),
+
                 Forms\Components\Select::make('status')
                     ->options([
                         'pending' => 'Pending',
@@ -53,6 +105,9 @@ class LeaveRequestResource extends Resource
                     ->required(),
                 Forms\Components\Textarea::make('reason')
                     ->columnSpanFull(),
+
+                // Leave Attachments
+                ...LeaveAttachmentForm::make(),
             ]);
     }
 
@@ -106,6 +161,7 @@ class LeaveRequestResource extends Resource
             ])
             ->actions([
                 EditAction::make(),
+                ViewAction::make(),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
@@ -126,6 +182,7 @@ class LeaveRequestResource extends Resource
         return [
             'index' => Pages\ListLeaveRequests::route('/'),
             'create' => Pages\CreateLeaveRequest::route('/create'),
+            'view' => Pages\ViewLeaveRequest::route('/{record}'),
             'edit' => Pages\EditLeaveRequest::route('/{record}/edit'),
         ];
     }

@@ -8,7 +8,6 @@ use Modules\PaymentsChannel\Models\PayIntent;
 use Modules\PaymentsChannel\Models\PayMethod;
 use Modules\PaymentsChannel\Models\PayProviderConfig;
 use Modules\PaymentsChannel\Models\PayTransaction;
-use Illuminate\Support\Facades\Auth;
 use Modules\PaymentsChannel\Services\Gateway\FlutterwaveGateway;
 use Modules\PaymentsChannel\Services\Gateway\ManualGateway;
 use Modules\PaymentsChannel\Services\Gateway\PaymentInitResponse;
@@ -43,19 +42,19 @@ class PaymentService
             }
 
             // Apply filters
-            if (!empty($filters['payment_mode'])) {
+            if (! empty($filters['payment_mode'])) {
                 $query->where('payment_mode', $filters['payment_mode']);
             }
-            
-            if (!empty($filters['provider'])) {
+
+            if (! empty($filters['provider'])) {
                 $query->where('provider', $filters['provider']);
             }
-            
-            if (!empty($filters['channel'])) {
+
+            if (! empty($filters['channel'])) {
                 $query->where('channel', $filters['channel']);
             }
-            
-            if (!empty($filters['currency'])) {
+
+            if (! empty($filters['currency'])) {
                 $query->where('currency', $filters['currency']);
             }
 
@@ -70,13 +69,13 @@ class PaymentService
     {
         $keyParts = [
             'payment_methods',
-            'company_' . ($companyId ?? 'global'),
+            'company_'.($companyId ?? 'global'),
         ];
 
         // Add filter parameters to cache key
         foreach (['payment_mode', 'provider', 'channel', 'currency'] as $filter) {
-            if (!empty($filters[$filter])) {
-                $keyParts[] = $filter . '_' . $filters[$filter];
+            if (! empty($filters[$filter])) {
+                $keyParts[] = $filter.'_'.$filters[$filter];
             }
         }
 
@@ -98,13 +97,13 @@ class PaymentService
     public function getGroupedPaymentMethods(?int $companyId = null, array $filters = []): array
     {
         $methods = $this->getAvailablePaymentMethods($companyId, $filters);
-        
+
         $grouped = [];
         foreach ($methods as $method) {
             $provider = $method['provider'] ?? 'other';
             $grouped[$provider][] = $method;
         }
-        
+
         return $grouped;
     }
 

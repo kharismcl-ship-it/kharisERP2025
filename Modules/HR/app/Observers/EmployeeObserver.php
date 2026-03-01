@@ -14,10 +14,8 @@ class EmployeeObserver
      */
     public function created(Employee $employee): void
     {
-        // Automatically create a user account when an employee is created
-        if (config('hr.auto_create_user_accounts') && $employee->email && ! $employee->user_id) {
-            $this->createUserFromEmployee($employee);
-        }
+        // Automatic user creation is now disabled by default
+        // Use the hybrid approach with request/approve workflow instead
     }
 
     /**
@@ -33,10 +31,8 @@ class EmployeeObserver
             ]);
         }
 
-        // If employee is updated with an email but doesn't have a user, create one
-        if (config('hr.auto_create_user_accounts') && $employee->email && ! $employee->user_id) {
-            $this->createUserFromEmployee($employee);
-        }
+        // Automatic user creation is now disabled by default
+        // Use the hybrid approach with request/approve workflow instead
     }
 
     /**

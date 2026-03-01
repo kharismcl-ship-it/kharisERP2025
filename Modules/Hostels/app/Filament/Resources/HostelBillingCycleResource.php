@@ -14,7 +14,6 @@ use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
-use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -89,13 +88,14 @@ class HostelBillingCycleResource extends Resource
                     ->sortable()
                     ->searchable(),
 
-                BadgeColumn::make('cycle_type')
-                    ->colors([
-                        'primary' => 'monthly',
-                        'success' => 'quarterly',
-                        'warning' => 'semester',
-                        'gray' => 'custom',
-                    ]),
+                TextColumn::make('cycle_type')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'monthly'   => 'primary',
+                        'quarterly' => 'success',
+                        'semester'  => 'warning',
+                        default     => 'gray',
+                    }),
 
                 TextColumn::make('start_date')
                     ->date()

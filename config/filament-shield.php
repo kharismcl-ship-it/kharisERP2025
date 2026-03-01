@@ -38,7 +38,7 @@ return [
     |
     */
 
-    'tenant_model' => null,
+    'tenant_model' => \App\Models\Company::class,
 
     /*
     |--------------------------------------------------------------------------
@@ -67,7 +67,7 @@ return [
     'super_admin' => [
         'enabled' => true,
         'name' => 'super_admin',
-        'define_via_gate' => false,
+        'define_via_gate' => true,
         'intercept_gate' => 'before',
     ],
 
@@ -242,9 +242,9 @@ return [
     */
 
     'discovery' => [
-        'discover_all_resources' => false,
-        'discover_all_widgets' => false,
-        'discover_all_pages' => false,
+        'discover_all_resources' => true,
+        'discover_all_widgets' => true,
+        'discover_all_pages' => true,
     ],
 
     /*

@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Modules\Hostels\Policies;
 
+use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Foundation\Auth\User as AuthUser;
 use Modules\Hostels\Models\MaintenanceRequest;
-use Illuminate\Auth\Access\HandlesAuthorization;
 
 class MaintenanceRequestPolicy
 {
     use HandlesAuthorization;
-    
+
     public function viewAny(AuthUser $authUser): bool
     {
         return $authUser->can('ViewAny:MaintenanceRequest');
@@ -66,5 +66,4 @@ class MaintenanceRequestPolicy
     {
         return $authUser->can('Reorder:MaintenanceRequest');
     }
-
 }

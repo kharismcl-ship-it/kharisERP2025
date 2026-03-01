@@ -4,10 +4,11 @@ namespace App\Providers;
 
 use App\Models\Permission;
 use App\Models\Role;
-use Illuminate\Support\ServiceProvider;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
-use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Support\ServiceProvider;
+use Spatie\Permission\PermissionRegistrar;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -24,7 +25,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        app(\Spatie\Permission\PermissionRegistrar::class)
+
+        app(PermissionRegistrar::class)
             ->setPermissionClass(Permission::class)
             ->setRoleClass(Role::class);
 

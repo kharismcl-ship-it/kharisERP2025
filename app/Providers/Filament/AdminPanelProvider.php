@@ -3,6 +3,8 @@
 namespace App\Providers\Filament;
 
 use Alizharb\FilamentModuleManager\FilamentModuleManagerPlugin;
+use App\Http\Middleware\EnsureGlobalSuperAdminRole;
+use App\Http\Middleware\SyncSpatiePermissionsWithFilamentTenants;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Filament\Pages\Dashboard;
 use Filament\Panel;
@@ -16,23 +18,30 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
-use Modules\Core\Models\Company;
+use Modules\CommunicationCentre\Filament\CommunicationCentreFilamentPlugin;
+use Modules\Construction\Filament\ConstructionFilamentPlugin;
+use Modules\Core\Filament\CoreFilamentPlugin;
+use Modules\Farms\Filament\FarmsFilamentPlugin;
 use Modules\Finance\Filament\FinanceFilamentPlugin;
+use Modules\Fleet\Filament\FleetFilamentPlugin;
 use Modules\Hostels\Filament\HostelsFilamentPlugin;
+use Modules\HR\Filament\HRFilamentPlugin;
 use Modules\PaymentsChannel\Filament\PaymentsChannelFilamentPlugin;
+use Modules\ManufacturingPaper\Filament\ManufacturingPaperFilamentPlugin;
+use Modules\ManufacturingWater\Filament\ManufacturingWaterFilamentPlugin;
+use Modules\ProcurementInventory\Filament\ProcurementInventoryFilamentPlugin;
 
 class AdminPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
-        // Register a minimal Filament admin panel at /admin.
         return $panel
             ->id('admin')
             ->path('admin')
             ->default()
             ->brandName('Kharis ERP')
+            ->databaseNotifications()
             ->readOnlyRelationManagersOnResourceViewPagesByDefault(false)
-           // ->tenant(Company::class, ownershipRelationship: 'companies')
             ->colors([
                 'primary' => Color::Indigo,
             ])
@@ -50,12 +59,26 @@ class AdminPanelProvider extends PanelProvider
                 ShareErrorsFromSession::class,
                 VerifyCsrfToken::class,
                 SubstituteBindings::class,
+                // Set Spatie team_id to NULL so global (unscoped) roles apply here
+                SyncSpatiePermissionsWithFilamentTenants::class,
+                // Propagate global super_admin into per-company roles (cached 24 h)
+                EnsureGlobalSuperAdminRole::class,
             ])
             ->plugins([
-                FilamentShieldPlugin::make(),
+                // centralApp(true) → Shield uses global unscoped roles for this panel
+                FilamentShieldPlugin::make()->centralApp(true),
+                CoreFilamentPlugin::make(),
+                HRFilamentPlugin::make(),
                 HostelsFilamentPlugin::make(),
                 PaymentsChannelFilamentPlugin::make(),
                 FinanceFilamentPlugin::make(),
+                CommunicationCentreFilamentPlugin::make(),
+                ProcurementInventoryFilamentPlugin::make(),
+                FleetFilamentPlugin::make(),
+                ConstructionFilamentPlugin::make(),
+                FarmsFilamentPlugin::make(),
+                ManufacturingPaperFilamentPlugin::make(),
+                ManufacturingWaterFilamentPlugin::make(),
                 FilamentModuleManagerPlugin::make(),
             ])
             ->authMiddleware([

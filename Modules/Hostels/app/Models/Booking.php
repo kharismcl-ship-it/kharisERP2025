@@ -32,6 +32,7 @@ class Booking extends Model
      * The attributes that are mass assignable.
      */
     protected $fillable = [
+        'company_id',
         'hostel_id',
         'room_id',
         'bed_id',
@@ -150,6 +151,11 @@ class Booking extends Model
     public function hostelOccupantUser()
     {
         return $this->belongsTo(HostelOccupantUser::class);
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(\App\Models\Company::class);
     }
 
     public function charges()

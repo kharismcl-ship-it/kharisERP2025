@@ -3,7 +3,19 @@
 namespace Modules\Fleet\Providers;
 
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
+use Modules\Fleet\Models\DriverAssignment;
+use Modules\Fleet\Models\FuelLog;
+use Modules\Fleet\Models\MaintenanceRecord;
+use Modules\Fleet\Models\TripLog;
+use Modules\Fleet\Models\Vehicle;
+use Modules\Fleet\Policies\DriverAssignmentPolicy;
+use Modules\Fleet\Policies\FuelLogPolicy;
+use Modules\Fleet\Policies\MaintenanceRecordPolicy;
+use Modules\Fleet\Policies\TripLogPolicy;
+use Modules\Fleet\Policies\VehiclePolicy;
+use Modules\Fleet\Services\FleetService;
 use Nwidart\Modules\Traits\PathNamespace;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -35,6 +47,7 @@ class FleetServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->name, 'database/migrations'));
+        $this->registerPolicies();
     }
 
     /**
@@ -44,6 +57,16 @@ class FleetServiceProvider extends ServiceProvider
     {
         $this->app->register(EventServiceProvider::class);
         $this->app->register(RouteServiceProvider::class);
+        $this->app->singleton(FleetService::class);
+    }
+
+    protected function registerPolicies(): void
+    {
+        Gate::policy(Vehicle::class, VehiclePolicy::class);
+        Gate::policy(MaintenanceRecord::class, MaintenanceRecordPolicy::class);
+        Gate::policy(FuelLog::class, FuelLogPolicy::class);
+        Gate::policy(DriverAssignment::class, DriverAssignmentPolicy::class);
+        Gate::policy(TripLog::class, TripLogPolicy::class);
     }
 
     /**

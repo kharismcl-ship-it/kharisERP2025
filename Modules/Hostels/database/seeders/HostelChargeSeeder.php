@@ -31,7 +31,7 @@ class HostelChargeSeeder extends Seeder
                 'amount' => rand(100, 500),
                 'is_active' => true,
             ]);
-            
+
             HostelFeeSetting::create([
                 'hostel_id' => $hostel->id,
                 'name' => 'Water Charge',
@@ -39,7 +39,7 @@ class HostelChargeSeeder extends Seeder
                 'amount' => rand(50, 300),
                 'is_active' => true,
             ]);
-            
+
             HostelFeeSetting::create([
                 'hostel_id' => $hostel->id,
                 'name' => 'Maintenance Fee',

@@ -22,6 +22,8 @@ class HostelWhatsAppGroupResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'Hostels';
 
+    protected static ?int $navigationSort = 12;
+
     public static function form(Schema $schema): Schema
     {
         return $schema

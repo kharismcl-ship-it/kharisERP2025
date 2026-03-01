@@ -4,8 +4,11 @@ namespace Modules\CommunicationCentre\Providers;
 
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
+use Modules\CommunicationCentre\Console\Commands\TestMnotifyProvider;
 use Modules\CommunicationCentre\Console\Commands\TestWasenderProvider;
 use Modules\CommunicationCentre\Services\CommunicationService;
+use Modules\CommunicationCentre\Services\RateLimitingService;
+use Modules\CommunicationCentre\Services\TemplateValidationService;
 use Nwidart\Modules\Traits\PathNamespace;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -32,7 +35,7 @@ class CommunicationCentreServiceProvider extends ServiceProvider
     }
 
     /**
-     *Register the service provider.
+     * Register the service provider.
      */
     public function register(): void
     {
@@ -41,7 +44,10 @@ class CommunicationCentreServiceProvider extends ServiceProvider
 
         // Register the communication service
         $this->app->singleton('communication', function ($app) {
-            return new CommunicationService;
+            return new CommunicationService(
+                $app->make(RateLimitingService::class),
+                $app->make(TemplateValidationService::class)
+            );
         });
     }
 
@@ -51,6 +57,7 @@ class CommunicationCentreServiceProvider extends ServiceProvider
     protected function registerCommands(): void
     {
         $this->commands([
+            TestMnotifyProvider::class,
             TestWasenderProvider::class,
         ]);
     }

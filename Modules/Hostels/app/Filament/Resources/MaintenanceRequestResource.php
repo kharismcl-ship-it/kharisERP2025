@@ -30,6 +30,8 @@ class MaintenanceRequestResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'Hostels';
 
+    protected static ?int $navigationSort = 8;
+
     public static function form(Schema $schema): Schema
     {
         return $schema
@@ -41,29 +43,29 @@ class MaintenanceRequestResource extends Resource
                             ->searchable()
                             ->required(),
 
-                    Select::make('room_id')
-                        ->relationship('room', 'room_number')
-                        ->searchable()
-                        ->nullable(),
+                        Select::make('room_id')
+                            ->relationship('room', 'room_number')
+                            ->searchable()
+                            ->nullable(),
 
-                    Select::make('bed_id')
-                        ->relationship('bed', 'bed_number')
-                        ->searchable()
-                        ->nullable(),
+                        Select::make('bed_id')
+                            ->relationship('bed', 'bed_number')
+                            ->searchable()
+                            ->nullable(),
 
-                    Select::make('reported_by_hostel_occupant_id')
-                        ->relationship('reportedByHostelOccupant', 'first_name')
-                        ->searchable()
-                        ->nullable(),
+                        Select::make('reported_by_hostel_occupant_id')
+                            ->relationship('reportedByHostelOccupant', 'first_name')
+                            ->searchable()
+                            ->nullable(),
 
-                    Select::make('reported_by_user_id')
-                        ->relationship('reportedByUser', 'name')
-                        ->searchable()
-                        ->nullable(),
+                        Select::make('reported_by_user_id')
+                            ->relationship('reportedByUser', 'name')
+                            ->searchable()
+                            ->nullable(),
 
-                    TextInput::make('title')
-                        ->required(),
-                ]),
+                        TextInput::make('title')
+                            ->required(),
+                    ]),
 
                 Textarea::make('description')
                     ->required(),

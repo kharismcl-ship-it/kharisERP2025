@@ -13,7 +13,6 @@ use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
-use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -140,15 +139,16 @@ class HostelUtilityChargeResource extends Resource
                     ->sortable()
                     ->searchable(),
 
-                BadgeColumn::make('utility_type')
-                    ->colors([
-                        'primary' => 'electricity',
-                        'success' => 'water',
-                        'warning' => 'internet',
-                        'danger' => 'gas',
-                        'gray' => 'maintenance',
-                        'info' => 'service',
-                    ]),
+                TextColumn::make('utility_type')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'electricity' => 'primary',
+                        'water'       => 'success',
+                        'internet'    => 'warning',
+                        'gas'         => 'danger',
+                        'service'     => 'info',
+                        default       => 'gray',
+                    }),
 
                 TextColumn::make('consumption')
                     ->numeric(decimalPlaces: 2),
@@ -169,14 +169,15 @@ class HostelUtilityChargeResource extends Resource
                     ->date()
                     ->sortable(),
 
-                BadgeColumn::make('status')
-                    ->colors([
-                        'primary' => 'pending',
-                        'success' => 'billed',
-                        'warning' => 'paid',
-                        'danger' => 'overdue',
-                        'gray' => 'cancelled',
-                    ]),
+                TextColumn::make('status')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'pending'   => 'primary',
+                        'billed'    => 'success',
+                        'paid'      => 'warning',
+                        'overdue'   => 'danger',
+                        default     => 'gray',
+                    }),
 
                 IconColumn::make('billingCycle.name')
                     ->label('Billing Cycle')

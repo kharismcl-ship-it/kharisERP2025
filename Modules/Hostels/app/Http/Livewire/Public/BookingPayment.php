@@ -28,15 +28,15 @@ class BookingPayment extends Component
 
         // Get available payment methods for this company
         $companyId = $this->booking->hostel->company_id ?? null;
-        
+
         // Get online payment methods for immediate payment
         $this->availablePaymentMethods = Payment::getAvailablePaymentMethods($companyId, [
-            'payment_mode' => 'online'
+            'payment_mode' => 'online',
         ]);
 
         // Group payment methods by provider using the built-in method
         $this->groupedPaymentMethods = Payment::getGroupedPaymentMethods($companyId, [
-            'payment_mode' => 'online'
+            'payment_mode' => 'online',
         ]);
 
         // Check if there's already a payment intent for this booking

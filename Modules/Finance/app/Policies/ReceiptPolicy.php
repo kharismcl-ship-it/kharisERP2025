@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Modules\Finance\Policies;
 
+use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Foundation\Auth\User as AuthUser;
 use Modules\Finance\Models\Receipt;
-use Illuminate\Auth\Access\HandlesAuthorization;
 
 class ReceiptPolicy
 {
     use HandlesAuthorization;
-    
+
     public function viewAny(AuthUser $authUser): bool
     {
         return $authUser->can('ViewAny:Receipt');
@@ -66,5 +66,4 @@ class ReceiptPolicy
     {
         return $authUser->can('Reorder:Receipt');
     }
-
 }

@@ -15,8 +15,13 @@ class LaravelMailProvider implements ChannelProviderInterface
     public function send(CommMessage $message): void
     {
         try {
-            Mail::raw($message->content, function ($mail) use ($message) {
-                $mail->to($message->recipient)
+            // Check if recipient email is valid
+            if (empty($message->to_email)) {
+                throw new \Exception('Recipient email is empty or null');
+            }
+
+            Mail::raw($message->body, function ($mail) use ($message) {
+                $mail->to($message->to_email)
                     ->subject($message->subject);
             });
 

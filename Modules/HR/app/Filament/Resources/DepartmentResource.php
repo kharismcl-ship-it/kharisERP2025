@@ -2,7 +2,9 @@
 
 namespace Modules\HR\Filament\Resources;
 
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
@@ -10,6 +12,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables;
+use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Modules\HR\Filament\Resources\DepartmentResource\Pages;
 use Modules\HR\Models\Department;
@@ -50,10 +53,17 @@ class DepartmentResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->defaultGroup('company.name')
+            ->groups([
+                Group::make('company.name')
+                    ->collapsible(),
+            ])
             ->columns([
                 Tables\Columns\TextColumn::make('company.name')
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('name')
+                    ->weight('bold')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('code')
                     ->searchable(),
@@ -80,7 +90,12 @@ class DepartmentResource extends Resource
                 Tables\Filters\TernaryFilter::make('is_active'),
             ])
             ->actions([
-                EditAction::make(),
+                ActionGroup::make([
+                    EditAction::make()
+                        ->slideOver(),
+                    DeleteAction::make(),
+                ]),
+
             ])
             ->bulkActions([
                 BulkActionGroup::make([

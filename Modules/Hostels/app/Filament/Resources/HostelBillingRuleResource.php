@@ -14,7 +14,6 @@ use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
-use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -105,23 +104,26 @@ class HostelBillingRuleResource extends Resource
                     ->sortable()
                     ->searchable(),
 
-                BadgeColumn::make('rule_type')
-                    ->colors([
-                        'danger' => 'late_fee',
-                        'warning' => 'damage_charge',
-                        'primary' => 'service_fee',
-                        'success' => 'discount',
-                        'info' => 'tax',
-                        'gray' => 'penalty',
-                    ]),
+                TextColumn::make('rule_type')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'late_fee'      => 'danger',
+                        'damage_charge' => 'warning',
+                        'service_fee'   => 'primary',
+                        'discount'      => 'success',
+                        'tax'           => 'info',
+                        default         => 'gray',
+                    }),
 
-                BadgeColumn::make('calculation_method')
-                    ->colors([
-                        'primary' => 'fixed',
-                        'success' => 'percentage',
-                        'warning' => 'per_day',
-                        'info' => 'per_unit',
-                    ]),
+                TextColumn::make('calculation_method')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'fixed'      => 'primary',
+                        'percentage' => 'success',
+                        'per_day'    => 'warning',
+                        'per_unit'   => 'info',
+                        default      => 'gray',
+                    }),
 
                 TextColumn::make('amount')
                     ->numeric(decimalPlaces: 4)

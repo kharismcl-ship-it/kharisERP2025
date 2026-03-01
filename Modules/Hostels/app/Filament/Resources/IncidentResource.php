@@ -29,6 +29,8 @@ class IncidentResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'Hostels';
 
+    protected static ?int $navigationSort = 9;
+
     public static function form(Schema $schema): Schema
     {
         return $schema

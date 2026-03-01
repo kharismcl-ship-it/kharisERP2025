@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasTenants;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -10,20 +11,17 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Laravel\Fortify\TwoFactorAuthenticatable;
+use Modules\CommunicationCentre\Traits\HasNotificationPreferences;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable implements HasTenants
+class User extends Authenticatable implements FilamentUser, HasTenants
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, HasRoles, Notifiable, TwoFactorAuthenticatable;
+    use HasFactory, HasNotificationPreferences, HasRoles, Notifiable, TwoFactorAuthenticatable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
         'name',
         'email',
@@ -31,11 +29,6 @@ class User extends Authenticatable implements HasTenants
         'current_company_id',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
         'password',
         'two_factor_secret',
@@ -43,21 +36,17 @@ class User extends Authenticatable implements HasTenants
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            'email_verified_at'  => 'datetime',
+            'password'           => 'hashed',
+            'current_company_id' => 'integer',
         ];
     }
 
     /**
-     * Relationship: companies the user belongs to.
+     * All companies this user belongs to (with pivot metadata).
      */
     public function companies()
     {
@@ -67,23 +56,15 @@ class User extends Authenticatable implements HasTenants
     }
 
     /**
-     * Relationship: the user's current company.
+     * Only actively assigned companies.
      */
-    public function currentCompany()
+    public function activeCompanies()
     {
-        return $this->belongsTo(Company::class, 'current_company_id');
+        return $this->companies()->wherePivot('is_active', true);
     }
 
     /**
-     * Convenience: current company id from session or container.
-     */
-    public function currentCompanyId(): ?int
-    {
-        return app()->has('current_company_id') ? app('current_company_id') : session('current_company_id');
-    }
-
-    /**
-     * Get the user's initials
+     * Get the user's initials.
      */
     public function initials(): string
     {
@@ -95,34 +76,68 @@ class User extends Authenticatable implements HasTenants
     }
 
     /**
-     * Relationship: company assignments through pivot table.
-     */
-    // public function companyAssignments()
-    // {
-    //     return $this->hasMany(CompanyUser::class, 'user_id');
-    // }
-
-    /**
-     * Check if user can access the Filament panel.
+     * Filament panel access control.
+     *
+     * - admin panel      → only global super_admin users
+     * - company-admin    → any user with at least one active company assignment
      */
     public function canAccessPanel(Panel $panel): bool
     {
-        return true; // Adjust this based on your authorization logic
+        if ($panel->getId() === 'admin') {
+            return $this->isGlobalSuperAdmin();
+        }
+
+        // company-admin panel: user must belong to at least one company
+        return $this->activeCompanies()->exists();
     }
 
     /**
-     * Get the tenants (companies) that the user belongs to.
+     * Return the list of companies (tenants) this user can switch between
+     * in the company-admin panel.
      */
     public function getTenants(Panel $panel): Collection
     {
-        return $this->companies;
+        // Global super admins see ALL companies so they can manage any tenant
+        if ($this->isGlobalSuperAdmin()) {
+            return Company::all();
+        }
+
+        return $this->activeCompanies()->get();
     }
 
     /**
-     * Check if user can access a specific tenant (company).
+     * Authorise access to a specific tenant.
+     * Global super admins bypass the membership check.
      */
     public function canAccessTenant(Model $tenant): bool
     {
-        return $this->companies()->whereKey($tenant->getKey())->exists();
+        if ($this->isGlobalSuperAdmin()) {
+            return true;
+        }
+
+        return $this->activeCompanies()->whereKey($tenant->getKey())->exists();
     }
+
+    /**
+     * Check whether this user holds a global (non-company-scoped) super_admin role.
+     * We query the DB directly to avoid team-mode interference.
+     */
+    public function isGlobalSuperAdmin(): bool
+    {
+        $teamKey = config('permission.column_names.team_foreign_key', 'team_id');
+
+        return DB::table('model_has_roles')
+            ->join('roles', 'roles.id', '=', 'model_has_roles.role_id')
+            ->where('model_has_roles.model_type', get_class($this))
+            ->where('model_has_roles.model_id', $this->getKey())
+            ->where('roles.name', 'super_admin')
+            ->whereNull("model_has_roles.{$teamKey}")
+            ->exists();
+    }
+
+    // ─── Communication centre helpers ────────────────────────────────────────
+
+    public function getCommName(): string   { return $this->name; }
+    public function getCommEmail(): ?string { return $this->email; }
+    public function getCommPhone(): ?string { return null; }
 }

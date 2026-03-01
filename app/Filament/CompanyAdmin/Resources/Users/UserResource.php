@@ -22,6 +22,16 @@ class UserResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
+    public static function getNavigationGroup(): string|\UnitEnum|null
+    {
+        return 'Core';
+    }
+
+    public static function getNavigationLabel(): string
+    {
+        return 'Users';
+    }
+
     public static function form(Schema $schema): Schema
     {
         return UserForm::configure($schema);

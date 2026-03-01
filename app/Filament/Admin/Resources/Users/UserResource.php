@@ -2,7 +2,7 @@
 
 namespace App\Filament\Admin\Resources\Users;
 
-use App\Filament\Admin\Resources\Users\RelationManagers\CompaniesRelationManager;
+use App\Models\Company;
 use App\Models\User;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -12,9 +12,11 @@ use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Fieldset;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class UserResource extends Resource
 {
@@ -38,7 +40,7 @@ class UserResource extends Resource
     public static function getRelations(): array
     {
         return [
-            CompaniesRelationManager::class,
+
         ];
     }
 
@@ -78,14 +80,42 @@ class UserResource extends Resource
 
                 Section::make('Membership')
                     ->schema([
-                        Forms\Components\Select::make('current_company_id')
-                            ->label('Current Company')
-                            ->relationship('currentCompany', 'name')
-                            ->helperText('Set the user\'s active company.')
-                            ->searchable()
-                            ->preload(),
+
+                        // Using Select Component
+                        // Forms\Components\Select::make('roles_company_id')
+                        //     ->label('Company')
+                        //     ->options(Company::query()->pluck('name', 'id'))
+                        //     ->reactive()
+                        //     ->required(),
+
+                        // Forms\Components\Select::make('roles')
+                        //     ->label('Roles')
+                        //     ->relationship('roles', 'name', fn (Builder $query, Get $get) =>
+                        //         $get('roles_company_id')
+                        //             ? $query->where('company_id', $get('roles_company_id'))
+                        //             : $query
+                        //     )
+                        //     ->multiple()
+                        //     ->required(),
 
                     ]),
+
+                Section::make('Notification Preferences')
+                    ->description(fn ($record) => $record && $record->employee
+                        ? 'Preferences managed through employee record'
+                        : 'Set system notification preferences'
+                    )
+                    ->schema([
+                        Forms\Components\Placeholder::make('preference_note')
+                            ->content(fn ($record) => $record && $record->employee
+                                ? "This user is linked to an employee. Operational notifications (leave, payroll, HR) will use the employee's preferences. System notifications will use these preferences."
+                                : 'Set notification preferences for system-level notifications'
+                            )
+                            ->columnSpanFull(),
+                        \Modules\CommunicationCentre\Filament\Components\NotificationPreferenceForm::make('App\\Models\\User')
+                            ->hidden(fn ($record) => $record && $record->employee),
+                    ]),
+
             ]);
     }
 

@@ -5,10 +5,12 @@ namespace Modules\HR\Models;
 use App\Models\Company;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
+use Modules\CommunicationCentre\Traits\HasNotificationPreferences;
 
 class Employee extends Model
 {
-    use HasFactory;
+    use HasFactory, HasNotificationPreferences;
 
     /**
      * The table associated with the model.
@@ -22,6 +24,7 @@ class Employee extends Model
         'company_id',
         'user_id',
         'employee_code',
+        'employee_photo',
         'first_name',
         'last_name',
         'other_names',
@@ -30,6 +33,7 @@ class Employee extends Model
         'dob',
         'phone',
         'alt_phone',
+        'whatsapp_no',
         'email',
         'national_id_number',
         'marital_status',
@@ -43,6 +47,17 @@ class Employee extends Model
         'employment_status',
         'reporting_to_employee_id',
         'photo_path',
+        'residential_gps',
+        'system_access_requested',
+        'system_access_approved_at',
+        'next_of_kin',
+        'bank_account_holder_name',
+        'bank_name',
+        'bank_account_no',
+        'bank_branch',
+        'bank_sort_code',
+        'national_id_type',
+        'national_id_photos',
     ];
 
     /**
@@ -53,6 +68,9 @@ class Employee extends Model
         return [
             'hire_date' => 'date',
             'dob' => 'date',
+            'next_of_kin' => 'json',
+            'national_id_photos' => 'array',
+
         ];
     }
 
@@ -65,11 +83,20 @@ class Employee extends Model
 
         static::creating(function ($employee) {
             $employee->full_name = $employee->first_name.' '.$employee->last_name;
+
+            // Generate Employee code
+            if (empty($employee->employee_code)) {
+                $lastEmployee = static::orderBy('id', 'desc')->first();
+                $lastId = $lastEmployee ? $lastEmployee->id : 0;
+                $employee->employee_code = '#EMP'.str_pad($lastId + 1, 6, '0', STR_PAD_LEFT);
+            }
+
         });
 
         static::updating(function ($employee) {
             $employee->full_name = $employee->first_name.' '.$employee->last_name;
         });
+
     }
 
     /**
@@ -145,6 +172,14 @@ class Employee extends Model
     }
 
     /**
+     * Get the leave balances for the employee.
+     */
+    public function leaveBalances()
+    {
+        return $this->hasMany(LeaveBalance::class);
+    }
+
+    /**
      * Get the employment contracts for the employee.
      */
     public function contracts()
@@ -158,6 +193,30 @@ class Employee extends Model
     public function documents()
     {
         return $this->hasMany(EmployeeDocument::class);
+    }
+
+    /**
+     * Get communication name for notification system
+     */
+    public function getCommName(): string
+    {
+        return $this->full_name;
+    }
+
+    /**
+     * Get communication email for notification system
+     */
+    public function getCommEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    /**
+     * Get communication phone for notification system
+     */
+    public function getCommPhone(): ?string
+    {
+        return $this->phone ?? $this->whatsapp_no;
     }
 
     /**
@@ -280,14 +339,140 @@ class Employee extends Model
         // Assign roles based on company assignments
         foreach ($this->activeCompanyAssignments as $assignment) {
             if ($assignment->role) {
-                // Assign the role specified in the assignment
-                $this->user->assignRole($assignment->role);
+                try {
+                    // Assign the role specified in the assignment
+                    $this->user->assignRole($assignment->role);
+                } catch (\Exception $e) {
+                    // Log the error but continue with other assignments
+                    Log::warning("Failed to assign role '{$assignment->role}' to user {$this->user->id}: {$e->getMessage()}");
+                }
             }
         }
 
         // If no roles were assigned, assign the default employee role
         if ($this->user->roles->isEmpty() && config('hr.default_employee_role')) {
-            $this->user->assignRole(config('hr.default_employee_role'));
+            $defaultRole = config('hr.default_employee_role');
+            try {
+                $this->user->assignRole($defaultRole);
+            } catch (\Exception $e) {
+                // Log the error but don't break the application
+                Log::warning("Failed to assign default role '{$defaultRole}' to user {$this->user->id}: {$e->getMessage()}");
+
+                // Fallback: assign a basic role that should exist
+                try {
+                    $this->user->assignRole('user');
+                } catch (\Exception $fallbackException) {
+                    Log::error("Failed to assign fallback role 'user' to user {$this->user->id}: {$fallbackException->getMessage()}");
+                }
+            }
         }
+    }
+
+    /**
+     * Request system access for this employee.
+     */
+    public function requestSystemAccess(): void
+    {
+        if ($this->user_id) {
+            throw new \Exception('Employee already has a user account');
+        }
+
+        if (! $this->email) {
+            throw new \Exception('Employee email is required to request system access');
+        }
+
+        $this->update([
+            'system_access_requested' => true,
+            'system_access_approved_at' => null,
+        ]);
+
+        // In a real implementation, you would trigger a notification to admins here
+        Log::info("System access requested for employee: {$this->full_name} ({$this->email})");
+    }
+
+    /**
+     * Approve system access and create user account.
+     */
+    public function approveSystemAccess(?string $password = null): \App\Models\User
+    {
+        if (! $this->system_access_requested) {
+            throw new \Exception('System access not requested');
+        }
+
+        if ($this->user_id) {
+            throw new \Exception('Employee already has a user account');
+        }
+
+        if (! $this->email) {
+            throw new \Exception('Employee email is required to create user account');
+        }
+
+        $password = $password ?? \Illuminate\Support\Str::random(config('hr.default_password_length', 12));
+
+        $user = \App\Models\User::create([
+            'name' => $this->full_name,
+            'email' => $this->email,
+            'password' => \Illuminate\Support\Facades\Hash::make($password),
+            'current_company_id' => $this->company_id,
+        ]);
+
+        $this->update([
+            'user_id' => $user->id,
+            'system_access_approved_at' => now(),
+            'system_access_requested' => false,
+        ]);
+
+        $this->syncUserRoles();
+
+        Log::info("System access approved for employee: {$this->full_name}, user ID: {$user->id}");
+
+        return $user;
+    }
+
+    /**
+     * Deny system access request.
+     */
+    public function denySystemAccess(): void
+    {
+        if (! $this->system_access_requested) {
+            throw new \Exception('System access not requested');
+        }
+
+        $this->update([
+            'system_access_requested' => false,
+            'system_access_approved_at' => null,
+        ]);
+
+        Log::info("System access denied for employee: {$this->full_name}");
+    }
+
+    /**
+     * Create user account manually (bypass approval workflow).
+     */
+    public function createUserAccount(?string $password = null): \App\Models\User
+    {
+        if ($this->user_id) {
+            throw new \Exception('Employee already has a user account');
+        }
+
+        if (! $this->email) {
+            throw new \Exception('Employee email is required to create user account');
+        }
+
+        $password = $password ?? \Illuminate\Support\Str::random(config('hr.default_password_length', 12));
+
+        $user = \App\Models\User::create([
+            'name' => $this->full_name,
+            'email' => $this->email,
+            'password' => \Illuminate\Support\Facades\Hash::make($password),
+            'current_company_id' => $this->company_id,
+        ]);
+
+        $this->update(['user_id' => $user->id]);
+        $this->syncUserRoles();
+
+        Log::info("User account created for employee: {$this->full_name}, user ID: {$user->id}");
+
+        return $user;
     }
 }

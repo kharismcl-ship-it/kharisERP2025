@@ -27,6 +27,12 @@ class LeaveType extends Model
         'requires_approval',
         'is_paid',
         'is_active',
+        'has_accrual',
+        'accrual_rate',
+        'accrual_frequency',
+        'carryover_limit',
+        'max_balance',
+        'pro_rata_enabled',
     ];
 
     /**
@@ -39,6 +45,11 @@ class LeaveType extends Model
             'requires_approval' => 'boolean',
             'is_paid' => 'boolean',
             'is_active' => 'boolean',
+            'has_accrual' => 'boolean',
+            'accrual_rate' => 'decimal:2',
+            'carryover_limit' => 'decimal:2',
+            'max_balance' => 'decimal:2',
+            'pro_rata_enabled' => 'boolean',
         ];
     }
 

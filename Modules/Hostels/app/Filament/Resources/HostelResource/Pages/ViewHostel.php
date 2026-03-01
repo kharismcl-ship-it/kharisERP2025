@@ -82,8 +82,8 @@ class ViewHostel extends ViewRecord
                             ->label('Location')
                             ->columnSpanFull()
                             // Basic Configuration
-                            ->defaultLocation(latitude: 5.6037, longitude: -0.1870)
-                            ->draggable(false)
+                            // ->defaultLocation(latitude: 5.6037, longitude: -0.1870)
+                            // ->draggable(false)
                             ->zoom(15)
                             ->minZoom(0)
                             ->maxZoom(28)

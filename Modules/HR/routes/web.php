@@ -9,6 +9,7 @@ use Modules\HR\Http\Livewire\EmployeeSalaries\Show as EmployeeSalariesShow;
 use Modules\HR\Http\Livewire\EmploymentContracts\Index as EmploymentContractsIndex;
 use Modules\HR\Http\Livewire\EmploymentContracts\Show as EmploymentContractsShow;
 use Modules\HR\Http\Livewire\HRDashboard;
+use Modules\HR\Http\Livewire\LeaveReports;
 use Modules\HR\Http\Livewire\Leaves\Index as LeavesIndex;
 use Modules\HR\Http\Livewire\Leaves\Requests as LeavesRequests;
 use Modules\HR\Http\Livewire\OrgChart\Index as OrgChartIndex;
@@ -18,6 +19,7 @@ use Modules\HR\Http\Livewire\PerformanceReviews\Index as PerformanceReviewsIndex
 use Modules\HR\Http\Livewire\PerformanceReviews\Show as PerformanceReviewsShow;
 use Modules\HR\Http\Livewire\SalaryScales\Index as SalaryScalesIndex;
 use Modules\HR\Http\Livewire\SalaryScales\Show as SalaryScalesShow;
+use Modules\HR\Http\Livewire\TeamLeaveCalendar;
 
 Route::middleware(['web', 'auth', 'set-company:hr'])
     ->prefix('hr')
@@ -42,4 +44,6 @@ Route::middleware(['web', 'auth', 'set-company:hr'])
         Route::get('/performance-reviews/{review}', PerformanceReviewsShow::class)->name('performance-reviews.show');
         Route::get('/salary-scales', SalaryScalesIndex::class)->name('salary-scales.index');
         Route::get('/salary-scales/{scale}', SalaryScalesShow::class)->name('salary-scales.show');
+        Route::get('/leave-calendar', TeamLeaveCalendar::class)->name('leave-calendar.index');
+        Route::get('/leave-reports', LeaveReports::class)->name('leave-reports.index');
     });

@@ -32,19 +32,42 @@ class CommProviderConfigResource extends Resource
                     ->relationship('company', 'name')
                     ->nullable(),
                 Forms\Components\Select::make('channel')
-                    ->options([
-                        'email' => 'Email',
-                        'sms' => 'SMS',
-                        'whatsapp' => 'WhatsApp',
-                    ])
+                    ->options(function () {
+                        $channels = config('communicationcentre.channels', []);
+                        $channelLabels = [
+                            'email' => 'Email',
+                            'sms' => 'SMS',
+                            'whatsapp' => 'WhatsApp',
+                            'database' => 'Database',
+                        ];
+
+                        $options = [];
+                        foreach ($channels as $channel) {
+                            $options[$channel] = $channelLabels[$channel] ?? ucfirst($channel);
+                        }
+
+                        return $options;
+                    })
                     ->required(),
                 Forms\Components\Select::make('provider')
-                    ->options([
-                        'laravel_mail' => 'Laravel Mail',
-                        'twilio' => 'Twilio',
-                        'mnotify' => 'mNotify',
-                        'wasender' => 'Wasender',
-                    ])
+                    ->options(function () {
+                        $providers = config('communicationcentre.providers', []);
+                        $providerLabels = [
+                            'laravel_mail' => 'Laravel Mail',
+                            'mailtrap' => 'Mailtrap',
+                            'twilio' => 'Twilio',
+                            'mnotify' => 'mNotify',
+                            'wasender' => 'Wasender',
+                            'filament_database' => 'Filament Database',
+                        ];
+
+                        $options = [];
+                        foreach ($providers as $provider) {
+                            $options[$provider] = $providerLabels[$provider] ?? ucfirst(str_replace('_', ' ', $provider));
+                        }
+
+                        return $options;
+                    })
                     ->required(),
                 Forms\Components\TextInput::make('name')
                     ->required()

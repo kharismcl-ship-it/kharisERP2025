@@ -7,6 +7,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables;
@@ -31,19 +32,87 @@ class CommTemplateResource extends Resource
             ->components([
                 Forms\Components\Select::make('company_id')
                     ->relationship('company', 'name')
+                    ->live()
                     ->nullable(),
                 Forms\Components\TextInput::make('code')
                     ->required()
                     ->maxLength(255),
                 Forms\Components\Select::make('channel')
-                    ->options([
-                        'email' => 'Email',
-                        'sms' => 'SMS',
-                        'whatsapp' => 'WhatsApp',
-                    ])
-                    ->required(),
+                    ->options(function () {
+                        $channels = config('communicationcentre.channels', []);
+                        $channelLabels = [
+                            'email' => 'Email',
+                            'sms' => 'SMS',
+                            'whatsapp' => 'WhatsApp',
+                            'database' => 'Database',
+                        ];
+
+                        $options = [];
+                        foreach ($channels as $channel) {
+                            $options[$channel] = $channelLabels[$channel] ?? ucfirst($channel);
+                        }
+
+                        return $options;
+                    })
+                    ->required()
+                    ->live(),
                 Forms\Components\Select::make('provider')
-                    ->options(CommProviderConfig::pluck('provider', 'provider'))
+                    ->options(function (Get $get) {
+                        $channel = $get('channel');
+                        $companyId = $get('company_id');
+
+                        if (! $channel) {
+                            return [];
+                        }
+
+                        $query = CommProviderConfig::where('channel', $channel)
+                            ->where('is_active', true);
+
+                        if ($companyId) {
+                            $query->where(function ($q) use ($companyId) {
+                                $q->where('company_id', $companyId)
+                                    ->orWhereNull('company_id');
+                            });
+                        } else {
+                            $query->whereNull('company_id');
+                        }
+
+                        $providerLabels = [
+                            'laravel_mail' => 'Laravel Mail',
+                            'mailtrap' => 'Mailtrap',
+                            'twilio' => 'Twilio',
+                            'mnotify' => 'mNotify',
+                            'wasender' => 'Wasender',
+                            'filament_database' => 'Filament Database',
+                        ];
+
+                        return $query->get()
+                            ->mapWithKeys(function ($config) use ($providerLabels) {
+                                $label = $providerLabels[$config->provider] ?? ucfirst(str_replace('_', ' ', $config->provider));
+
+                                return [$config->provider => "{$label} ({$config->name})"];
+                            })
+                            ->toArray();
+                    })
+                    ->required()
+                    ->searchable(),
+                Forms\Components\Select::make('language')
+                    ->options([
+                        'en' => 'English',
+                        'fr' => 'French',
+                        'es' => 'Spanish',
+                        'de' => 'German',
+                        'pt' => 'Portuguese',
+                        'it' => 'Italian',
+                        'ru' => 'Russian',
+                        'zh' => 'Chinese',
+                        'ja' => 'Japanese',
+                        'ar' => 'Arabic',
+                        'hi' => 'Hindi',
+                        'sw' => 'Swahili',
+                    ])
+                    ->default('en')
+                    ->searchable()
                     ->required(),
                 Forms\Components\TextInput::make('name')
                     ->required()
@@ -71,6 +140,9 @@ class CommTemplateResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('channel')
                     ->searchable(),
+                Tables\Columns\TextColumn::make('language')
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('subject')

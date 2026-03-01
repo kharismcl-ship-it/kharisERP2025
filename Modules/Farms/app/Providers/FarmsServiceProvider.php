@@ -3,7 +3,19 @@
 namespace Modules\Farms\Providers;
 
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
+use Modules\Farms\Models\CropCycle;
+use Modules\Farms\Models\Farm;
+use Modules\Farms\Models\FarmExpense;
+use Modules\Farms\Models\HarvestRecord;
+use Modules\Farms\Models\LivestockBatch;
+use Modules\Farms\Policies\CropCyclePolicy;
+use Modules\Farms\Policies\FarmExpensePolicy;
+use Modules\Farms\Policies\FarmPolicy;
+use Modules\Farms\Policies\HarvestRecordPolicy;
+use Modules\Farms\Policies\LivestockBatchPolicy;
+use Modules\Farms\Services\FarmService;
 use Nwidart\Modules\Traits\PathNamespace;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -35,6 +47,7 @@ class FarmsServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->name, 'database/migrations'));
+        $this->registerPolicies();
     }
 
     /**
@@ -44,6 +57,16 @@ class FarmsServiceProvider extends ServiceProvider
     {
         $this->app->register(EventServiceProvider::class);
         $this->app->register(RouteServiceProvider::class);
+        $this->app->singleton(FarmService::class);
+    }
+
+    protected function registerPolicies(): void
+    {
+        Gate::policy(Farm::class, FarmPolicy::class);
+        Gate::policy(CropCycle::class, CropCyclePolicy::class);
+        Gate::policy(LivestockBatch::class, LivestockBatchPolicy::class);
+        Gate::policy(HarvestRecord::class, HarvestRecordPolicy::class);
+        Gate::policy(FarmExpense::class, FarmExpensePolicy::class);
     }
 
     /**

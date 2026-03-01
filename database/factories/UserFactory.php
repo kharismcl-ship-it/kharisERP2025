@@ -27,10 +27,10 @@ class UserFactory extends Factory
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= 'password',
-            'remember_token' => Str::random(10),
-            'two_factor_secret' => Str::random(10),
-            'two_factor_recovery_codes' => Str::random(10),
-            'two_factor_confirmed_at' => now(),
+            // 'remember_token' => Str::random(10),
+            // 'two_factor_secret' => Str::random(10),
+            // 'two_factor_recovery_codes' => Str::random(10),
+            // 'two_factor_confirmed_at' => now(),
         ];
     }
 
@@ -56,39 +56,28 @@ class UserFactory extends Factory
         ]);
     }
 
-    /**
-     * Configure the model factory to create a user with a specific company.
-     */
-    public function withCompany($company = null)
+    public function withCompany($company = null): static
     {
         return $this->afterCreating(function (\App\Models\User $user) use ($company) {
             if (! $company) {
                 $company = \App\Models\Company::factory()->create();
             }
 
-            $user->companies()->attach($company->id, [
-                'position' => 'Administrator',
-                'is_active' => true,
-                'assigned_at' => now(),
-            ]);
-
-            $user->current_company_id = $company->id;
-            $user->save();
+            $user->companies()->attach($company->id);
         });
     }
 
     /**
      * Configure the model factory to create a super admin user.
      */
-    public function superAdmin()
-    {
-        return $this->afterCreating(function (\App\Models\User $user) {
-            $superAdminRole = \Spatie\Permission\Models\Role::firstOrCreate(
-                ['name' => 'super_admin', 'guard_name' => 'web'],
-                ['name' => 'super_admin', 'guard_name' => 'web', 'company_id' => null]
-            );
+    // public function superAdmin()
+    //     return $this->afterCreating(function (\App\Models\User $user) {
+    //         $superAdminRole = \Spatie\Permission\Models\Role::firstOrCreate(
+    //             ['name' => 'super_admin', 'guard_name' => 'web'],
+    //             ['name' => 'super_admin', 'guard_name' => 'web', 'company_id' => null]
+    //         );
 
-            $user->assignRole($superAdminRole);
-        });
-    }
+    //         $user->assignRole($superAdminRole);
+    //     });
+    // }
 }

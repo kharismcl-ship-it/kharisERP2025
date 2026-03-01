@@ -13,7 +13,6 @@ use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
-use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -132,22 +131,25 @@ class DepositResource extends Resource
                     ->money('GHS')
                     ->sortable(),
 
-                BadgeColumn::make('deposit_type')
-                    ->colors([
-                        'primary' => 'security',
-                        'success' => 'advance',
-                        'warning' => 'damage',
-                        'danger' => 'utility',
-                    ]),
+                TextColumn::make('deposit_type')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'security' => 'primary',
+                        'advance'  => 'success',
+                        'damage'   => 'warning',
+                        'utility'  => 'danger',
+                        default    => 'gray',
+                    }),
 
-                BadgeColumn::make('status')
-                    ->colors([
-                        'primary' => Deposit::STATUS_PENDING,
-                        'success' => Deposit::STATUS_COLLECTED,
-                        'warning' => Deposit::STATUS_REFUNDED,
-                        'danger' => Deposit::STATUS_PARTIAL_REFUND,
-                        'gray' => Deposit::STATUS_FORFEITED,
-                    ]),
+                TextColumn::make('status')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        Deposit::STATUS_COLLECTED     => 'success',
+                        Deposit::STATUS_REFUNDED      => 'warning',
+                        Deposit::STATUS_PARTIAL_REFUND => 'danger',
+                        Deposit::STATUS_FORFEITED     => 'gray',
+                        default                       => 'primary',
+                    }),
 
                 TextColumn::make('collected_date')
                     ->date()

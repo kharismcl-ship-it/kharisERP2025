@@ -3,6 +3,7 @@
 namespace Modules\Hostels\Providers;
 
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Modules\Hostels\Console\Commands\ReleaseExpiredManualBookings;
 use Modules\Hostels\Console\Commands\SendCheckoutReminders;
@@ -49,6 +50,7 @@ class HostelsServiceProvider extends ServiceProvider
         // Register the Bookingobserver
         Booking::observe(BookingObserver::class);
 
+        $this->registerPolicies();
         $this->registerCommands();
         $this->registerCommandSchedules();
         $this->registerTranslations();
@@ -145,6 +147,42 @@ class HostelsServiceProvider extends ServiceProvider
 
                     $this->publishes([$file->getPathname() => config_path($config)], 'config');
                     $this->mergeConfigFrom($file->getPathname(), $key);
+                }
+            }
+        }
+    }
+
+    /**
+     * Register module policies with the Gate so Filament and Laravel
+     * respect permissions and toggles for this module's models.
+     */
+    protected function registerPolicies(): void
+    {
+        $policiesPath = module_path($this->name, 'app/Policies');
+
+        if (! is_dir($policiesPath)) {
+            return;
+        }
+
+        $iterator = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($policiesPath));
+
+        foreach ($iterator as $file) {
+            if (! $file->isFile() || $file->getExtension() !== 'php') {
+                continue;
+            }
+
+            $policyClass = 'Modules\\'.$this->name.'\\Policies\\'.basename($file->getFilename(), '.php');
+            if (! class_exists($policyClass)) {
+                continue;
+            }
+
+            $contents = @file_get_contents($file->getPathname()) ?: '';
+
+            if (preg_match('/use\\s+Modules\\\\'.$this->name.'\\\\Models\\\\([A-Za-z0-9_\\\\]+);/', $contents, $matches)) {
+                $modelClass = 'Modules\\'.$this->name.'\\Models\\'.$matches[1];
+
+                if (class_exists($modelClass)) {
+                    Gate::policy($modelClass, $policyClass);
                 }
             }
         }

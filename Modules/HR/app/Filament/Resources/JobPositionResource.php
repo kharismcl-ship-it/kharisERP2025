@@ -2,14 +2,19 @@
 
 namespace Modules\HR\Filament\Resources;
 
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Modules\HR\Filament\Resources\JobPositionResource\Pages;
 use Modules\HR\Models\JobPosition;
@@ -28,9 +33,13 @@ class JobPositionResource extends Resource
             ->components([
                 Forms\Components\Select::make('company_id')
                     ->relationship('company', 'name')
+                    ->live()
                     ->required(),
                 Forms\Components\Select::make('department_id')
                     ->relationship('department', 'name')
+                    ->options(fn (Get $get) => \Modules\HR\Models\Department::query()
+                        ->when($get('company_id'), fn ($q, $companyId) => $q->where('company_id', $companyId))
+                        ->pluck('name', 'id'))
                     ->searchable()
                     ->preload(),
                 Forms\Components\TextInput::make('title')
@@ -62,14 +71,25 @@ class JobPositionResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->defaultGroup('company.name')
+            ->groups([
+                Group::make('company.name')
+                    ->collapsible(),
+            ])
             ->columns([
                 Tables\Columns\TextColumn::make('company.name')
+                    ->toggleable(isToggledHiddenByDefault: true)
                     ->sortable(),
                 Tables\Columns\TextColumn::make('title')
+                    ->weight('bold')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('department.name')
                     ->searchable()
                     ->sortable(),
+                TextColumn::make('grade')
+                    ->sortable()
+                    ->weight('bold')
+                    ->alignCenter(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -86,7 +106,11 @@ class JobPositionResource extends Resource
                     ->relationship('department', 'name'),
             ])
             ->actions([
-                EditAction::make(),
+                ActionGroup::make([
+                    EditAction::make(),
+                    DeleteAction::make(),
+                ]),
+
             ])
             ->bulkActions([
                 BulkActionGroup::make([
