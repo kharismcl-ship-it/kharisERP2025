@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Modules\Hostels\Policies;
 
-use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Foundation\Auth\User as AuthUser;
 use Modules\Hostels\Models\RoomInventoryAssignment;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class RoomInventoryAssignmentPolicy
 {
     use HandlesAuthorization;
-
+    
     public function viewAny(AuthUser $authUser): bool
     {
         return $authUser->can('ViewAny:RoomInventoryAssignment');
@@ -66,4 +66,5 @@ class RoomInventoryAssignmentPolicy
     {
         return $authUser->can('Reorder:RoomInventoryAssignment');
     }
+
 }

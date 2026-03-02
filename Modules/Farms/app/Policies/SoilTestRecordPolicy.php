@@ -1,16 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Farms\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use Modules\Farms\Models\SoilTestRecord;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class SoilTestRecordPolicy
 {
-    public function viewAny(User $user): bool  { return $user->can('view_any_soil_test_record'); }
-    public function view(User $user, SoilTestRecord $record): bool { return $user->can('view_soil_test_record'); }
-    public function create(User $user): bool   { return $user->can('create_soil_test_record'); }
-    public function update(User $user, SoilTestRecord $record): bool { return $user->can('update_soil_test_record'); }
-    public function delete(User $user, SoilTestRecord $record): bool { return $user->can('delete_soil_test_record'); }
-    public function deleteAny(User $user): bool { return $user->can('delete_any_soil_test_record'); }
+    use HandlesAuthorization;
+    
+    public function viewAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ViewAny:SoilTestRecord');
+    }
+
+    public function view(AuthUser $authUser, SoilTestRecord $soilTestRecord): bool
+    {
+        return $authUser->can('View:SoilTestRecord');
+    }
+
+    public function create(AuthUser $authUser): bool
+    {
+        return $authUser->can('Create:SoilTestRecord');
+    }
+
+    public function update(AuthUser $authUser, SoilTestRecord $soilTestRecord): bool
+    {
+        return $authUser->can('Update:SoilTestRecord');
+    }
+
+    public function delete(AuthUser $authUser, SoilTestRecord $soilTestRecord): bool
+    {
+        return $authUser->can('Delete:SoilTestRecord');
+    }
+
+    public function restore(AuthUser $authUser, SoilTestRecord $soilTestRecord): bool
+    {
+        return $authUser->can('Restore:SoilTestRecord');
+    }
+
+    public function forceDelete(AuthUser $authUser, SoilTestRecord $soilTestRecord): bool
+    {
+        return $authUser->can('ForceDelete:SoilTestRecord');
+    }
+
+    public function forceDeleteAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ForceDeleteAny:SoilTestRecord');
+    }
+
+    public function restoreAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('RestoreAny:SoilTestRecord');
+    }
+
+    public function replicate(AuthUser $authUser, SoilTestRecord $soilTestRecord): bool
+    {
+        return $authUser->can('Replicate:SoilTestRecord');
+    }
+
+    public function reorder(AuthUser $authUser): bool
+    {
+        return $authUser->can('Reorder:SoilTestRecord');
+    }
+
 }

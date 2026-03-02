@@ -1,16 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Sales\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use Modules\Sales\Models\SalesOrder;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class SalesOrderPolicy
 {
-    public function viewAny(User $user): bool  { return $user->can('view_any_sales_order'); }
-    public function view(User $user, SalesOrder $model): bool  { return $user->can('view_sales_order'); }
-    public function create(User $user): bool   { return $user->can('create_sales_order'); }
-    public function update(User $user, SalesOrder $model): bool { return $user->can('update_sales_order'); }
-    public function delete(User $user, SalesOrder $model): bool { return $user->can('delete_sales_order'); }
-    public function deleteAny(User $user): bool { return $user->can('delete_any_sales_order'); }
+    use HandlesAuthorization;
+    
+    public function viewAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ViewAny:SalesOrder');
+    }
+
+    public function view(AuthUser $authUser, SalesOrder $salesOrder): bool
+    {
+        return $authUser->can('View:SalesOrder');
+    }
+
+    public function create(AuthUser $authUser): bool
+    {
+        return $authUser->can('Create:SalesOrder');
+    }
+
+    public function update(AuthUser $authUser, SalesOrder $salesOrder): bool
+    {
+        return $authUser->can('Update:SalesOrder');
+    }
+
+    public function delete(AuthUser $authUser, SalesOrder $salesOrder): bool
+    {
+        return $authUser->can('Delete:SalesOrder');
+    }
+
+    public function restore(AuthUser $authUser, SalesOrder $salesOrder): bool
+    {
+        return $authUser->can('Restore:SalesOrder');
+    }
+
+    public function forceDelete(AuthUser $authUser, SalesOrder $salesOrder): bool
+    {
+        return $authUser->can('ForceDelete:SalesOrder');
+    }
+
+    public function forceDeleteAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ForceDeleteAny:SalesOrder');
+    }
+
+    public function restoreAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('RestoreAny:SalesOrder');
+    }
+
+    public function replicate(AuthUser $authUser, SalesOrder $salesOrder): bool
+    {
+        return $authUser->can('Replicate:SalesOrder');
+    }
+
+    public function reorder(AuthUser $authUser): bool
+    {
+        return $authUser->can('Reorder:SalesOrder');
+    }
+
 }

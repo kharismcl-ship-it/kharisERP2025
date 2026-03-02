@@ -1,16 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Sales\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use Modules\Sales\Models\DiningTable;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class DiningTablePolicy
 {
-    public function viewAny(User $user): bool  { return $user->can('view_any_dining_table'); }
-    public function view(User $user, DiningTable $model): bool  { return $user->can('view_dining_table'); }
-    public function create(User $user): bool   { return $user->can('create_dining_table'); }
-    public function update(User $user, DiningTable $model): bool { return $user->can('update_dining_table'); }
-    public function delete(User $user, DiningTable $model): bool { return $user->can('delete_dining_table'); }
-    public function deleteAny(User $user): bool { return $user->can('delete_any_dining_table'); }
+    use HandlesAuthorization;
+    
+    public function viewAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ViewAny:DiningTable');
+    }
+
+    public function view(AuthUser $authUser, DiningTable $diningTable): bool
+    {
+        return $authUser->can('View:DiningTable');
+    }
+
+    public function create(AuthUser $authUser): bool
+    {
+        return $authUser->can('Create:DiningTable');
+    }
+
+    public function update(AuthUser $authUser, DiningTable $diningTable): bool
+    {
+        return $authUser->can('Update:DiningTable');
+    }
+
+    public function delete(AuthUser $authUser, DiningTable $diningTable): bool
+    {
+        return $authUser->can('Delete:DiningTable');
+    }
+
+    public function restore(AuthUser $authUser, DiningTable $diningTable): bool
+    {
+        return $authUser->can('Restore:DiningTable');
+    }
+
+    public function forceDelete(AuthUser $authUser, DiningTable $diningTable): bool
+    {
+        return $authUser->can('ForceDelete:DiningTable');
+    }
+
+    public function forceDeleteAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ForceDeleteAny:DiningTable');
+    }
+
+    public function restoreAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('RestoreAny:DiningTable');
+    }
+
+    public function replicate(AuthUser $authUser, DiningTable $diningTable): bool
+    {
+        return $authUser->can('Replicate:DiningTable');
+    }
+
+    public function reorder(AuthUser $authUser): bool
+    {
+        return $authUser->can('Reorder:DiningTable');
+    }
+
 }

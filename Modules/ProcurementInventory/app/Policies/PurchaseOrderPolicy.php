@@ -1,16 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\ProcurementInventory\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use Modules\ProcurementInventory\Models\PurchaseOrder;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class PurchaseOrderPolicy
 {
-    public function viewAny(User $user): bool { return $user->can('view_any_purchase_order'); }
-    public function view(User $user, PurchaseOrder $model): bool { return $user->can('view_purchase_order'); }
-    public function create(User $user): bool { return $user->can('create_purchase_order'); }
-    public function update(User $user, PurchaseOrder $model): bool { return $user->can('update_purchase_order'); }
-    public function delete(User $user, PurchaseOrder $model): bool { return $user->can('delete_purchase_order'); }
-    public function deleteAny(User $user): bool { return $user->can('delete_any_purchase_order'); }
+    use HandlesAuthorization;
+    
+    public function viewAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ViewAny:PurchaseOrder');
+    }
+
+    public function view(AuthUser $authUser, PurchaseOrder $purchaseOrder): bool
+    {
+        return $authUser->can('View:PurchaseOrder');
+    }
+
+    public function create(AuthUser $authUser): bool
+    {
+        return $authUser->can('Create:PurchaseOrder');
+    }
+
+    public function update(AuthUser $authUser, PurchaseOrder $purchaseOrder): bool
+    {
+        return $authUser->can('Update:PurchaseOrder');
+    }
+
+    public function delete(AuthUser $authUser, PurchaseOrder $purchaseOrder): bool
+    {
+        return $authUser->can('Delete:PurchaseOrder');
+    }
+
+    public function restore(AuthUser $authUser, PurchaseOrder $purchaseOrder): bool
+    {
+        return $authUser->can('Restore:PurchaseOrder');
+    }
+
+    public function forceDelete(AuthUser $authUser, PurchaseOrder $purchaseOrder): bool
+    {
+        return $authUser->can('ForceDelete:PurchaseOrder');
+    }
+
+    public function forceDeleteAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ForceDeleteAny:PurchaseOrder');
+    }
+
+    public function restoreAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('RestoreAny:PurchaseOrder');
+    }
+
+    public function replicate(AuthUser $authUser, PurchaseOrder $purchaseOrder): bool
+    {
+        return $authUser->can('Replicate:PurchaseOrder');
+    }
+
+    public function reorder(AuthUser $authUser): bool
+    {
+        return $authUser->can('Reorder:PurchaseOrder');
+    }
+
 }

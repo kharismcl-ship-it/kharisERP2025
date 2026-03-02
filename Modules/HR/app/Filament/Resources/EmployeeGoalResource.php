@@ -24,6 +24,13 @@ class EmployeeGoalResource extends Resource
 {
     protected static ?string $model = EmployeeGoal::class;
 
+    /**
+     * This model has no direct company_id — Filament's ownership
+     * check is skipped. Data isolation is handled via the parent
+     * relationship or a custom getEloquentQuery() scope.
+     */
+    protected static bool $isScopedToTenant = false;
+
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedFlag;
 
     protected static string|\UnitEnum|null $navigationGroup = 'Performance';

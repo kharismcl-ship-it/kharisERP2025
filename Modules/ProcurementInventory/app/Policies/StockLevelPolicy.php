@@ -1,16 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\ProcurementInventory\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use Modules\ProcurementInventory\Models\StockLevel;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class StockLevelPolicy
 {
-    public function viewAny(User $user): bool { return $user->can('view_any_stock_level'); }
-    public function view(User $user, StockLevel $model): bool { return $user->can('view_stock_level'); }
-    public function create(User $user): bool { return $user->can('create_stock_level'); }
-    public function update(User $user, StockLevel $model): bool { return $user->can('update_stock_level'); }
-    public function delete(User $user, StockLevel $model): bool { return $user->can('delete_stock_level'); }
-    public function deleteAny(User $user): bool { return $user->can('delete_any_stock_level'); }
+    use HandlesAuthorization;
+    
+    public function viewAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ViewAny:StockLevel');
+    }
+
+    public function view(AuthUser $authUser, StockLevel $stockLevel): bool
+    {
+        return $authUser->can('View:StockLevel');
+    }
+
+    public function create(AuthUser $authUser): bool
+    {
+        return $authUser->can('Create:StockLevel');
+    }
+
+    public function update(AuthUser $authUser, StockLevel $stockLevel): bool
+    {
+        return $authUser->can('Update:StockLevel');
+    }
+
+    public function delete(AuthUser $authUser, StockLevel $stockLevel): bool
+    {
+        return $authUser->can('Delete:StockLevel');
+    }
+
+    public function restore(AuthUser $authUser, StockLevel $stockLevel): bool
+    {
+        return $authUser->can('Restore:StockLevel');
+    }
+
+    public function forceDelete(AuthUser $authUser, StockLevel $stockLevel): bool
+    {
+        return $authUser->can('ForceDelete:StockLevel');
+    }
+
+    public function forceDeleteAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ForceDeleteAny:StockLevel');
+    }
+
+    public function restoreAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('RestoreAny:StockLevel');
+    }
+
+    public function replicate(AuthUser $authUser, StockLevel $stockLevel): bool
+    {
+        return $authUser->can('Replicate:StockLevel');
+    }
+
+    public function reorder(AuthUser $authUser): bool
+    {
+        return $authUser->can('Reorder:StockLevel');
+    }
+
 }

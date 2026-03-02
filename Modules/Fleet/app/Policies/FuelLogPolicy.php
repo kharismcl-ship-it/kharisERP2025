@@ -1,39 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Fleet\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use Modules\Fleet\Models\FuelLog;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class FuelLogPolicy
 {
-    public function viewAny(User $user): bool
+    use HandlesAuthorization;
+    
+    public function viewAny(AuthUser $authUser): bool
     {
-        return $user->can('view_any_fuel_log');
+        return $authUser->can('ViewAny:FuelLog');
     }
 
-    public function view(User $user, FuelLog $fuelLog): bool
+    public function view(AuthUser $authUser, FuelLog $fuelLog): bool
     {
-        return $user->can('view_fuel_log');
+        return $authUser->can('View:FuelLog');
     }
 
-    public function create(User $user): bool
+    public function create(AuthUser $authUser): bool
     {
-        return $user->can('create_fuel_log');
+        return $authUser->can('Create:FuelLog');
     }
 
-    public function update(User $user, FuelLog $fuelLog): bool
+    public function update(AuthUser $authUser, FuelLog $fuelLog): bool
     {
-        return $user->can('update_fuel_log');
+        return $authUser->can('Update:FuelLog');
     }
 
-    public function delete(User $user, FuelLog $fuelLog): bool
+    public function delete(AuthUser $authUser, FuelLog $fuelLog): bool
     {
-        return $user->can('delete_fuel_log');
+        return $authUser->can('Delete:FuelLog');
     }
 
-    public function deleteAny(User $user): bool
+    public function restore(AuthUser $authUser, FuelLog $fuelLog): bool
     {
-        return $user->can('delete_any_fuel_log');
+        return $authUser->can('Restore:FuelLog');
     }
+
+    public function forceDelete(AuthUser $authUser, FuelLog $fuelLog): bool
+    {
+        return $authUser->can('ForceDelete:FuelLog');
+    }
+
+    public function forceDeleteAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ForceDeleteAny:FuelLog');
+    }
+
+    public function restoreAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('RestoreAny:FuelLog');
+    }
+
+    public function replicate(AuthUser $authUser, FuelLog $fuelLog): bool
+    {
+        return $authUser->can('Replicate:FuelLog');
+    }
+
+    public function reorder(AuthUser $authUser): bool
+    {
+        return $authUser->can('Reorder:FuelLog');
+    }
+
 }

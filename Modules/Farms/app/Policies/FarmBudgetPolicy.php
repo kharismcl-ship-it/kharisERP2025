@@ -1,16 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Farms\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use Modules\Farms\Models\FarmBudget;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class FarmBudgetPolicy
 {
-    public function viewAny(User $user): bool  { return $user->can('view_any_farm_budget'); }
-    public function view(User $user, FarmBudget $record): bool { return $user->can('view_farm_budget'); }
-    public function create(User $user): bool   { return $user->can('create_farm_budget'); }
-    public function update(User $user, FarmBudget $record): bool { return $user->can('update_farm_budget'); }
-    public function delete(User $user, FarmBudget $record): bool { return $user->can('delete_farm_budget'); }
-    public function deleteAny(User $user): bool { return $user->can('delete_any_farm_budget'); }
+    use HandlesAuthorization;
+    
+    public function viewAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ViewAny:FarmBudget');
+    }
+
+    public function view(AuthUser $authUser, FarmBudget $farmBudget): bool
+    {
+        return $authUser->can('View:FarmBudget');
+    }
+
+    public function create(AuthUser $authUser): bool
+    {
+        return $authUser->can('Create:FarmBudget');
+    }
+
+    public function update(AuthUser $authUser, FarmBudget $farmBudget): bool
+    {
+        return $authUser->can('Update:FarmBudget');
+    }
+
+    public function delete(AuthUser $authUser, FarmBudget $farmBudget): bool
+    {
+        return $authUser->can('Delete:FarmBudget');
+    }
+
+    public function restore(AuthUser $authUser, FarmBudget $farmBudget): bool
+    {
+        return $authUser->can('Restore:FarmBudget');
+    }
+
+    public function forceDelete(AuthUser $authUser, FarmBudget $farmBudget): bool
+    {
+        return $authUser->can('ForceDelete:FarmBudget');
+    }
+
+    public function forceDeleteAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ForceDeleteAny:FarmBudget');
+    }
+
+    public function restoreAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('RestoreAny:FarmBudget');
+    }
+
+    public function replicate(AuthUser $authUser, FarmBudget $farmBudget): bool
+    {
+        return $authUser->can('Replicate:FarmBudget');
+    }
+
+    public function reorder(AuthUser $authUser): bool
+    {
+        return $authUser->can('Reorder:FarmBudget');
+    }
+
 }

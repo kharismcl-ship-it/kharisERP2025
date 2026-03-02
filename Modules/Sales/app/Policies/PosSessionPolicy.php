@@ -1,16 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Sales\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use Modules\Sales\Models\PosSession;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class PosSessionPolicy
 {
-    public function viewAny(User $user): bool  { return $user->can('view_any_pos_session'); }
-    public function view(User $user, PosSession $model): bool  { return $user->can('view_pos_session'); }
-    public function create(User $user): bool   { return $user->can('create_pos_session'); }
-    public function update(User $user, PosSession $model): bool { return $user->can('update_pos_session'); }
-    public function delete(User $user, PosSession $model): bool { return $user->can('delete_pos_session'); }
-    public function deleteAny(User $user): bool { return $user->can('delete_any_pos_session'); }
+    use HandlesAuthorization;
+    
+    public function viewAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ViewAny:PosSession');
+    }
+
+    public function view(AuthUser $authUser, PosSession $posSession): bool
+    {
+        return $authUser->can('View:PosSession');
+    }
+
+    public function create(AuthUser $authUser): bool
+    {
+        return $authUser->can('Create:PosSession');
+    }
+
+    public function update(AuthUser $authUser, PosSession $posSession): bool
+    {
+        return $authUser->can('Update:PosSession');
+    }
+
+    public function delete(AuthUser $authUser, PosSession $posSession): bool
+    {
+        return $authUser->can('Delete:PosSession');
+    }
+
+    public function restore(AuthUser $authUser, PosSession $posSession): bool
+    {
+        return $authUser->can('Restore:PosSession');
+    }
+
+    public function forceDelete(AuthUser $authUser, PosSession $posSession): bool
+    {
+        return $authUser->can('ForceDelete:PosSession');
+    }
+
+    public function forceDeleteAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ForceDeleteAny:PosSession');
+    }
+
+    public function restoreAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('RestoreAny:PosSession');
+    }
+
+    public function replicate(AuthUser $authUser, PosSession $posSession): bool
+    {
+        return $authUser->can('Replicate:PosSession');
+    }
+
+    public function reorder(AuthUser $authUser): bool
+    {
+        return $authUser->can('Reorder:PosSession');
+    }
+
 }

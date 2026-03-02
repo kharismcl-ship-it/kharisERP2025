@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Modules\Finance\Policies;
 
-use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Foundation\Auth\User as AuthUser;
 use Modules\Finance\Models\RecurringInvoice;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class RecurringInvoicePolicy
 {
     use HandlesAuthorization;
-
+    
     public function viewAny(AuthUser $authUser): bool
     {
         return $authUser->can('ViewAny:RecurringInvoice');
@@ -66,4 +66,5 @@ class RecurringInvoicePolicy
     {
         return $authUser->can('Reorder:RecurringInvoice');
     }
+
 }

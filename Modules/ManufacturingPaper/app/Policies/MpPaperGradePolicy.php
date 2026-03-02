@@ -1,16 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\ManufacturingPaper\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use Modules\ManufacturingPaper\Models\MpPaperGrade;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class MpPaperGradePolicy
 {
-    public function viewAny(User $user): bool   { return $user->can('view_any_mp::paper::grade'); }
-    public function view(User $user, MpPaperGrade $model): bool { return $user->can('view_mp::paper::grade'); }
-    public function create(User $user): bool    { return $user->can('create_mp::paper::grade'); }
-    public function update(User $user, MpPaperGrade $model): bool { return $user->can('update_mp::paper::grade'); }
-    public function delete(User $user, MpPaperGrade $model): bool { return $user->can('delete_mp::paper::grade'); }
-    public function deleteAny(User $user): bool { return $user->can('delete_any_mp::paper::grade'); }
+    use HandlesAuthorization;
+    
+    public function viewAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ViewAny:MpPaperGrade');
+    }
+
+    public function view(AuthUser $authUser, MpPaperGrade $mpPaperGrade): bool
+    {
+        return $authUser->can('View:MpPaperGrade');
+    }
+
+    public function create(AuthUser $authUser): bool
+    {
+        return $authUser->can('Create:MpPaperGrade');
+    }
+
+    public function update(AuthUser $authUser, MpPaperGrade $mpPaperGrade): bool
+    {
+        return $authUser->can('Update:MpPaperGrade');
+    }
+
+    public function delete(AuthUser $authUser, MpPaperGrade $mpPaperGrade): bool
+    {
+        return $authUser->can('Delete:MpPaperGrade');
+    }
+
+    public function restore(AuthUser $authUser, MpPaperGrade $mpPaperGrade): bool
+    {
+        return $authUser->can('Restore:MpPaperGrade');
+    }
+
+    public function forceDelete(AuthUser $authUser, MpPaperGrade $mpPaperGrade): bool
+    {
+        return $authUser->can('ForceDelete:MpPaperGrade');
+    }
+
+    public function forceDeleteAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ForceDeleteAny:MpPaperGrade');
+    }
+
+    public function restoreAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('RestoreAny:MpPaperGrade');
+    }
+
+    public function replicate(AuthUser $authUser, MpPaperGrade $mpPaperGrade): bool
+    {
+        return $authUser->can('Replicate:MpPaperGrade');
+    }
+
+    public function reorder(AuthUser $authUser): bool
+    {
+        return $authUser->can('Reorder:MpPaperGrade');
+    }
+
 }

@@ -1,16 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Farms\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use Modules\Farms\Models\LivestockBatch;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class LivestockBatchPolicy
 {
-    public function viewAny(User $user): bool  { return $user->can('view_any_livestock_batch'); }
-    public function view(User $user, LivestockBatch $r): bool { return $user->can('view_livestock_batch'); }
-    public function create(User $user): bool   { return $user->can('create_livestock_batch'); }
-    public function update(User $user, LivestockBatch $r): bool { return $user->can('update_livestock_batch'); }
-    public function delete(User $user, LivestockBatch $r): bool { return $user->can('delete_livestock_batch'); }
-    public function deleteAny(User $user): bool { return $user->can('delete_any_livestock_batch'); }
+    use HandlesAuthorization;
+    
+    public function viewAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ViewAny:LivestockBatch');
+    }
+
+    public function view(AuthUser $authUser, LivestockBatch $livestockBatch): bool
+    {
+        return $authUser->can('View:LivestockBatch');
+    }
+
+    public function create(AuthUser $authUser): bool
+    {
+        return $authUser->can('Create:LivestockBatch');
+    }
+
+    public function update(AuthUser $authUser, LivestockBatch $livestockBatch): bool
+    {
+        return $authUser->can('Update:LivestockBatch');
+    }
+
+    public function delete(AuthUser $authUser, LivestockBatch $livestockBatch): bool
+    {
+        return $authUser->can('Delete:LivestockBatch');
+    }
+
+    public function restore(AuthUser $authUser, LivestockBatch $livestockBatch): bool
+    {
+        return $authUser->can('Restore:LivestockBatch');
+    }
+
+    public function forceDelete(AuthUser $authUser, LivestockBatch $livestockBatch): bool
+    {
+        return $authUser->can('ForceDelete:LivestockBatch');
+    }
+
+    public function forceDeleteAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ForceDeleteAny:LivestockBatch');
+    }
+
+    public function restoreAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('RestoreAny:LivestockBatch');
+    }
+
+    public function replicate(AuthUser $authUser, LivestockBatch $livestockBatch): bool
+    {
+        return $authUser->can('Replicate:LivestockBatch');
+    }
+
+    public function reorder(AuthUser $authUser): bool
+    {
+        return $authUser->can('Reorder:LivestockBatch');
+    }
+
 }

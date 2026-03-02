@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Modules\Hostels\Policies;
 
-use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Foundation\Auth\User as AuthUser;
 use Modules\Hostels\Models\HostelStaffRoleAssignment;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class HostelStaffRoleAssignmentPolicy
 {
     use HandlesAuthorization;
-
+    
     public function viewAny(AuthUser $authUser): bool
     {
         return $authUser->can('ViewAny:HostelStaffRoleAssignment');
@@ -66,4 +66,5 @@ class HostelStaffRoleAssignmentPolicy
     {
         return $authUser->can('Reorder:HostelStaffRoleAssignment');
     }
+
 }

@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Modules\CommunicationCentre\Policies;
 
-use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Foundation\Auth\User as AuthUser;
 use Modules\CommunicationCentre\Models\CommPreference;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class CommPreferencePolicy
 {
     use HandlesAuthorization;
-
+    
     public function viewAny(AuthUser $authUser): bool
     {
         return $authUser->can('ViewAny:CommPreference');
@@ -66,4 +66,5 @@ class CommPreferencePolicy
     {
         return $authUser->can('Reorder:CommPreference');
     }
+
 }

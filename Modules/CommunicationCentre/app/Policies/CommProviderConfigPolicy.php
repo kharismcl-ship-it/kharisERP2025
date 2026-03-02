@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Modules\CommunicationCentre\Policies;
 
-use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Foundation\Auth\User as AuthUser;
 use Modules\CommunicationCentre\Models\CommProviderConfig;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class CommProviderConfigPolicy
 {
     use HandlesAuthorization;
-
+    
     public function viewAny(AuthUser $authUser): bool
     {
         return $authUser->can('ViewAny:CommProviderConfig');
@@ -66,4 +66,5 @@ class CommProviderConfigPolicy
     {
         return $authUser->can('Reorder:CommProviderConfig');
     }
+
 }

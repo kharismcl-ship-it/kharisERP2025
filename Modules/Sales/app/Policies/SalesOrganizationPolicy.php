@@ -1,16 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Sales\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use Modules\Sales\Models\SalesOrganization;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class SalesOrganizationPolicy
 {
-    public function viewAny(User $user): bool  { return $user->can('view_any_sales_organization'); }
-    public function view(User $user, SalesOrganization $model): bool  { return $user->can('view_sales_organization'); }
-    public function create(User $user): bool   { return $user->can('create_sales_organization'); }
-    public function update(User $user, SalesOrganization $model): bool { return $user->can('update_sales_organization'); }
-    public function delete(User $user, SalesOrganization $model): bool { return $user->can('delete_sales_organization'); }
-    public function deleteAny(User $user): bool { return $user->can('delete_any_sales_organization'); }
+    use HandlesAuthorization;
+    
+    public function viewAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ViewAny:SalesOrganization');
+    }
+
+    public function view(AuthUser $authUser, SalesOrganization $salesOrganization): bool
+    {
+        return $authUser->can('View:SalesOrganization');
+    }
+
+    public function create(AuthUser $authUser): bool
+    {
+        return $authUser->can('Create:SalesOrganization');
+    }
+
+    public function update(AuthUser $authUser, SalesOrganization $salesOrganization): bool
+    {
+        return $authUser->can('Update:SalesOrganization');
+    }
+
+    public function delete(AuthUser $authUser, SalesOrganization $salesOrganization): bool
+    {
+        return $authUser->can('Delete:SalesOrganization');
+    }
+
+    public function restore(AuthUser $authUser, SalesOrganization $salesOrganization): bool
+    {
+        return $authUser->can('Restore:SalesOrganization');
+    }
+
+    public function forceDelete(AuthUser $authUser, SalesOrganization $salesOrganization): bool
+    {
+        return $authUser->can('ForceDelete:SalesOrganization');
+    }
+
+    public function forceDeleteAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ForceDeleteAny:SalesOrganization');
+    }
+
+    public function restoreAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('RestoreAny:SalesOrganization');
+    }
+
+    public function replicate(AuthUser $authUser, SalesOrganization $salesOrganization): bool
+    {
+        return $authUser->can('Replicate:SalesOrganization');
+    }
+
+    public function reorder(AuthUser $authUser): bool
+    {
+        return $authUser->can('Reorder:SalesOrganization');
+    }
+
 }

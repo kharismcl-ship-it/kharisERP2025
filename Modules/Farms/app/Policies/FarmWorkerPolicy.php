@@ -1,16 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Farms\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use Modules\Farms\Models\FarmWorker;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class FarmWorkerPolicy
 {
-    public function viewAny(User $user): bool  { return $user->can('view_any_farm_worker'); }
-    public function view(User $user, FarmWorker $record): bool { return $user->can('view_farm_worker'); }
-    public function create(User $user): bool   { return $user->can('create_farm_worker'); }
-    public function update(User $user, FarmWorker $record): bool { return $user->can('update_farm_worker'); }
-    public function delete(User $user, FarmWorker $record): bool { return $user->can('delete_farm_worker'); }
-    public function deleteAny(User $user): bool { return $user->can('delete_any_farm_worker'); }
+    use HandlesAuthorization;
+    
+    public function viewAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ViewAny:FarmWorker');
+    }
+
+    public function view(AuthUser $authUser, FarmWorker $farmWorker): bool
+    {
+        return $authUser->can('View:FarmWorker');
+    }
+
+    public function create(AuthUser $authUser): bool
+    {
+        return $authUser->can('Create:FarmWorker');
+    }
+
+    public function update(AuthUser $authUser, FarmWorker $farmWorker): bool
+    {
+        return $authUser->can('Update:FarmWorker');
+    }
+
+    public function delete(AuthUser $authUser, FarmWorker $farmWorker): bool
+    {
+        return $authUser->can('Delete:FarmWorker');
+    }
+
+    public function restore(AuthUser $authUser, FarmWorker $farmWorker): bool
+    {
+        return $authUser->can('Restore:FarmWorker');
+    }
+
+    public function forceDelete(AuthUser $authUser, FarmWorker $farmWorker): bool
+    {
+        return $authUser->can('ForceDelete:FarmWorker');
+    }
+
+    public function forceDeleteAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ForceDeleteAny:FarmWorker');
+    }
+
+    public function restoreAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('RestoreAny:FarmWorker');
+    }
+
+    public function replicate(AuthUser $authUser, FarmWorker $farmWorker): bool
+    {
+        return $authUser->can('Replicate:FarmWorker');
+    }
+
+    public function reorder(AuthUser $authUser): bool
+    {
+        return $authUser->can('Reorder:FarmWorker');
+    }
+
 }

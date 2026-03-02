@@ -1,16 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\ManufacturingWater\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use Modules\ManufacturingWater\Models\MwPlant;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class MwPlantPolicy
 {
-    public function viewAny(User $user): bool   { return $user->can('view_any_mw::plant'); }
-    public function view(User $user, MwPlant $model): bool { return $user->can('view_mw::plant'); }
-    public function create(User $user): bool    { return $user->can('create_mw::plant'); }
-    public function update(User $user, MwPlant $model): bool { return $user->can('update_mw::plant'); }
-    public function delete(User $user, MwPlant $model): bool { return $user->can('delete_mw::plant'); }
-    public function deleteAny(User $user): bool { return $user->can('delete_any_mw::plant'); }
+    use HandlesAuthorization;
+    
+    public function viewAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ViewAny:MwPlant');
+    }
+
+    public function view(AuthUser $authUser, MwPlant $mwPlant): bool
+    {
+        return $authUser->can('View:MwPlant');
+    }
+
+    public function create(AuthUser $authUser): bool
+    {
+        return $authUser->can('Create:MwPlant');
+    }
+
+    public function update(AuthUser $authUser, MwPlant $mwPlant): bool
+    {
+        return $authUser->can('Update:MwPlant');
+    }
+
+    public function delete(AuthUser $authUser, MwPlant $mwPlant): bool
+    {
+        return $authUser->can('Delete:MwPlant');
+    }
+
+    public function restore(AuthUser $authUser, MwPlant $mwPlant): bool
+    {
+        return $authUser->can('Restore:MwPlant');
+    }
+
+    public function forceDelete(AuthUser $authUser, MwPlant $mwPlant): bool
+    {
+        return $authUser->can('ForceDelete:MwPlant');
+    }
+
+    public function forceDeleteAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ForceDeleteAny:MwPlant');
+    }
+
+    public function restoreAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('RestoreAny:MwPlant');
+    }
+
+    public function replicate(AuthUser $authUser, MwPlant $mwPlant): bool
+    {
+        return $authUser->can('Replicate:MwPlant');
+    }
+
+    public function reorder(AuthUser $authUser): bool
+    {
+        return $authUser->can('Reorder:MwPlant');
+    }
+
 }

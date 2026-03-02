@@ -1,16 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Sales\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use Modules\Sales\Models\SalesQuotation;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class SalesQuotationPolicy
 {
-    public function viewAny(User $user): bool  { return $user->can('view_any_sales_quotation'); }
-    public function view(User $user, SalesQuotation $model): bool  { return $user->can('view_sales_quotation'); }
-    public function create(User $user): bool   { return $user->can('create_sales_quotation'); }
-    public function update(User $user, SalesQuotation $model): bool { return $user->can('update_sales_quotation'); }
-    public function delete(User $user, SalesQuotation $model): bool { return $user->can('delete_sales_quotation'); }
-    public function deleteAny(User $user): bool { return $user->can('delete_any_sales_quotation'); }
+    use HandlesAuthorization;
+    
+    public function viewAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ViewAny:SalesQuotation');
+    }
+
+    public function view(AuthUser $authUser, SalesQuotation $salesQuotation): bool
+    {
+        return $authUser->can('View:SalesQuotation');
+    }
+
+    public function create(AuthUser $authUser): bool
+    {
+        return $authUser->can('Create:SalesQuotation');
+    }
+
+    public function update(AuthUser $authUser, SalesQuotation $salesQuotation): bool
+    {
+        return $authUser->can('Update:SalesQuotation');
+    }
+
+    public function delete(AuthUser $authUser, SalesQuotation $salesQuotation): bool
+    {
+        return $authUser->can('Delete:SalesQuotation');
+    }
+
+    public function restore(AuthUser $authUser, SalesQuotation $salesQuotation): bool
+    {
+        return $authUser->can('Restore:SalesQuotation');
+    }
+
+    public function forceDelete(AuthUser $authUser, SalesQuotation $salesQuotation): bool
+    {
+        return $authUser->can('ForceDelete:SalesQuotation');
+    }
+
+    public function forceDeleteAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ForceDeleteAny:SalesQuotation');
+    }
+
+    public function restoreAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('RestoreAny:SalesQuotation');
+    }
+
+    public function replicate(AuthUser $authUser, SalesQuotation $salesQuotation): bool
+    {
+        return $authUser->can('Replicate:SalesQuotation');
+    }
+
+    public function reorder(AuthUser $authUser): bool
+    {
+        return $authUser->can('Reorder:SalesQuotation');
+    }
+
 }

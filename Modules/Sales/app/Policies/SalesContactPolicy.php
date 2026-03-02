@@ -1,16 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Sales\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use Modules\Sales\Models\SalesContact;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class SalesContactPolicy
 {
-    public function viewAny(User $user): bool  { return $user->can('view_any_sales_contact'); }
-    public function view(User $user, SalesContact $model): bool  { return $user->can('view_sales_contact'); }
-    public function create(User $user): bool   { return $user->can('create_sales_contact'); }
-    public function update(User $user, SalesContact $model): bool { return $user->can('update_sales_contact'); }
-    public function delete(User $user, SalesContact $model): bool { return $user->can('delete_sales_contact'); }
-    public function deleteAny(User $user): bool { return $user->can('delete_any_sales_contact'); }
+    use HandlesAuthorization;
+    
+    public function viewAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ViewAny:SalesContact');
+    }
+
+    public function view(AuthUser $authUser, SalesContact $salesContact): bool
+    {
+        return $authUser->can('View:SalesContact');
+    }
+
+    public function create(AuthUser $authUser): bool
+    {
+        return $authUser->can('Create:SalesContact');
+    }
+
+    public function update(AuthUser $authUser, SalesContact $salesContact): bool
+    {
+        return $authUser->can('Update:SalesContact');
+    }
+
+    public function delete(AuthUser $authUser, SalesContact $salesContact): bool
+    {
+        return $authUser->can('Delete:SalesContact');
+    }
+
+    public function restore(AuthUser $authUser, SalesContact $salesContact): bool
+    {
+        return $authUser->can('Restore:SalesContact');
+    }
+
+    public function forceDelete(AuthUser $authUser, SalesContact $salesContact): bool
+    {
+        return $authUser->can('ForceDelete:SalesContact');
+    }
+
+    public function forceDeleteAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ForceDeleteAny:SalesContact');
+    }
+
+    public function restoreAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('RestoreAny:SalesContact');
+    }
+
+    public function replicate(AuthUser $authUser, SalesContact $salesContact): bool
+    {
+        return $authUser->can('Replicate:SalesContact');
+    }
+
+    public function reorder(AuthUser $authUser): bool
+    {
+        return $authUser->can('Reorder:SalesContact');
+    }
+
 }

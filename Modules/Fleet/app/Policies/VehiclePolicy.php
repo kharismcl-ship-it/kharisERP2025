@@ -1,39 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Fleet\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use Modules\Fleet\Models\Vehicle;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class VehiclePolicy
 {
-    public function viewAny(User $user): bool
+    use HandlesAuthorization;
+    
+    public function viewAny(AuthUser $authUser): bool
     {
-        return $user->can('view_any_vehicle');
+        return $authUser->can('ViewAny:Vehicle');
     }
 
-    public function view(User $user, Vehicle $vehicle): bool
+    public function view(AuthUser $authUser, Vehicle $vehicle): bool
     {
-        return $user->can('view_vehicle');
+        return $authUser->can('View:Vehicle');
     }
 
-    public function create(User $user): bool
+    public function create(AuthUser $authUser): bool
     {
-        return $user->can('create_vehicle');
+        return $authUser->can('Create:Vehicle');
     }
 
-    public function update(User $user, Vehicle $vehicle): bool
+    public function update(AuthUser $authUser, Vehicle $vehicle): bool
     {
-        return $user->can('update_vehicle');
+        return $authUser->can('Update:Vehicle');
     }
 
-    public function delete(User $user, Vehicle $vehicle): bool
+    public function delete(AuthUser $authUser, Vehicle $vehicle): bool
     {
-        return $user->can('delete_vehicle');
+        return $authUser->can('Delete:Vehicle');
     }
 
-    public function deleteAny(User $user): bool
+    public function restore(AuthUser $authUser, Vehicle $vehicle): bool
     {
-        return $user->can('delete_any_vehicle');
+        return $authUser->can('Restore:Vehicle');
     }
+
+    public function forceDelete(AuthUser $authUser, Vehicle $vehicle): bool
+    {
+        return $authUser->can('ForceDelete:Vehicle');
+    }
+
+    public function forceDeleteAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ForceDeleteAny:Vehicle');
+    }
+
+    public function restoreAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('RestoreAny:Vehicle');
+    }
+
+    public function replicate(AuthUser $authUser, Vehicle $vehicle): bool
+    {
+        return $authUser->can('Replicate:Vehicle');
+    }
+
+    public function reorder(AuthUser $authUser): bool
+    {
+        return $authUser->can('Reorder:Vehicle');
+    }
+
 }

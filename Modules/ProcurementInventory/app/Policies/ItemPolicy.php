@@ -1,16 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\ProcurementInventory\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use Modules\ProcurementInventory\Models\Item;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class ItemPolicy
 {
-    public function viewAny(User $user): bool { return $user->can('view_any_item'); }
-    public function view(User $user, Item $model): bool { return $user->can('view_item'); }
-    public function create(User $user): bool { return $user->can('create_item'); }
-    public function update(User $user, Item $model): bool { return $user->can('update_item'); }
-    public function delete(User $user, Item $model): bool { return $user->can('delete_item'); }
-    public function deleteAny(User $user): bool { return $user->can('delete_any_item'); }
+    use HandlesAuthorization;
+    
+    public function viewAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ViewAny:Item');
+    }
+
+    public function view(AuthUser $authUser, Item $item): bool
+    {
+        return $authUser->can('View:Item');
+    }
+
+    public function create(AuthUser $authUser): bool
+    {
+        return $authUser->can('Create:Item');
+    }
+
+    public function update(AuthUser $authUser, Item $item): bool
+    {
+        return $authUser->can('Update:Item');
+    }
+
+    public function delete(AuthUser $authUser, Item $item): bool
+    {
+        return $authUser->can('Delete:Item');
+    }
+
+    public function restore(AuthUser $authUser, Item $item): bool
+    {
+        return $authUser->can('Restore:Item');
+    }
+
+    public function forceDelete(AuthUser $authUser, Item $item): bool
+    {
+        return $authUser->can('ForceDelete:Item');
+    }
+
+    public function forceDeleteAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ForceDeleteAny:Item');
+    }
+
+    public function restoreAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('RestoreAny:Item');
+    }
+
+    public function replicate(AuthUser $authUser, Item $item): bool
+    {
+        return $authUser->can('Replicate:Item');
+    }
+
+    public function reorder(AuthUser $authUser): bool
+    {
+        return $authUser->can('Reorder:Item');
+    }
+
 }

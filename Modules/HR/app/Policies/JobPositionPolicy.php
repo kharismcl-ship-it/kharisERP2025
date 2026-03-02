@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Modules\HR\Policies;
 
-use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Foundation\Auth\User as AuthUser;
 use Modules\HR\Models\JobPosition;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class JobPositionPolicy
 {
     use HandlesAuthorization;
-
+    
     public function viewAny(AuthUser $authUser): bool
     {
         return $authUser->can('ViewAny:JobPosition');
@@ -66,4 +66,5 @@ class JobPositionPolicy
     {
         return $authUser->can('Reorder:JobPosition');
     }
+
 }

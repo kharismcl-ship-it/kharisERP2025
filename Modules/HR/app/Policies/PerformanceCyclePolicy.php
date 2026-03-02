@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Modules\HR\Policies;
 
-use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Foundation\Auth\User as AuthUser;
 use Modules\HR\Models\PerformanceCycle;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class PerformanceCyclePolicy
 {
     use HandlesAuthorization;
-
+    
     public function viewAny(AuthUser $authUser): bool
     {
         return $authUser->can('ViewAny:PerformanceCycle');
@@ -66,4 +66,5 @@ class PerformanceCyclePolicy
     {
         return $authUser->can('Reorder:PerformanceCycle');
     }
+
 }

@@ -1,16 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Farms\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use Modules\Farms\Models\FarmSale;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class FarmSalePolicy
 {
-    public function viewAny(User $user): bool  { return $user->can('view_any_farm_sale'); }
-    public function view(User $user, FarmSale $record): bool { return $user->can('view_farm_sale'); }
-    public function create(User $user): bool   { return $user->can('create_farm_sale'); }
-    public function update(User $user, FarmSale $record): bool { return $user->can('update_farm_sale'); }
-    public function delete(User $user, FarmSale $record): bool { return $user->can('delete_farm_sale'); }
-    public function deleteAny(User $user): bool { return $user->can('delete_any_farm_sale'); }
+    use HandlesAuthorization;
+    
+    public function viewAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ViewAny:FarmSale');
+    }
+
+    public function view(AuthUser $authUser, FarmSale $farmSale): bool
+    {
+        return $authUser->can('View:FarmSale');
+    }
+
+    public function create(AuthUser $authUser): bool
+    {
+        return $authUser->can('Create:FarmSale');
+    }
+
+    public function update(AuthUser $authUser, FarmSale $farmSale): bool
+    {
+        return $authUser->can('Update:FarmSale');
+    }
+
+    public function delete(AuthUser $authUser, FarmSale $farmSale): bool
+    {
+        return $authUser->can('Delete:FarmSale');
+    }
+
+    public function restore(AuthUser $authUser, FarmSale $farmSale): bool
+    {
+        return $authUser->can('Restore:FarmSale');
+    }
+
+    public function forceDelete(AuthUser $authUser, FarmSale $farmSale): bool
+    {
+        return $authUser->can('ForceDelete:FarmSale');
+    }
+
+    public function forceDeleteAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ForceDeleteAny:FarmSale');
+    }
+
+    public function restoreAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('RestoreAny:FarmSale');
+    }
+
+    public function replicate(AuthUser $authUser, FarmSale $farmSale): bool
+    {
+        return $authUser->can('Replicate:FarmSale');
+    }
+
+    public function reorder(AuthUser $authUser): bool
+    {
+        return $authUser->can('Reorder:FarmSale');
+    }
+
 }

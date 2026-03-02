@@ -23,6 +23,13 @@ class IncidentResource extends Resource
 {
     protected static ?string $model = Incident::class;
 
+    /**
+     * This model has no direct company_id — Filament's ownership
+     * check is skipped. Data isolation is handled via the parent
+     * relationship or a custom getEloquentQuery() scope.
+     */
+    protected static bool $isScopedToTenant = false;
+
     protected static ?string $slug = 'incidents';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;

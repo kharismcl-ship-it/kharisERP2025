@@ -1,16 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\ManufacturingWater\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use Modules\ManufacturingWater\Models\MwWaterTestRecord;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class MwWaterTestRecordPolicy
 {
-    public function viewAny(User $user): bool   { return $user->can('view_any_mw::water::test::record'); }
-    public function view(User $user, MwWaterTestRecord $model): bool { return $user->can('view_mw::water::test::record'); }
-    public function create(User $user): bool    { return $user->can('create_mw::water::test::record'); }
-    public function update(User $user, MwWaterTestRecord $model): bool { return $user->can('update_mw::water::test::record'); }
-    public function delete(User $user, MwWaterTestRecord $model): bool { return $user->can('delete_mw::water::test::record'); }
-    public function deleteAny(User $user): bool { return $user->can('delete_any_mw::water::test::record'); }
+    use HandlesAuthorization;
+    
+    public function viewAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ViewAny:MwWaterTestRecord');
+    }
+
+    public function view(AuthUser $authUser, MwWaterTestRecord $mwWaterTestRecord): bool
+    {
+        return $authUser->can('View:MwWaterTestRecord');
+    }
+
+    public function create(AuthUser $authUser): bool
+    {
+        return $authUser->can('Create:MwWaterTestRecord');
+    }
+
+    public function update(AuthUser $authUser, MwWaterTestRecord $mwWaterTestRecord): bool
+    {
+        return $authUser->can('Update:MwWaterTestRecord');
+    }
+
+    public function delete(AuthUser $authUser, MwWaterTestRecord $mwWaterTestRecord): bool
+    {
+        return $authUser->can('Delete:MwWaterTestRecord');
+    }
+
+    public function restore(AuthUser $authUser, MwWaterTestRecord $mwWaterTestRecord): bool
+    {
+        return $authUser->can('Restore:MwWaterTestRecord');
+    }
+
+    public function forceDelete(AuthUser $authUser, MwWaterTestRecord $mwWaterTestRecord): bool
+    {
+        return $authUser->can('ForceDelete:MwWaterTestRecord');
+    }
+
+    public function forceDeleteAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ForceDeleteAny:MwWaterTestRecord');
+    }
+
+    public function restoreAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('RestoreAny:MwWaterTestRecord');
+    }
+
+    public function replicate(AuthUser $authUser, MwWaterTestRecord $mwWaterTestRecord): bool
+    {
+        return $authUser->can('Replicate:MwWaterTestRecord');
+    }
+
+    public function reorder(AuthUser $authUser): bool
+    {
+        return $authUser->can('Reorder:MwWaterTestRecord');
+    }
+
 }

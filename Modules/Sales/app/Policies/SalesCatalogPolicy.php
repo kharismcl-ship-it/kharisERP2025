@@ -1,16 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Sales\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use Modules\Sales\Models\SalesCatalog;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class SalesCatalogPolicy
 {
-    public function viewAny(User $user): bool  { return $user->can('view_any_sales_catalog'); }
-    public function view(User $user, SalesCatalog $model): bool  { return $user->can('view_sales_catalog'); }
-    public function create(User $user): bool   { return $user->can('create_sales_catalog'); }
-    public function update(User $user, SalesCatalog $model): bool { return $user->can('update_sales_catalog'); }
-    public function delete(User $user, SalesCatalog $model): bool { return $user->can('delete_sales_catalog'); }
-    public function deleteAny(User $user): bool { return $user->can('delete_any_sales_catalog'); }
+    use HandlesAuthorization;
+    
+    public function viewAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ViewAny:SalesCatalog');
+    }
+
+    public function view(AuthUser $authUser, SalesCatalog $salesCatalog): bool
+    {
+        return $authUser->can('View:SalesCatalog');
+    }
+
+    public function create(AuthUser $authUser): bool
+    {
+        return $authUser->can('Create:SalesCatalog');
+    }
+
+    public function update(AuthUser $authUser, SalesCatalog $salesCatalog): bool
+    {
+        return $authUser->can('Update:SalesCatalog');
+    }
+
+    public function delete(AuthUser $authUser, SalesCatalog $salesCatalog): bool
+    {
+        return $authUser->can('Delete:SalesCatalog');
+    }
+
+    public function restore(AuthUser $authUser, SalesCatalog $salesCatalog): bool
+    {
+        return $authUser->can('Restore:SalesCatalog');
+    }
+
+    public function forceDelete(AuthUser $authUser, SalesCatalog $salesCatalog): bool
+    {
+        return $authUser->can('ForceDelete:SalesCatalog');
+    }
+
+    public function forceDeleteAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ForceDeleteAny:SalesCatalog');
+    }
+
+    public function restoreAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('RestoreAny:SalesCatalog');
+    }
+
+    public function replicate(AuthUser $authUser, SalesCatalog $salesCatalog): bool
+    {
+        return $authUser->can('Replicate:SalesCatalog');
+    }
+
+    public function reorder(AuthUser $authUser): bool
+    {
+        return $authUser->can('Reorder:SalesCatalog');
+    }
+
 }

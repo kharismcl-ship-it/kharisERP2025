@@ -1,16 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Farms\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use Modules\Farms\Models\FarmEquipment;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class FarmEquipmentPolicy
 {
-    public function viewAny(User $user): bool  { return $user->can('view_any_farm_equipment'); }
-    public function view(User $user, FarmEquipment $record): bool { return $user->can('view_farm_equipment'); }
-    public function create(User $user): bool   { return $user->can('create_farm_equipment'); }
-    public function update(User $user, FarmEquipment $record): bool { return $user->can('update_farm_equipment'); }
-    public function delete(User $user, FarmEquipment $record): bool { return $user->can('delete_farm_equipment'); }
-    public function deleteAny(User $user): bool { return $user->can('delete_any_farm_equipment'); }
+    use HandlesAuthorization;
+    
+    public function viewAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ViewAny:FarmEquipment');
+    }
+
+    public function view(AuthUser $authUser, FarmEquipment $farmEquipment): bool
+    {
+        return $authUser->can('View:FarmEquipment');
+    }
+
+    public function create(AuthUser $authUser): bool
+    {
+        return $authUser->can('Create:FarmEquipment');
+    }
+
+    public function update(AuthUser $authUser, FarmEquipment $farmEquipment): bool
+    {
+        return $authUser->can('Update:FarmEquipment');
+    }
+
+    public function delete(AuthUser $authUser, FarmEquipment $farmEquipment): bool
+    {
+        return $authUser->can('Delete:FarmEquipment');
+    }
+
+    public function restore(AuthUser $authUser, FarmEquipment $farmEquipment): bool
+    {
+        return $authUser->can('Restore:FarmEquipment');
+    }
+
+    public function forceDelete(AuthUser $authUser, FarmEquipment $farmEquipment): bool
+    {
+        return $authUser->can('ForceDelete:FarmEquipment');
+    }
+
+    public function forceDeleteAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ForceDeleteAny:FarmEquipment');
+    }
+
+    public function restoreAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('RestoreAny:FarmEquipment');
+    }
+
+    public function replicate(AuthUser $authUser, FarmEquipment $farmEquipment): bool
+    {
+        return $authUser->can('Replicate:FarmEquipment');
+    }
+
+    public function reorder(AuthUser $authUser): bool
+    {
+        return $authUser->can('Reorder:FarmEquipment');
+    }
+
 }

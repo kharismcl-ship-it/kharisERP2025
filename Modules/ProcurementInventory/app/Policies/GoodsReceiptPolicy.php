@@ -1,16 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\ProcurementInventory\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use Modules\ProcurementInventory\Models\GoodsReceipt;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class GoodsReceiptPolicy
 {
-    public function viewAny(User $user): bool { return $user->can('view_any_goods_receipt'); }
-    public function view(User $user, GoodsReceipt $model): bool { return $user->can('view_goods_receipt'); }
-    public function create(User $user): bool { return $user->can('create_goods_receipt'); }
-    public function update(User $user, GoodsReceipt $model): bool { return $user->can('update_goods_receipt'); }
-    public function delete(User $user, GoodsReceipt $model): bool { return $user->can('delete_goods_receipt'); }
-    public function deleteAny(User $user): bool { return $user->can('delete_any_goods_receipt'); }
+    use HandlesAuthorization;
+    
+    public function viewAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ViewAny:GoodsReceipt');
+    }
+
+    public function view(AuthUser $authUser, GoodsReceipt $goodsReceipt): bool
+    {
+        return $authUser->can('View:GoodsReceipt');
+    }
+
+    public function create(AuthUser $authUser): bool
+    {
+        return $authUser->can('Create:GoodsReceipt');
+    }
+
+    public function update(AuthUser $authUser, GoodsReceipt $goodsReceipt): bool
+    {
+        return $authUser->can('Update:GoodsReceipt');
+    }
+
+    public function delete(AuthUser $authUser, GoodsReceipt $goodsReceipt): bool
+    {
+        return $authUser->can('Delete:GoodsReceipt');
+    }
+
+    public function restore(AuthUser $authUser, GoodsReceipt $goodsReceipt): bool
+    {
+        return $authUser->can('Restore:GoodsReceipt');
+    }
+
+    public function forceDelete(AuthUser $authUser, GoodsReceipt $goodsReceipt): bool
+    {
+        return $authUser->can('ForceDelete:GoodsReceipt');
+    }
+
+    public function forceDeleteAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ForceDeleteAny:GoodsReceipt');
+    }
+
+    public function restoreAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('RestoreAny:GoodsReceipt');
+    }
+
+    public function replicate(AuthUser $authUser, GoodsReceipt $goodsReceipt): bool
+    {
+        return $authUser->can('Replicate:GoodsReceipt');
+    }
+
+    public function reorder(AuthUser $authUser): bool
+    {
+        return $authUser->can('Reorder:GoodsReceipt');
+    }
+
 }

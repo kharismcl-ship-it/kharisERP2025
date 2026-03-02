@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Modules\Core\Policies;
 
-use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Foundation\Auth\User as AuthUser;
 use Modules\Core\Models\AutomationSetting;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class AutomationSettingPolicy
 {
     use HandlesAuthorization;
-
+    
     public function viewAny(AuthUser $authUser): bool
     {
         return $authUser->can('ViewAny:AutomationSetting');
@@ -66,4 +66,5 @@ class AutomationSettingPolicy
     {
         return $authUser->can('Reorder:AutomationSetting');
     }
+
 }

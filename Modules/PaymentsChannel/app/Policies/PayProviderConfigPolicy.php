@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Modules\PaymentsChannel\Policies;
 
-use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Foundation\Auth\User as AuthUser;
 use Modules\PaymentsChannel\Models\PayProviderConfig;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class PayProviderConfigPolicy
 {
     use HandlesAuthorization;
-
+    
     public function viewAny(AuthUser $authUser): bool
     {
         return $authUser->can('ViewAny:PayProviderConfig');
@@ -66,4 +66,5 @@ class PayProviderConfigPolicy
     {
         return $authUser->can('Reorder:PayProviderConfig');
     }
+
 }

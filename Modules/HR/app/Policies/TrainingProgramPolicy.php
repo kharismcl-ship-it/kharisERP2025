@@ -1,13 +1,70 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Modules\HR\Policies;
-use App\Models\User;
+
+use Illuminate\Foundation\Auth\User as AuthUser;
 use Modules\HR\Models\TrainingProgram;
-class TrainingProgramPolicy {
-    public function viewAny(User $user): bool { return true; }
-    public function view(User $user, TrainingProgram $model): bool { return true; }
-    public function create(User $user): bool { return true; }
-    public function update(User $user, TrainingProgram $model): bool { return true; }
-    public function delete(User $user, TrainingProgram $model): bool { return true; }
-    public function restore(User $user, TrainingProgram $model): bool { return true; }
-    public function forceDelete(User $user, TrainingProgram $model): bool { return true; }
+use Illuminate\Auth\Access\HandlesAuthorization;
+
+class TrainingProgramPolicy
+{
+    use HandlesAuthorization;
+    
+    public function viewAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ViewAny:TrainingProgram');
+    }
+
+    public function view(AuthUser $authUser, TrainingProgram $trainingProgram): bool
+    {
+        return $authUser->can('View:TrainingProgram');
+    }
+
+    public function create(AuthUser $authUser): bool
+    {
+        return $authUser->can('Create:TrainingProgram');
+    }
+
+    public function update(AuthUser $authUser, TrainingProgram $trainingProgram): bool
+    {
+        return $authUser->can('Update:TrainingProgram');
+    }
+
+    public function delete(AuthUser $authUser, TrainingProgram $trainingProgram): bool
+    {
+        return $authUser->can('Delete:TrainingProgram');
+    }
+
+    public function restore(AuthUser $authUser, TrainingProgram $trainingProgram): bool
+    {
+        return $authUser->can('Restore:TrainingProgram');
+    }
+
+    public function forceDelete(AuthUser $authUser, TrainingProgram $trainingProgram): bool
+    {
+        return $authUser->can('ForceDelete:TrainingProgram');
+    }
+
+    public function forceDeleteAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ForceDeleteAny:TrainingProgram');
+    }
+
+    public function restoreAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('RestoreAny:TrainingProgram');
+    }
+
+    public function replicate(AuthUser $authUser, TrainingProgram $trainingProgram): bool
+    {
+        return $authUser->can('Replicate:TrainingProgram');
+    }
+
+    public function reorder(AuthUser $authUser): bool
+    {
+        return $authUser->can('Reorder:TrainingProgram');
+    }
+
 }

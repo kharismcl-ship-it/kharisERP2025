@@ -1,13 +1,70 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Modules\HR\Policies;
-use App\Models\User;
+
+use Illuminate\Foundation\Auth\User as AuthUser;
 use Modules\HR\Models\BenefitType;
-class BenefitTypePolicy {
-    public function viewAny(User $user): bool { return true; }
-    public function view(User $user, BenefitType $model): bool { return true; }
-    public function create(User $user): bool { return true; }
-    public function update(User $user, BenefitType $model): bool { return true; }
-    public function delete(User $user, BenefitType $model): bool { return true; }
-    public function restore(User $user, BenefitType $model): bool { return true; }
-    public function forceDelete(User $user, BenefitType $model): bool { return true; }
+use Illuminate\Auth\Access\HandlesAuthorization;
+
+class BenefitTypePolicy
+{
+    use HandlesAuthorization;
+    
+    public function viewAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ViewAny:BenefitType');
+    }
+
+    public function view(AuthUser $authUser, BenefitType $benefitType): bool
+    {
+        return $authUser->can('View:BenefitType');
+    }
+
+    public function create(AuthUser $authUser): bool
+    {
+        return $authUser->can('Create:BenefitType');
+    }
+
+    public function update(AuthUser $authUser, BenefitType $benefitType): bool
+    {
+        return $authUser->can('Update:BenefitType');
+    }
+
+    public function delete(AuthUser $authUser, BenefitType $benefitType): bool
+    {
+        return $authUser->can('Delete:BenefitType');
+    }
+
+    public function restore(AuthUser $authUser, BenefitType $benefitType): bool
+    {
+        return $authUser->can('Restore:BenefitType');
+    }
+
+    public function forceDelete(AuthUser $authUser, BenefitType $benefitType): bool
+    {
+        return $authUser->can('ForceDelete:BenefitType');
+    }
+
+    public function forceDeleteAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ForceDeleteAny:BenefitType');
+    }
+
+    public function restoreAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('RestoreAny:BenefitType');
+    }
+
+    public function replicate(AuthUser $authUser, BenefitType $benefitType): bool
+    {
+        return $authUser->can('Replicate:BenefitType');
+    }
+
+    public function reorder(AuthUser $authUser): bool
+    {
+        return $authUser->can('Reorder:BenefitType');
+    }
+
 }

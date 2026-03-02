@@ -1,16 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Farms\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use Modules\Farms\Models\CropScoutingRecord;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class CropScoutingRecordPolicy
 {
-    public function viewAny(User $user): bool   { return $user->can('view_any_crop_scouting_record'); }
-    public function view(User $user, CropScoutingRecord $r): bool { return $user->can('view_crop_scouting_record'); }
-    public function create(User $user): bool    { return $user->can('create_crop_scouting_record'); }
-    public function update(User $user, CropScoutingRecord $r): bool { return $user->can('update_crop_scouting_record'); }
-    public function delete(User $user, CropScoutingRecord $r): bool { return $user->can('delete_crop_scouting_record'); }
-    public function deleteAny(User $user): bool { return $user->can('delete_any_crop_scouting_record'); }
+    use HandlesAuthorization;
+    
+    public function viewAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ViewAny:CropScoutingRecord');
+    }
+
+    public function view(AuthUser $authUser, CropScoutingRecord $cropScoutingRecord): bool
+    {
+        return $authUser->can('View:CropScoutingRecord');
+    }
+
+    public function create(AuthUser $authUser): bool
+    {
+        return $authUser->can('Create:CropScoutingRecord');
+    }
+
+    public function update(AuthUser $authUser, CropScoutingRecord $cropScoutingRecord): bool
+    {
+        return $authUser->can('Update:CropScoutingRecord');
+    }
+
+    public function delete(AuthUser $authUser, CropScoutingRecord $cropScoutingRecord): bool
+    {
+        return $authUser->can('Delete:CropScoutingRecord');
+    }
+
+    public function restore(AuthUser $authUser, CropScoutingRecord $cropScoutingRecord): bool
+    {
+        return $authUser->can('Restore:CropScoutingRecord');
+    }
+
+    public function forceDelete(AuthUser $authUser, CropScoutingRecord $cropScoutingRecord): bool
+    {
+        return $authUser->can('ForceDelete:CropScoutingRecord');
+    }
+
+    public function forceDeleteAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ForceDeleteAny:CropScoutingRecord');
+    }
+
+    public function restoreAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('RestoreAny:CropScoutingRecord');
+    }
+
+    public function replicate(AuthUser $authUser, CropScoutingRecord $cropScoutingRecord): bool
+    {
+        return $authUser->can('Replicate:CropScoutingRecord');
+    }
+
+    public function reorder(AuthUser $authUser): bool
+    {
+        return $authUser->can('Reorder:CropScoutingRecord');
+    }
+
 }

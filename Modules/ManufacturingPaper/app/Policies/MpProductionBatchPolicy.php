@@ -1,16 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\ManufacturingPaper\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use Modules\ManufacturingPaper\Models\MpProductionBatch;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class MpProductionBatchPolicy
 {
-    public function viewAny(User $user): bool   { return $user->can('view_any_mp::production::batch'); }
-    public function view(User $user, MpProductionBatch $model): bool { return $user->can('view_mp::production::batch'); }
-    public function create(User $user): bool    { return $user->can('create_mp::production::batch'); }
-    public function update(User $user, MpProductionBatch $model): bool { return $user->can('update_mp::production::batch'); }
-    public function delete(User $user, MpProductionBatch $model): bool { return $user->can('delete_mp::production::batch'); }
-    public function deleteAny(User $user): bool { return $user->can('delete_any_mp::production::batch'); }
+    use HandlesAuthorization;
+    
+    public function viewAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ViewAny:MpProductionBatch');
+    }
+
+    public function view(AuthUser $authUser, MpProductionBatch $mpProductionBatch): bool
+    {
+        return $authUser->can('View:MpProductionBatch');
+    }
+
+    public function create(AuthUser $authUser): bool
+    {
+        return $authUser->can('Create:MpProductionBatch');
+    }
+
+    public function update(AuthUser $authUser, MpProductionBatch $mpProductionBatch): bool
+    {
+        return $authUser->can('Update:MpProductionBatch');
+    }
+
+    public function delete(AuthUser $authUser, MpProductionBatch $mpProductionBatch): bool
+    {
+        return $authUser->can('Delete:MpProductionBatch');
+    }
+
+    public function restore(AuthUser $authUser, MpProductionBatch $mpProductionBatch): bool
+    {
+        return $authUser->can('Restore:MpProductionBatch');
+    }
+
+    public function forceDelete(AuthUser $authUser, MpProductionBatch $mpProductionBatch): bool
+    {
+        return $authUser->can('ForceDelete:MpProductionBatch');
+    }
+
+    public function forceDeleteAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ForceDeleteAny:MpProductionBatch');
+    }
+
+    public function restoreAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('RestoreAny:MpProductionBatch');
+    }
+
+    public function replicate(AuthUser $authUser, MpProductionBatch $mpProductionBatch): bool
+    {
+        return $authUser->can('Replicate:MpProductionBatch');
+    }
+
+    public function reorder(AuthUser $authUser): bool
+    {
+        return $authUser->can('Reorder:MpProductionBatch');
+    }
+
 }

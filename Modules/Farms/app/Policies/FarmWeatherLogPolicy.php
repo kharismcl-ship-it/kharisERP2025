@@ -1,16 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Farms\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use Modules\Farms\Models\FarmWeatherLog;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class FarmWeatherLogPolicy
 {
-    public function viewAny(User $user): bool  { return $user->can('view_any_farm_weather_log'); }
-    public function view(User $user, FarmWeatherLog $record): bool { return $user->can('view_farm_weather_log'); }
-    public function create(User $user): bool   { return $user->can('create_farm_weather_log'); }
-    public function update(User $user, FarmWeatherLog $record): bool { return $user->can('update_farm_weather_log'); }
-    public function delete(User $user, FarmWeatherLog $record): bool { return $user->can('delete_farm_weather_log'); }
-    public function deleteAny(User $user): bool { return $user->can('delete_any_farm_weather_log'); }
+    use HandlesAuthorization;
+    
+    public function viewAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ViewAny:FarmWeatherLog');
+    }
+
+    public function view(AuthUser $authUser, FarmWeatherLog $farmWeatherLog): bool
+    {
+        return $authUser->can('View:FarmWeatherLog');
+    }
+
+    public function create(AuthUser $authUser): bool
+    {
+        return $authUser->can('Create:FarmWeatherLog');
+    }
+
+    public function update(AuthUser $authUser, FarmWeatherLog $farmWeatherLog): bool
+    {
+        return $authUser->can('Update:FarmWeatherLog');
+    }
+
+    public function delete(AuthUser $authUser, FarmWeatherLog $farmWeatherLog): bool
+    {
+        return $authUser->can('Delete:FarmWeatherLog');
+    }
+
+    public function restore(AuthUser $authUser, FarmWeatherLog $farmWeatherLog): bool
+    {
+        return $authUser->can('Restore:FarmWeatherLog');
+    }
+
+    public function forceDelete(AuthUser $authUser, FarmWeatherLog $farmWeatherLog): bool
+    {
+        return $authUser->can('ForceDelete:FarmWeatherLog');
+    }
+
+    public function forceDeleteAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ForceDeleteAny:FarmWeatherLog');
+    }
+
+    public function restoreAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('RestoreAny:FarmWeatherLog');
+    }
+
+    public function replicate(AuthUser $authUser, FarmWeatherLog $farmWeatherLog): bool
+    {
+        return $authUser->can('Replicate:FarmWeatherLog');
+    }
+
+    public function reorder(AuthUser $authUser): bool
+    {
+        return $authUser->can('Reorder:FarmWeatherLog');
+    }
+
 }

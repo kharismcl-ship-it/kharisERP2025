@@ -25,6 +25,13 @@ class HostelBillingCycleResource extends Resource
 {
     protected static ?string $model = HostelBillingCycle::class;
 
+    /**
+     * This model has no direct company_id — Filament's ownership
+     * check is skipped. Data isolation is handled via the parent
+     * relationship or a custom getEloquentQuery() scope.
+     */
+    protected static bool $isScopedToTenant = false;
+
     protected static ?string $slug = 'hostel-billing-cycles';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCurrencyDollar;

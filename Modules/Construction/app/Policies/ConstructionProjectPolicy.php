@@ -1,16 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Construction\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use Modules\Construction\Models\ConstructionProject;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class ConstructionProjectPolicy
 {
-    public function viewAny(User $user): bool  { return $user->can('view_any_construction_project'); }
-    public function view(User $user, ConstructionProject $r): bool { return $user->can('view_construction_project'); }
-    public function create(User $user): bool   { return $user->can('create_construction_project'); }
-    public function update(User $user, ConstructionProject $r): bool { return $user->can('update_construction_project'); }
-    public function delete(User $user, ConstructionProject $r): bool { return $user->can('delete_construction_project'); }
-    public function deleteAny(User $user): bool { return $user->can('delete_any_construction_project'); }
+    use HandlesAuthorization;
+    
+    public function viewAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ViewAny:ConstructionProject');
+    }
+
+    public function view(AuthUser $authUser, ConstructionProject $constructionProject): bool
+    {
+        return $authUser->can('View:ConstructionProject');
+    }
+
+    public function create(AuthUser $authUser): bool
+    {
+        return $authUser->can('Create:ConstructionProject');
+    }
+
+    public function update(AuthUser $authUser, ConstructionProject $constructionProject): bool
+    {
+        return $authUser->can('Update:ConstructionProject');
+    }
+
+    public function delete(AuthUser $authUser, ConstructionProject $constructionProject): bool
+    {
+        return $authUser->can('Delete:ConstructionProject');
+    }
+
+    public function restore(AuthUser $authUser, ConstructionProject $constructionProject): bool
+    {
+        return $authUser->can('Restore:ConstructionProject');
+    }
+
+    public function forceDelete(AuthUser $authUser, ConstructionProject $constructionProject): bool
+    {
+        return $authUser->can('ForceDelete:ConstructionProject');
+    }
+
+    public function forceDeleteAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ForceDeleteAny:ConstructionProject');
+    }
+
+    public function restoreAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('RestoreAny:ConstructionProject');
+    }
+
+    public function replicate(AuthUser $authUser, ConstructionProject $constructionProject): bool
+    {
+        return $authUser->can('Replicate:ConstructionProject');
+    }
+
+    public function reorder(AuthUser $authUser): bool
+    {
+        return $authUser->can('Reorder:ConstructionProject');
+    }
+
 }

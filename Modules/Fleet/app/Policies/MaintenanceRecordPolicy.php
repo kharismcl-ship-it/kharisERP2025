@@ -1,39 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Fleet\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use Modules\Fleet\Models\MaintenanceRecord;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class MaintenanceRecordPolicy
 {
-    public function viewAny(User $user): bool
+    use HandlesAuthorization;
+    
+    public function viewAny(AuthUser $authUser): bool
     {
-        return $user->can('view_any_maintenance_record');
+        return $authUser->can('ViewAny:MaintenanceRecord');
     }
 
-    public function view(User $user, MaintenanceRecord $record): bool
+    public function view(AuthUser $authUser, MaintenanceRecord $maintenanceRecord): bool
     {
-        return $user->can('view_maintenance_record');
+        return $authUser->can('View:MaintenanceRecord');
     }
 
-    public function create(User $user): bool
+    public function create(AuthUser $authUser): bool
     {
-        return $user->can('create_maintenance_record');
+        return $authUser->can('Create:MaintenanceRecord');
     }
 
-    public function update(User $user, MaintenanceRecord $record): bool
+    public function update(AuthUser $authUser, MaintenanceRecord $maintenanceRecord): bool
     {
-        return $user->can('update_maintenance_record');
+        return $authUser->can('Update:MaintenanceRecord');
     }
 
-    public function delete(User $user, MaintenanceRecord $record): bool
+    public function delete(AuthUser $authUser, MaintenanceRecord $maintenanceRecord): bool
     {
-        return $user->can('delete_maintenance_record');
+        return $authUser->can('Delete:MaintenanceRecord');
     }
 
-    public function deleteAny(User $user): bool
+    public function restore(AuthUser $authUser, MaintenanceRecord $maintenanceRecord): bool
     {
-        return $user->can('delete_any_maintenance_record');
+        return $authUser->can('Restore:MaintenanceRecord');
     }
+
+    public function forceDelete(AuthUser $authUser, MaintenanceRecord $maintenanceRecord): bool
+    {
+        return $authUser->can('ForceDelete:MaintenanceRecord');
+    }
+
+    public function forceDeleteAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ForceDeleteAny:MaintenanceRecord');
+    }
+
+    public function restoreAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('RestoreAny:MaintenanceRecord');
+    }
+
+    public function replicate(AuthUser $authUser, MaintenanceRecord $maintenanceRecord): bool
+    {
+        return $authUser->can('Replicate:MaintenanceRecord');
+    }
+
+    public function reorder(AuthUser $authUser): bool
+    {
+        return $authUser->can('Reorder:MaintenanceRecord');
+    }
+
 }

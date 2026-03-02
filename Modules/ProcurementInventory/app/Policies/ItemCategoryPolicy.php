@@ -1,16 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\ProcurementInventory\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use Modules\ProcurementInventory\Models\ItemCategory;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class ItemCategoryPolicy
 {
-    public function viewAny(User $user): bool { return $user->can('view_any_item_category'); }
-    public function view(User $user, ItemCategory $model): bool { return $user->can('view_item_category'); }
-    public function create(User $user): bool { return $user->can('create_item_category'); }
-    public function update(User $user, ItemCategory $model): bool { return $user->can('update_item_category'); }
-    public function delete(User $user, ItemCategory $model): bool { return $user->can('delete_item_category'); }
-    public function deleteAny(User $user): bool { return $user->can('delete_any_item_category'); }
+    use HandlesAuthorization;
+    
+    public function viewAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ViewAny:ItemCategory');
+    }
+
+    public function view(AuthUser $authUser, ItemCategory $itemCategory): bool
+    {
+        return $authUser->can('View:ItemCategory');
+    }
+
+    public function create(AuthUser $authUser): bool
+    {
+        return $authUser->can('Create:ItemCategory');
+    }
+
+    public function update(AuthUser $authUser, ItemCategory $itemCategory): bool
+    {
+        return $authUser->can('Update:ItemCategory');
+    }
+
+    public function delete(AuthUser $authUser, ItemCategory $itemCategory): bool
+    {
+        return $authUser->can('Delete:ItemCategory');
+    }
+
+    public function restore(AuthUser $authUser, ItemCategory $itemCategory): bool
+    {
+        return $authUser->can('Restore:ItemCategory');
+    }
+
+    public function forceDelete(AuthUser $authUser, ItemCategory $itemCategory): bool
+    {
+        return $authUser->can('ForceDelete:ItemCategory');
+    }
+
+    public function forceDeleteAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ForceDeleteAny:ItemCategory');
+    }
+
+    public function restoreAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('RestoreAny:ItemCategory');
+    }
+
+    public function replicate(AuthUser $authUser, ItemCategory $itemCategory): bool
+    {
+        return $authUser->can('Replicate:ItemCategory');
+    }
+
+    public function reorder(AuthUser $authUser): bool
+    {
+        return $authUser->can('Reorder:ItemCategory');
+    }
+
 }

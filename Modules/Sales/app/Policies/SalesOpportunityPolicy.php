@@ -1,16 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Sales\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use Modules\Sales\Models\SalesOpportunity;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class SalesOpportunityPolicy
 {
-    public function viewAny(User $user): bool  { return $user->can('view_any_sales_opportunity'); }
-    public function view(User $user, SalesOpportunity $model): bool  { return $user->can('view_sales_opportunity'); }
-    public function create(User $user): bool   { return $user->can('create_sales_opportunity'); }
-    public function update(User $user, SalesOpportunity $model): bool { return $user->can('update_sales_opportunity'); }
-    public function delete(User $user, SalesOpportunity $model): bool { return $user->can('delete_sales_opportunity'); }
-    public function deleteAny(User $user): bool { return $user->can('delete_any_sales_opportunity'); }
+    use HandlesAuthorization;
+    
+    public function viewAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ViewAny:SalesOpportunity');
+    }
+
+    public function view(AuthUser $authUser, SalesOpportunity $salesOpportunity): bool
+    {
+        return $authUser->can('View:SalesOpportunity');
+    }
+
+    public function create(AuthUser $authUser): bool
+    {
+        return $authUser->can('Create:SalesOpportunity');
+    }
+
+    public function update(AuthUser $authUser, SalesOpportunity $salesOpportunity): bool
+    {
+        return $authUser->can('Update:SalesOpportunity');
+    }
+
+    public function delete(AuthUser $authUser, SalesOpportunity $salesOpportunity): bool
+    {
+        return $authUser->can('Delete:SalesOpportunity');
+    }
+
+    public function restore(AuthUser $authUser, SalesOpportunity $salesOpportunity): bool
+    {
+        return $authUser->can('Restore:SalesOpportunity');
+    }
+
+    public function forceDelete(AuthUser $authUser, SalesOpportunity $salesOpportunity): bool
+    {
+        return $authUser->can('ForceDelete:SalesOpportunity');
+    }
+
+    public function forceDeleteAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ForceDeleteAny:SalesOpportunity');
+    }
+
+    public function restoreAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('RestoreAny:SalesOpportunity');
+    }
+
+    public function replicate(AuthUser $authUser, SalesOpportunity $salesOpportunity): bool
+    {
+        return $authUser->can('Replicate:SalesOpportunity');
+    }
+
+    public function reorder(AuthUser $authUser): bool
+    {
+        return $authUser->can('Reorder:SalesOpportunity');
+    }
+
 }

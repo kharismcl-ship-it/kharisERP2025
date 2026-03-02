@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Modules\Hostels\Policies;
 
-use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Foundation\Auth\User as AuthUser;
 use Modules\Hostels\Models\HostelOccupant;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class HostelOccupantPolicy
 {
     use HandlesAuthorization;
-
+    
     public function viewAny(AuthUser $authUser): bool
     {
         return $authUser->can('ViewAny:HostelOccupant');
@@ -66,4 +66,5 @@ class HostelOccupantPolicy
     {
         return $authUser->can('Reorder:HostelOccupant');
     }
+
 }

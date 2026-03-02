@@ -1,13 +1,70 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Modules\HR\Policies;
-use App\Models\User;
+
+use Illuminate\Foundation\Auth\User as AuthUser;
 use Modules\HR\Models\Announcement;
-class AnnouncementPolicy {
-    public function viewAny(User $user): bool { return true; }
-    public function view(User $user, Announcement $model): bool { return true; }
-    public function create(User $user): bool { return true; }
-    public function update(User $user, Announcement $model): bool { return true; }
-    public function delete(User $user, Announcement $model): bool { return true; }
-    public function restore(User $user, Announcement $model): bool { return true; }
-    public function forceDelete(User $user, Announcement $model): bool { return true; }
+use Illuminate\Auth\Access\HandlesAuthorization;
+
+class AnnouncementPolicy
+{
+    use HandlesAuthorization;
+    
+    public function viewAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ViewAny:Announcement');
+    }
+
+    public function view(AuthUser $authUser, Announcement $announcement): bool
+    {
+        return $authUser->can('View:Announcement');
+    }
+
+    public function create(AuthUser $authUser): bool
+    {
+        return $authUser->can('Create:Announcement');
+    }
+
+    public function update(AuthUser $authUser, Announcement $announcement): bool
+    {
+        return $authUser->can('Update:Announcement');
+    }
+
+    public function delete(AuthUser $authUser, Announcement $announcement): bool
+    {
+        return $authUser->can('Delete:Announcement');
+    }
+
+    public function restore(AuthUser $authUser, Announcement $announcement): bool
+    {
+        return $authUser->can('Restore:Announcement');
+    }
+
+    public function forceDelete(AuthUser $authUser, Announcement $announcement): bool
+    {
+        return $authUser->can('ForceDelete:Announcement');
+    }
+
+    public function forceDeleteAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ForceDeleteAny:Announcement');
+    }
+
+    public function restoreAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('RestoreAny:Announcement');
+    }
+
+    public function replicate(AuthUser $authUser, Announcement $announcement): bool
+    {
+        return $authUser->can('Replicate:Announcement');
+    }
+
+    public function reorder(AuthUser $authUser): bool
+    {
+        return $authUser->can('Reorder:Announcement');
+    }
+
 }
