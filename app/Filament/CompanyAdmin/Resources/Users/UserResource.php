@@ -22,6 +22,13 @@ class UserResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
+    /**
+     * User belongs to companies via a BelongsToMany, not a BelongsTo.
+     * Tell Filament to use the 'companies' pivot relationship for tenant
+     * ownership checks instead of the default 'company' (which doesn't exist).
+     */
+    protected static ?string $tenantOwnershipRelationshipName = 'companies';
+
     public static function getNavigationGroup(): string|\UnitEnum|null
     {
         return 'Core';
