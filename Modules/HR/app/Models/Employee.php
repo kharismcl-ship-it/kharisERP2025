@@ -394,7 +394,7 @@ class Employee extends Model
     /**
      * Approve system access and create user account.
      */
-    public function approveSystemAccess(?string $password = null): \App\Models\User
+    public function approveSystemAccess(?string $password = null, ?int $roleId = null): \App\Models\User
     {
         if (! $this->system_access_requested) {
             throw new \Exception('System access not requested');
@@ -411,19 +411,19 @@ class Employee extends Model
         $password = $password ?? \Illuminate\Support\Str::random(config('hr.default_password_length', 12));
 
         $user = \App\Models\User::create([
-            'name' => $this->full_name,
-            'email' => $this->email,
-            'password' => \Illuminate\Support\Facades\Hash::make($password),
+            'name'               => $this->full_name,
+            'email'              => $this->email,
+            'password'           => \Illuminate\Support\Facades\Hash::make($password),
             'current_company_id' => $this->company_id,
         ]);
 
         $this->update([
-            'user_id' => $user->id,
-            'system_access_approved_at' => now(),
-            'system_access_requested' => false,
+            'user_id'                    => $user->id,
+            'system_access_approved_at'  => now(),
+            'system_access_requested'    => false,
         ]);
 
-        $this->syncUserRoles();
+        $this->attachUserToCompanyAndRole($user, $roleId);
 
         Log::info("System access approved for employee: {$this->full_name}, user ID: {$user->id}");
 
@@ -450,7 +450,7 @@ class Employee extends Model
     /**
      * Create user account manually (bypass approval workflow).
      */
-    public function createUserAccount(?string $password = null): \App\Models\User
+    public function createUserAccount(?string $password = null, ?int $roleId = null): \App\Models\User
     {
         if ($this->user_id) {
             throw new \Exception('Employee already has a user account');
@@ -463,17 +463,53 @@ class Employee extends Model
         $password = $password ?? \Illuminate\Support\Str::random(config('hr.default_password_length', 12));
 
         $user = \App\Models\User::create([
-            'name' => $this->full_name,
-            'email' => $this->email,
-            'password' => \Illuminate\Support\Facades\Hash::make($password),
+            'name'               => $this->full_name,
+            'email'              => $this->email,
+            'password'           => \Illuminate\Support\Facades\Hash::make($password),
             'current_company_id' => $this->company_id,
         ]);
 
         $this->update(['user_id' => $user->id]);
-        $this->syncUserRoles();
+        $this->attachUserToCompanyAndRole($user, $roleId);
 
         Log::info("User account created for employee: {$this->full_name}, user ID: {$user->id}");
 
         return $user;
+    }
+
+    /**
+     * Attach the user to the employee's company pivot and assign a Spatie role.
+     * Called by approveSystemAccess() and createUserAccount().
+     */
+    private function attachUserToCompanyAndRole(\App\Models\User $user, ?int $roleId): void
+    {
+        // Insert into company_user pivot so the user can log into the company-admin panel
+        $user->companies()->syncWithoutDetaching([
+            $this->company_id => [
+                'is_active'   => true,
+                'assigned_at' => now(),
+            ],
+        ]);
+
+        // Assign the selected Spatie role scoped to the employee's company
+        if ($roleId) {
+            $teamKey = config('permission.column_names.team_foreign_key', 'company_id');
+            $tables  = config('permission.table_names');
+
+            \Illuminate\Support\Facades\DB::table($tables['model_has_roles'])->updateOrInsert(
+                [
+                    'role_id'    => $roleId,
+                    'model_type' => get_class($user),
+                    'model_id'   => $user->getKey(),
+                    $teamKey     => $this->company_id,
+                ],
+                [
+                    'role_id'    => $roleId,
+                    'model_type' => get_class($user),
+                    'model_id'   => $user->getKey(),
+                    $teamKey     => $this->company_id,
+                ]
+            );
+        }
     }
 }

@@ -2,12 +2,15 @@
 
 namespace Modules\HR\Filament\Resources;
 
+use App\Models\Company;
+use App\Models\Scopes\TenantScope;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
@@ -16,11 +19,14 @@ use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Fieldset;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Modules\CommunicationCentre\Filament\Components\NotificationPreferenceForm;
+use Modules\HR\Models\Department;
+use Modules\HR\Models\JobPosition;
 use Modules\HR\Filament\Resources\EmployeeResource\Pages;
 use Modules\HR\Filament\Resources\EmployeeResource\RelationManagers\AttendanceRecordsRelationManager;
 use Modules\HR\Filament\Resources\EmployeeResource\RelationManagers\CompanyAssignmentsRelationManager;
@@ -251,44 +257,103 @@ class EmployeeResource extends Resource
                     ->collapsible()
                     ->schema([
                         Forms\Components\Select::make('company_id')
-                            ->relationship('company', 'name')
-                            ->required(),
+                            ->label('Company')
+                            ->options(function (): array {
+                                $tenant = Filament::getTenant();
+                                if (! $tenant) {
+                                    return Company::withoutGlobalScope(TenantScope::class)
+                                        ->orderBy('name')->pluck('name', 'id')->all();
+                                }
+
+                                return Company::withoutGlobalScope(TenantScope::class)
+                                    ->whereIn('id', $tenant->selfAndDescendantIds())
+                                    ->orderBy('name')
+                                    ->pluck('name', 'id')
+                                    ->all();
+                            })
+                            ->default(fn (): ?int => Filament::getTenant()?->getKey())
+                            ->required()
+                            ->searchable()
+                            ->live(),
+
                         Forms\Components\Select::make('user_id')
                             ->relationship('user', 'name')
                             ->searchable()
                             ->preload(),
+
                         Forms\Components\DatePicker::make('hire_date'),
+
                         Forms\Components\Select::make('employment_type')
                             ->options([
                                 'full_time' => 'Full Time',
                                 'part_time' => 'Part Time',
-                                'contract' => 'Contract',
-                                'intern' => 'Intern',
+                                'contract'  => 'Contract',
+                                'intern'    => 'Intern',
                             ])
                             ->required(),
+
                         Forms\Components\Select::make('employment_status')
                             ->label('Employment Status')
                             ->options([
-                                'active' => 'Active',
-                                'probation' => 'Probation',
-                                'suspended' => 'Suspended',
+                                'active'     => 'Active',
+                                'probation'  => 'Probation',
+                                'suspended'  => 'Suspended',
                                 'terminated' => 'Terminated',
-                                'resigned' => 'Resigned',
+                                'resigned'   => 'Resigned',
                             ])
                             ->required(),
+
                         Forms\Components\Select::make('department_id')
-                            ->relationship('department', 'name')
+                            ->label('Department')
+                            ->options(function (Get $get): array {
+                                $companyId = $get('company_id');
+                                if (! $companyId) {
+                                    return [];
+                                }
+
+                                return Department::withoutGlobalScope(TenantScope::class)
+                                    ->where('company_id', $companyId)
+                                    ->orderBy('name')
+                                    ->pluck('name', 'id')
+                                    ->all();
+                            })
                             ->searchable()
-                            ->preload(),
+                            ->live(),
+
                         Forms\Components\Select::make('job_position_id')
-                            ->relationship('jobPosition', 'title')
+                            ->label('Job Position')
+                            ->options(function (Get $get): array {
+                                $companyId = $get('company_id');
+                                if (! $companyId) {
+                                    return [];
+                                }
+
+                                return JobPosition::withoutGlobalScope(TenantScope::class)
+                                    ->where('company_id', $companyId)
+                                    ->orderBy('title')
+                                    ->pluck('title', 'id')
+                                    ->all();
+                            })
                             ->searchable()
-                            ->preload(),
+                            ->live(),
+
                         Forms\Components\Select::make('reporting_to_employee_id')
                             ->label('Reporting To')
-                            ->relationship('manager', 'full_name')
+                            ->options(function (Get $get): array {
+                                $companyId = $get('company_id');
+                                if (! $companyId) {
+                                    return [];
+                                }
+
+                                return Employee::withoutGlobalScope(TenantScope::class)
+                                    ->where('company_id', $companyId)
+                                    ->orderBy('first_name')
+                                    ->get()
+                                    ->pluck('full_name', 'id')
+                                    ->all();
+                            })
                             ->searchable()
-                            ->preload(),
+                            ->live(),
                     ])
                     ->columns(2),
 

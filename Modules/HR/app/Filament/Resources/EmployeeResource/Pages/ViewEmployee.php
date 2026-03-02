@@ -2,8 +2,10 @@
 
 namespace Modules\HR\Filament\Resources\EmployeeResource\Pages;
 
+use App\Models\Role;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\Select;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\RepeatableEntry;
@@ -253,6 +255,22 @@ class ViewEmployee extends ViewRecord
 
     protected function getHeaderActions(): array
     {
+        $roleForm = fn (Employee $record): array => [
+            Select::make('role_id')
+                ->label('Assign Role')
+                ->options(function () use ($record): array {
+                    $teamKey = config('permission.column_names.team_foreign_key', 'company_id');
+
+                    return Role::where($teamKey, $record->company_id)
+                        ->orderBy('name')
+                        ->pluck('name', 'id')
+                        ->mapWithKeys(fn ($name, $id) => [$id => str($name)->headline()->toString()])
+                        ->all();
+                })
+                ->searchable()
+                ->helperText('Select a role for this employee within their company. You can change it later from the Users section.'),
+        ];
+
         return [
             EditAction::make()
                 ->label('Edit Employee'),
@@ -271,20 +289,22 @@ class ViewEmployee extends ViewRecord
                 ->label('Approve Access')
                 ->icon('heroicon-o-check-circle')
                 ->color('success')
-                ->action(fn (Employee $record) => $record->approveSystemAccess())
-                ->requiresConfirmation()
+                ->form(fn (Employee $record): array => $roleForm($record))
+                ->action(fn (Employee $record, array $data) => $record->approveSystemAccess(null, $data['role_id'] ?? null))
                 ->modalHeading('Approve System Access')
-                ->modalDescription('Are you sure you want to approve system access for this employee? A user account will be created with a random password.')
+                ->modalDescription('A user account will be created with a random password. Optionally assign a role now — no need to visit the Users section afterwards.')
+                ->modalSubmitActionLabel('Approve & Create Account')
                 ->visible(fn (Employee $record) => $record->system_access_requested && ! $record->user_id),
 
             Action::make('createUserAccount')
                 ->label('Create Account')
                 ->icon('heroicon-o-user-plus')
                 ->color('primary')
-                ->action(fn (Employee $record) => $record->createUserAccount())
-                ->requiresConfirmation()
+                ->form(fn (Employee $record): array => $roleForm($record))
+                ->action(fn (Employee $record, array $data) => $record->createUserAccount(null, $data['role_id'] ?? null))
                 ->modalHeading('Create User Account')
-                ->modalDescription('Are you sure you want to create a user account for this employee? This bypasses the approval workflow.')
+                ->modalDescription('Creates a user account and grants access to the company-admin panel. Optionally assign a role now — no need to visit the Users section afterwards.')
+                ->modalSubmitActionLabel('Create Account')
                 ->visible(fn (Employee $record) => ! $record->user_id),
         ];
     }
