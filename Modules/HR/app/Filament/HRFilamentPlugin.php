@@ -162,16 +162,15 @@ class HRFilamentPlugin implements Plugin
             ]);
         }
 
-        $panel->clusters([
+        // Clusters extend Page — register them via pages() so Filament
+        // recognises them as navigatable cluster containers.
+        $panel->pages([
             HrSetupCluster::class,
             HrRecruitmentCluster::class,
             HrPerformanceCluster::class,
             HrRelationsCluster::class,
             HrLearningCluster::class,
             HrRecordsCluster::class,
-        ]);
-
-        $panel->pages([
             HrAnalyticsDashboard::class,
         ]);
     }
