@@ -13,9 +13,18 @@ class LeaveTypeFactory extends Factory
     public function definition(): array
     {
         return [
-            'company_id' => Company::factory(),
-            'name' => $this->faker->randomElement(['Annual Leave', 'Sick Leave', 'Maternity Leave', 'Paternity Leave', 'Unpaid Leave']),
+            'company_id'        => Company::factory(),
+            'name'              => $this->faker->randomElement(['Annual Leave', 'Sick Leave', 'Maternity Leave', 'Paternity Leave', 'Unpaid Leave']),
             'max_days_per_year' => $this->faker->numberBetween(5, 30),
+            'is_active'         => true,
+            'requires_approval' => true,
+            'is_paid'           => true,
+            'has_accrual'       => false,
+            'accrual_rate'      => 1.67,
+            'accrual_frequency' => 'monthly',
+            'carryover_limit'   => 0.0,
+            'max_balance'       => null,
+            'pro_rata_enabled'  => false,
         ];
     }
 }

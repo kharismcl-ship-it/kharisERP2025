@@ -39,11 +39,11 @@ class PayrollService
 
         $run->refresh();
         $run->update([
-            'total_gross'      => $run->payrollLines->sum('gross_salary'),
-            'total_net'        => $run->payrollLines->sum('net_salary'),
-            'total_paye'       => $run->payrollLines->sum('paye_tax'),
-            'total_ssnit'      => $run->payrollLines->sum('ssnit_employee'),
-            'employee_count'   => $run->payrollLines->count(),
+            'total_gross'      => $run->lines->sum('gross_salary'),
+            'total_net'        => $run->lines->sum('net_salary'),
+            'total_paye'       => $run->lines->sum('paye_tax'),
+            'total_ssnit'      => $run->lines->sum('ssnit_employee'),
+            'employee_count'   => $run->lines->count(),
         ]);
 
         return $run;
@@ -55,8 +55,8 @@ class PayrollService
     public function calculateEmployeePayroll(PayrollRun $run, Employee $employee): PayrollLine
     {
         $salary = EmployeeSalary::where('employee_id', $employee->id)
-            ->where('effective_date', '<=', now())
-            ->orderByDesc('effective_date')
+            ->where('effective_from', '<=', now())
+            ->orderByDesc('effective_from')
             ->first();
 
         $basicSalary = $salary?->basic_salary ?? 0;

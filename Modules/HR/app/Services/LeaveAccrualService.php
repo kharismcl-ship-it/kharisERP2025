@@ -247,7 +247,7 @@ class LeaveAccrualService
             ->get();
 
         foreach ($leaveTypes as $leaveType) {
-            $balance = LeaveBalance::firstOrCreateForEmployee($employee->id, $leaveType->id, $year);
+            $balance = LeaveBalance::findOrCreateForEmployee($employee->id, $leaveType->id, $year);
 
             $forecast[] = [
                 'leave_type' => $leaveType->name,

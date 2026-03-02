@@ -25,6 +25,15 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        \Illuminate\Database\Eloquent\Factories\Factory::guessFactoryNamesUsing(function (string $modelName) {
+            if (str_starts_with($modelName, 'Modules\\')) {
+                $parts = explode('\\', $modelName);
+                $moduleName = $parts[1];
+                $modelClass = $parts[count($parts) - 1];
+                return "Modules\\{$moduleName}\\Database\\factories\\{$modelClass}Factory";
+            }
+            return 'Database\\Factories\\' . class_basename($modelName) . 'Factory';
+        });
 
         app(PermissionRegistrar::class)
             ->setPermissionClass(Permission::class)

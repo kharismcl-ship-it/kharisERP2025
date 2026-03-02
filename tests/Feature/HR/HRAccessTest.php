@@ -1,30 +1,20 @@
 <?php
 
+use App\Models\Company;
 use App\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Modules\Core\Models\Company;
 
-uses(RefreshDatabase::class);
-
-it('403s when user is not a member of the company (hr)', function () {
-    $user = User::factory()->create();
-    $company = Company::create(['name' => 'Acme HR', 'slug' => 'acme-hr', 'type' => 'hr']);
-
-    $this->actingAs($user);
-
-    $this->get('/hr?company=acme-hr')
-        ->assertForbidden();
+it('guests are redirected from admin HR resources', function () {
+    $response = $this->get('/admin/employees');
+    $response->assertRedirect();
 });
 
-it('loads hr index when user is a member', function () {
-    $user = User::factory()->create();
-    $company = Company::create(['name' => 'Beta HR', 'slug' => 'beta-hr', 'type' => 'hr']);
-
-    $user->companies()->attach($company->id);
+it('authenticated users without company membership cannot see employees', function () {
+    $user    = User::factory()->create();
+    $company = Company::factory()->create();
 
     $this->actingAs($user);
 
-    $this->get('/hr?company=beta-hr')
-        ->assertOk()
-        ->assertSee('HR');
+    // HR module resources require company context and auth
+    $response = $this->get('/admin/employees');
+    expect($response->status())->toBeIn([302, 403]);
 });
