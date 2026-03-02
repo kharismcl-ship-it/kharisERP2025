@@ -2,6 +2,8 @@
 
 namespace Modules\HR\Filament\Resources;
 
+use Modules\HR\Filament\Clusters\HrSetupCluster;
+
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -21,11 +23,11 @@ use Modules\HR\Models\BenefitType;
 
 class BenefitTypeResource extends Resource
 {
+    protected static ?string $cluster = HrSetupCluster::class;
     protected static ?string $model = BenefitType::class;
 
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedGift;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Benefits & Loans';
 
     protected static ?int $navigationSort = 66;
 

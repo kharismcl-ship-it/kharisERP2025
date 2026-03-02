@@ -42,11 +42,11 @@ use Ysfkaya\FilamentPhoneInput\PhoneInputNumberType;
 
 class EmployeeResource extends Resource
 {
+    protected static string|\UnitEnum|null $navigationGroup = 'HR Manager';
     protected static ?string $model = Employee::class;
 
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedUsers;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Core HR';
 
     protected static ?int $navigationSort = 10;
 

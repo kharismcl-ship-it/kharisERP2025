@@ -22,11 +22,11 @@ use Modules\HR\Models\Announcement;
 
 class AnnouncementResource extends Resource
 {
+    protected static string|\UnitEnum|null $navigationGroup = 'HR Manager';
     protected static ?string $model = Announcement::class;
 
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedMegaphone;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'HR Comms';
 
     protected static ?int $navigationSort = 70;
 

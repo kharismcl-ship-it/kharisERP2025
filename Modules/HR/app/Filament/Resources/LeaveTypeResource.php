@@ -2,6 +2,8 @@
 
 namespace Modules\HR\Filament\Resources;
 
+use Modules\HR\Filament\Clusters\HrSetupCluster;
+
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -17,11 +19,11 @@ use Modules\HR\Models\LeaveType;
 
 class LeaveTypeResource extends Resource
 {
+    protected static ?string $cluster = HrSetupCluster::class;
     protected static ?string $model = LeaveType::class;
 
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocument;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Leave';
 
     protected static ?int $navigationSort = 20;
 

@@ -2,6 +2,8 @@
 
 namespace Modules\HR\Filament\Resources;
 
+use Modules\HR\Filament\Clusters\HrLearningCluster;
+
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -20,6 +22,7 @@ use Modules\HR\Models\Certification;
 
 class CertificationResource extends Resource
 {
+    protected static ?string $cluster = HrLearningCluster::class;
     protected static ?string $model = Certification::class;
 
     /**
@@ -31,7 +34,6 @@ class CertificationResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedAcademicCap;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Learning & Development';
 
     protected static ?int $navigationSort = 59;
 

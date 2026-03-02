@@ -4,6 +4,12 @@ namespace Modules\HR\Filament;
 
 use Filament\Contracts\Plugin;
 use Filament\Panel;
+use Modules\HR\Filament\Clusters\HrLearningCluster;
+use Modules\HR\Filament\Clusters\HrPerformanceCluster;
+use Modules\HR\Filament\Clusters\HrRecordsCluster;
+use Modules\HR\Filament\Clusters\HrRecruitmentCluster;
+use Modules\HR\Filament\Clusters\HrRelationsCluster;
+use Modules\HR\Filament\Clusters\HrSetupCluster;
 use Modules\HR\Filament\Pages\HrAnalyticsDashboard;
 use Modules\HR\Filament\Resources\AllowanceTypeResource;
 use Modules\HR\Filament\Resources\AnnouncementResource;
@@ -155,6 +161,15 @@ class HRFilamentPlugin implements Plugin
                 AnnouncementResource::class,
             ]);
         }
+
+        $panel->clusters([
+            HrSetupCluster::class,
+            HrRecruitmentCluster::class,
+            HrPerformanceCluster::class,
+            HrRelationsCluster::class,
+            HrLearningCluster::class,
+            HrRecordsCluster::class,
+        ]);
 
         $panel->pages([
             HrAnalyticsDashboard::class,

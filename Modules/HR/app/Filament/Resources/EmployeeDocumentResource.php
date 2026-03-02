@@ -2,6 +2,8 @@
 
 namespace Modules\HR\Filament\Resources;
 
+use Modules\HR\Filament\Clusters\HrRecordsCluster;
+
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -19,13 +21,13 @@ use Modules\HR\Models\EmployeeDocument;
 
 class EmployeeDocumentResource extends Resource
 {
+    protected static ?string $cluster = HrRecordsCluster::class;
     protected static ?string $model = EmployeeDocument::class;
 
     protected static ?string $slug = 'employee-documents';
 
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedDocument;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Documents';
 
     protected static ?int $navigationSort = 69;
 

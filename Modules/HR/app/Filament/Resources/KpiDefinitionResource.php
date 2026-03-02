@@ -2,6 +2,8 @@
 
 namespace Modules\HR\Filament\Resources;
 
+use Modules\HR\Filament\Clusters\HrPerformanceCluster;
+
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -20,11 +22,11 @@ use Modules\HR\Models\KpiDefinition;
 
 class KpiDefinitionResource extends Resource
 {
+    protected static ?string $cluster = HrPerformanceCluster::class;
     protected static ?string $model = KpiDefinition::class;
 
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedChartBar;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Performance';
 
     protected static ?int $navigationSort = 63;
 

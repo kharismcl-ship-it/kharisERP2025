@@ -20,11 +20,11 @@ use Modules\HR\Models\AttendanceRecord;
 
 class AttendanceRecordResource extends Resource
 {
+    protected static string|\UnitEnum|null $navigationGroup = 'HR Manager';
     protected static ?string $model = AttendanceRecord::class;
 
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedFingerPrint;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Workforce';
 
     protected static ?int $navigationSort = 56;
 

@@ -2,6 +2,8 @@
 
 namespace Modules\HR\Filament\Resources;
 
+use Modules\HR\Filament\Clusters\HrSetupCluster;
+
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -22,11 +24,11 @@ use Modules\HR\Models\LeaveApprovalWorkflow;
 
 class LeaveApprovalWorkflowResource extends Resource
 {
+    protected static ?string $cluster = HrSetupCluster::class;
     protected static ?string $model = LeaveApprovalWorkflow::class;
 
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedArrowPath;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Leave';
 
     protected static ?int $navigationSort = 22;
 

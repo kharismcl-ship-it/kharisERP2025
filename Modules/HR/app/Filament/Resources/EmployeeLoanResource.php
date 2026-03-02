@@ -2,6 +2,8 @@
 
 namespace Modules\HR\Filament\Resources;
 
+use Modules\HR\Filament\Clusters\HrRecordsCluster;
+
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
@@ -23,11 +25,11 @@ use Modules\HR\Models\EmployeeLoan;
 
 class EmployeeLoanResource extends Resource
 {
+    protected static ?string $cluster = HrRecordsCluster::class;
     protected static ?string $model = EmployeeLoan::class;
 
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedCreditCard;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Benefits & Loans';
 
     protected static ?int $navigationSort = 67;
 

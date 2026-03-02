@@ -2,6 +2,8 @@
 
 namespace Modules\HR\Filament\Resources;
 
+use Modules\HR\Filament\Clusters\HrSetupCluster;
+
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -19,11 +21,11 @@ use Modules\HR\Models\SalaryScale;
 
 class SalaryScaleResource extends Resource
 {
+    protected static ?string $cluster = HrSetupCluster::class;
     protected static ?string $model = SalaryScale::class;
 
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedScale;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Core HR';
 
     protected static ?int $navigationSort = 13;
 

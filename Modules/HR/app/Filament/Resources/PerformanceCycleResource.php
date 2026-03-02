@@ -2,6 +2,8 @@
 
 namespace Modules\HR\Filament\Resources;
 
+use Modules\HR\Filament\Clusters\HrPerformanceCluster;
+
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -18,11 +20,11 @@ use Modules\HR\Models\PerformanceCycle;
 
 class PerformanceCycleResource extends Resource
 {
+    protected static ?string $cluster = HrPerformanceCluster::class;
     protected static ?string $model = PerformanceCycle::class;
 
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedArrowPathRoundedSquare;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Performance';
 
     protected static ?int $navigationSort = 60;
 

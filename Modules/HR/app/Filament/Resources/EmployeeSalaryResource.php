@@ -2,6 +2,8 @@
 
 namespace Modules\HR\Filament\Resources;
 
+use Modules\HR\Filament\Clusters\HrRecordsCluster;
+
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -20,11 +22,11 @@ use Modules\HR\Models\EmployeeSalary;
 
 class EmployeeSalaryResource extends Resource
 {
+    protected static ?string $cluster = HrRecordsCluster::class;
     protected static ?string $model = EmployeeSalary::class;
 
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedBanknotes;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Payroll';
 
     protected static ?int $navigationSort = 53;
 

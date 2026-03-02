@@ -20,11 +20,11 @@ use Modules\HR\Models\LeaveRequest;
 
 class LeaveRequestResource extends Resource
 {
+    protected static string|\UnitEnum|null $navigationGroup = 'HR Manager';
     protected static ?string $model = LeaveRequest::class;
 
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedCalendarDays;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Leave';
 
     protected static ?int $navigationSort = 23;
 

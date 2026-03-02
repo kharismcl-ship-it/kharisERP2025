@@ -2,6 +2,8 @@
 
 namespace Modules\HR\Filament\Resources;
 
+use Modules\HR\Filament\Clusters\HrRecordsCluster;
+
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -18,6 +20,7 @@ use Modules\HR\Models\HostelStaffAssignment;
 
 class HostelStaffAssignmentResource extends Resource
 {
+    protected static ?string $cluster = HrRecordsCluster::class;
     protected static ?string $model = HostelStaffAssignment::class;
 
     protected static ?string $navigationLabel = 'Hostel Staff Assignments';
@@ -28,7 +31,6 @@ class HostelStaffAssignmentResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedHomeModern;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Core HR';
 
     protected static ?int $navigationSort = 15;
 

@@ -2,6 +2,8 @@
 
 namespace Modules\HR\Filament\Resources;
 
+use Modules\HR\Filament\Clusters\HrRecruitmentCluster;
+
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
@@ -23,11 +25,11 @@ use Modules\HR\Models\JobVacancy;
 
 class JobVacancyResource extends Resource
 {
+    protected static ?string $cluster = HrRecruitmentCluster::class;
     protected static ?string $model = JobVacancy::class;
 
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedBriefcase;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Recruitment';
 
     protected static ?int $navigationSort = 57;
 

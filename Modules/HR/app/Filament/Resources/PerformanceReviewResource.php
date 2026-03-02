@@ -20,11 +20,11 @@ use Modules\HR\Models\PerformanceReview;
 
 class PerformanceReviewResource extends Resource
 {
+    protected static string|\UnitEnum|null $navigationGroup = 'HR Manager';
     protected static ?string $model = PerformanceReview::class;
 
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedStar;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Performance';
 
     protected static ?int $navigationSort = 61;
 

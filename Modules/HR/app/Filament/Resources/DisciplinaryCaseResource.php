@@ -2,6 +2,8 @@
 
 namespace Modules\HR\Filament\Resources;
 
+use Modules\HR\Filament\Clusters\HrRelationsCluster;
+
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
@@ -22,11 +24,11 @@ use Modules\HR\Models\DisciplinaryCase;
 
 class DisciplinaryCaseResource extends Resource
 {
+    protected static ?string $cluster = HrRelationsCluster::class;
     protected static ?string $model = DisciplinaryCase::class;
 
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedExclamationTriangle;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Employee Relations';
 
     protected static ?int $navigationSort = 64;
 

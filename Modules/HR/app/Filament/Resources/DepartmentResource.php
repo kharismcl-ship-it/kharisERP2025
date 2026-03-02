@@ -2,6 +2,8 @@
 
 namespace Modules\HR\Filament\Resources;
 
+use Modules\HR\Filament\Clusters\HrSetupCluster;
+
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -20,13 +22,13 @@ use Modules\HR\Models\Department;
 
 class DepartmentResource extends Resource
 {
+    protected static ?string $cluster = HrSetupCluster::class;
     protected static ?string $model = Department::class;
 
     protected static ?string $slug = 'departments';
 
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedBuildingOffice2;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Core HR';
 
     protected static ?int $navigationSort = 11;
 

@@ -2,6 +2,8 @@
 
 namespace Modules\HR\Filament\Resources;
 
+use Modules\HR\Filament\Clusters\HrRecordsCluster;
+
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -20,11 +22,11 @@ use Modules\HR\Models\LeaveBalance;
 
 class LeaveBalanceResource extends Resource
 {
+    protected static ?string $cluster = HrRecordsCluster::class;
     protected static ?string $model = LeaveBalance::class;
 
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedChartBar;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Leave';
 
     protected static ?int $navigationSort = 21;
 
