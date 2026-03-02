@@ -7,9 +7,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\Company;
 use App\Models\User;
+use App\Models\Concerns\BelongsToCompany;
 
 class Announcement extends Model
 {
+    use BelongsToCompany;
+
     protected $table = 'hr_announcements';
 
     protected $fillable = [

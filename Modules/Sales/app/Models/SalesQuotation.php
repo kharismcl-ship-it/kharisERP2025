@@ -7,9 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Modules\Sales\Events\QuotationSent;
+use App\Models\Concerns\BelongsToCompany;
 
 class SalesQuotation extends Model
 {
+    use BelongsToCompany;
+
     protected $fillable = [
         'company_id',
         'contact_id',

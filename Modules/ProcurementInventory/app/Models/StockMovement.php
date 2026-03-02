@@ -7,9 +7,12 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use App\Models\Concerns\BelongsToCompany;
 
 class StockMovement extends Model
 {
+    use BelongsToCompany;
+
     protected $fillable = [
         'company_id',
         'item_id',

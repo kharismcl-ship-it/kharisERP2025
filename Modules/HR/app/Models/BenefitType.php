@@ -6,9 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\Company;
+use App\Models\Concerns\BelongsToCompany;
 
 class BenefitType extends Model
 {
+    use BelongsToCompany;
+
     protected $table = 'hr_benefit_types';
 
     protected $fillable = [

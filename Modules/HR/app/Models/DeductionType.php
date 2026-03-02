@@ -5,9 +5,12 @@ namespace Modules\HR\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\Company;
+use App\Models\Concerns\BelongsToCompany;
 
 class DeductionType extends Model
 {
+    use BelongsToCompany;
+
     protected $table = 'hr_deduction_types';
 
     protected $fillable = [

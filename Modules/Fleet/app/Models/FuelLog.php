@@ -7,9 +7,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\Company;
 use App\Models\User;
 use Modules\Fleet\Events\FuelLogged;
+use App\Models\Concerns\BelongsToCompany;
 
 class FuelLog extends Model
 {
+    use BelongsToCompany;
+
     protected $fillable = [
         'vehicle_id',
         'company_id',

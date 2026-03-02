@@ -94,10 +94,15 @@ class User extends Authenticatable implements FilamentUser, HasTenants
     /**
      * Return the list of companies (tenants) this user can switch between
      * in the company-admin panel.
+     *
+     * - Global super_admins see every company.
+     * - Regular users see their directly assigned active companies only.
+     *   The UI tenant switcher shows these as selectable tenants; when a
+     *   group/HQ company is selected, the TenantScope automatically expands
+     *   queries to include all of that group's subsidiaries.
      */
     public function getTenants(Panel $panel): Collection
     {
-        // Global super admins see ALL companies so they can manage any tenant
         if ($this->isGlobalSuperAdmin()) {
             return Company::all();
         }
@@ -107,7 +112,10 @@ class User extends Authenticatable implements FilamentUser, HasTenants
 
     /**
      * Authorise access to a specific tenant.
-     * Global super admins bypass the membership check.
+     *
+     * - Global super_admins bypass all checks.
+     * - Users assigned to a parent/HQ company are also authorised to access
+     *   any of that company's subsidiaries (they inherit group access).
      */
     public function canAccessTenant(Model $tenant): bool
     {
@@ -115,7 +123,26 @@ class User extends Authenticatable implements FilamentUser, HasTenants
             return true;
         }
 
-        return $this->activeCompanies()->whereKey($tenant->getKey())->exists();
+        // Direct membership check
+        if ($this->activeCompanies()->whereKey($tenant->getKey())->exists()) {
+            return true;
+        }
+
+        // Hierarchy check: if the user belongs to a group/HQ company that is
+        // an ancestor of the requested tenant, grant access.
+        $userCompanyIds = $this->activeCompanies()->pluck('companies.id')->all();
+
+        foreach ($userCompanyIds as $userCompanyId) {
+            $userCompany = Company::find($userCompanyId);
+            if ($userCompany && $userCompany->isGroupCompany()) {
+                $descendants = $userCompany->selfAndDescendantIds();
+                if (in_array($tenant->getKey(), $descendants)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**

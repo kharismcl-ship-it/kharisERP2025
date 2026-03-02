@@ -10,9 +10,12 @@ use Modules\Farms\Events\CropCycleStarted;
 use Modules\Farms\Models\CropActivity;
 use Modules\Farms\Models\CropInputApplication;
 use Modules\Farms\Models\CropScoutingRecord;
+use App\Models\Concerns\BelongsToCompany;
 
 class CropCycle extends Model
 {
+    use BelongsToCompany;
+
     protected $fillable = [
         'farm_id',
         'farm_plot_id',

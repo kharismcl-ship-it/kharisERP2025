@@ -11,10 +11,11 @@ use Illuminate\Support\Str;
 use Modules\Hostels\Database\factories\HostelFactory;
 use Modules\HR\Models\EmployeeCompanyAssignment;
 use Modules\HR\Models\HostelStaffAssignment;
+use App\Models\Concerns\BelongsToCompany;
 
 class Hostel extends Model
 {
-    use HasFactory;
+    use HasFactory, BelongsToCompany;
 
     /**
      * The attributes that are mass assignable.

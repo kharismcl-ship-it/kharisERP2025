@@ -9,10 +9,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Modules\ProcurementInventory\Events\WarehouseTransferCompleted;
+use App\Models\Concerns\BelongsToCompany;
 
 class WarehouseTransfer extends Model
 {
-    use HasFactory;
+    use HasFactory, BelongsToCompany;
 
     protected $table = 'warehouse_transfers';
 

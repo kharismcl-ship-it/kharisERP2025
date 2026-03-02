@@ -228,11 +228,15 @@ class CompanyResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->badge()
-                    ->formatStateUsing(fn (string $state): string => ucfirst($state))
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'hq'         => 'HQ / Group',
+                        'subsidiary' => 'Subsidiary',
+                        default      => ucfirst($state),
+                    })
                     ->color(fn (string $state): string => match ($state) {
-                        'main' => 'info',
+                        'hq'         => 'info',
                         'subsidiary' => 'success',
-                        default => 'warning',
+                        default      => 'warning',
                     }),
                 Tables\Columns\TextColumn::make('company_service_type')
                     ->label('Service Type')
@@ -244,6 +248,12 @@ class CompanyResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('child_companies_count')
+                    ->label('Subsidiaries')
+                    ->counts('childCompanies')
+                    ->badge()
+                    ->color(fn (int $state): string => $state > 0 ? 'success' : 'gray')
+                    ->sortable(),
                 Tables\Columns\IconColumn::make('is_active')->boolean(),
                 Tables\Columns\TextColumn::make('created_at')->dateTime()->since()->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')->dateTime()->since()->toggleable(isToggledHiddenByDefault: true),
@@ -274,6 +284,13 @@ class CompanyResource extends Resource
                     DeleteBulkAction::make(),
                 ]),
             ]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            RelationManagers\SubsidiariesRelationManager::class,
+        ];
     }
 
     public static function getPages(): array

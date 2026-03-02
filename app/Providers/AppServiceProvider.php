@@ -2,8 +2,10 @@
 
 namespace App\Providers;
 
+use App\Models\Company;
 use App\Models\Permission;
 use App\Models\Role;
+use App\Observers\CompanyObserver;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
@@ -38,6 +40,9 @@ class AppServiceProvider extends ServiceProvider
         app(PermissionRegistrar::class)
             ->setPermissionClass(Permission::class)
             ->setRoleClass(Role::class);
+
+        // Auto-seed roles into new subsidiary companies
+        Company::observe(CompanyObserver::class);
 
         // Configure rate limiting for payment webhooks
         $this->configureRateLimiting();

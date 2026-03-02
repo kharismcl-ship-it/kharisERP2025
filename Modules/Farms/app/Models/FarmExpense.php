@@ -6,9 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\Company;
 use Modules\Farms\Events\FarmExpenseRecorded;
+use App\Models\Concerns\BelongsToCompany;
 
 class FarmExpense extends Model
 {
+    use BelongsToCompany;
+
     protected $fillable = [
         'farm_id',
         'crop_cycle_id',

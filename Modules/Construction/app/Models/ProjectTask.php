@@ -5,9 +5,12 @@ namespace Modules\Construction\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\Company;
+use App\Models\Concerns\BelongsToCompany;
 
 class ProjectTask extends Model
 {
+    use BelongsToCompany;
+
     protected $fillable = [
         'project_phase_id',
         'construction_project_id',

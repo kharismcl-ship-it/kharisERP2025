@@ -4,9 +4,12 @@ namespace Modules\Finance\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\Concerns\BelongsToCompany;
 
 class BankReconciliation extends Model
 {
+    use BelongsToCompany;
+
     protected $fillable = [
         'company_id',
         'bank_account_id',

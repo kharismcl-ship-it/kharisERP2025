@@ -8,9 +8,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 use Modules\ManufacturingPaper\Events\MpBatchCompleted;
+use App\Models\Concerns\BelongsToCompany;
 
 class MpProductionBatch extends Model
 {
+    use BelongsToCompany;
+
     protected $table = 'mp_production_batches';
 
     protected $fillable = [

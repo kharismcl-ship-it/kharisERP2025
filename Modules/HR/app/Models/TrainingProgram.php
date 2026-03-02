@@ -6,9 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\Company;
+use App\Models\Concerns\BelongsToCompany;
 
 class TrainingProgram extends Model
 {
+    use BelongsToCompany;
+
     protected $table = 'hr_training_programs';
 
     protected $fillable = [

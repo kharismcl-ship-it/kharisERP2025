@@ -6,9 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\Company;
+use App\Models\Concerns\BelongsToCompany;
 
 class FarmEquipment extends Model
 {
+    use BelongsToCompany;
+
     protected $table = 'farm_equipment';
 
     protected $fillable = [

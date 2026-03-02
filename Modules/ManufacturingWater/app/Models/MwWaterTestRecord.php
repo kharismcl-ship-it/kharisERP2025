@@ -6,9 +6,12 @@ use App\Models\Company;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Modules\ManufacturingWater\Events\MwWaterTestFailed;
+use App\Models\Concerns\BelongsToCompany;
 
 class MwWaterTestRecord extends Model
 {
+    use BelongsToCompany;
+
     protected $table = 'mw_water_test_records';
 
     protected $fillable = [

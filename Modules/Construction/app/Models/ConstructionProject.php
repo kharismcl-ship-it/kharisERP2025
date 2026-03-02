@@ -10,10 +10,11 @@ use App\Models\Company;
 use Modules\Construction\Events\ProjectBudgetOverrun;
 use Modules\Construction\Events\ProjectCompleted;
 use Modules\PaymentsChannel\Traits\HasPayments;
+use App\Models\Concerns\BelongsToCompany;
 
 class ConstructionProject extends Model
 {
-    use HasPayments;
+    use HasPayments, BelongsToCompany;
 
     protected $fillable = [
         'company_id',

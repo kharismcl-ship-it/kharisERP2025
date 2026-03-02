@@ -6,9 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\Company;
 use Modules\Fleet\Events\MaintenanceCompleted;
+use App\Models\Concerns\BelongsToCompany;
 
 class MaintenanceRecord extends Model
 {
+    use BelongsToCompany;
+
     protected $fillable = [
         'vehicle_id',
         'company_id',

@@ -9,10 +9,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Modules\HR\Services\LeaveApprovalService;
 use Modules\HR\Services\LeaveNotificationService;
+use App\Models\Concerns\BelongsToCompany;
 
 class LeaveRequest extends Model
 {
-    use HasFactory;
+    use HasFactory, BelongsToCompany;
 
     /**
      * The table associated with the model.

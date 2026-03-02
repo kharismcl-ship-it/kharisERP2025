@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 use Modules\CommunicationCentre\Traits\HasNotificationPreferences;
+use App\Models\Concerns\BelongsToCompany;
 
 class Employee extends Model
 {
-    use HasFactory, HasNotificationPreferences;
+    use HasFactory, HasNotificationPreferences, BelongsToCompany;
 
     /**
      * The table associated with the model.

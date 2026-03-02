@@ -6,9 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\Company;
 use App\Models\User;
+use App\Models\Concerns\BelongsToCompany;
 
 class TripLog extends Model
 {
+    use BelongsToCompany;
+
     protected $fillable = [
         'vehicle_id',
         'company_id',

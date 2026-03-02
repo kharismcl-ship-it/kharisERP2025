@@ -5,9 +5,12 @@ namespace Modules\Construction\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\Company;
+use App\Models\Concerns\BelongsToCompany;
 
 class ProjectBudgetItem extends Model
 {
+    use BelongsToCompany;
+
     protected $fillable = [
         'construction_project_id',
         'company_id',

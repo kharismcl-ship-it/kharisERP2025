@@ -5,9 +5,12 @@ namespace Modules\ManufacturingWater\Models;
 use App\Models\Company;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\Concerns\BelongsToCompany;
 
 class MwTankLevel extends Model
 {
+    use BelongsToCompany;
+
     protected $table = 'mw_tank_levels';
 
     protected $fillable = [

@@ -6,9 +6,12 @@ use App\Models\Company;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Modules\ProcurementInventory\Models\Item;
+use App\Models\Concerns\BelongsToCompany;
 
 class MwChemicalUsage extends Model
 {
+    use BelongsToCompany;
+
     protected $table = 'mw_chemical_usages';
 
     protected $fillable = [

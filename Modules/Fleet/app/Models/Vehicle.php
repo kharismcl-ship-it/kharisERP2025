@@ -8,9 +8,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Str;
 use App\Models\Company;
+use App\Models\Concerns\BelongsToCompany;
 
 class Vehicle extends Model
 {
+    use BelongsToCompany;
+
     protected $fillable = [
         'company_id',
         'name',

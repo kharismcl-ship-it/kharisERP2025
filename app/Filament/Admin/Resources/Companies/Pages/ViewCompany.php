@@ -67,19 +67,31 @@ class ViewCompany extends ViewRecord
                         ->color('gray'),
 
                     TextEntry::make('type')
-                        ->label('Company Type')
+                        ->label('Company Role')
                         ->badge()
-                        ->formatStateUsing(fn (string $state): string => ucfirst($state))
+                        ->formatStateUsing(fn (string $state): string => match ($state) {
+                            'hq'         => 'Group / HQ',
+                            'subsidiary' => 'Subsidiary',
+                            default      => ucfirst($state),
+                        })
                         ->color(fn (string $state): string => match ($state) {
-                            'main' => 'info',
+                            'hq'         => 'info',
                             'subsidiary' => 'success',
-                            default => 'gray',
+                            default      => 'gray',
                         }),
 
                     TextEntry::make('parentCompany.name')
                         ->label('Parent Company')
                         ->icon('heroicon-o-building-office')
                         ->visible(fn (Company $record) => $record->type === 'subsidiary'),
+
+                    TextEntry::make('childCompanies_count')
+                        ->label('Subsidiaries')
+                        ->state(fn (Company $record): string => $record->childCompanies()->count() . ' subsidiary / subsidiaries')
+                        ->icon('heroicon-o-building-office-2')
+                        ->badge()
+                        ->color('success')
+                        ->visible(fn (Company $record) => $record->isGroupCompany()),
 
                     IconEntry::make('is_active')
                         ->label('Status')

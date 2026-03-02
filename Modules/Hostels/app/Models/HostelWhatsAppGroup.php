@@ -5,10 +5,11 @@ namespace Modules\Hostels\Models;
 use App\Models\Company;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Concerns\BelongsToCompany;
 
 class HostelWhatsAppGroup extends Model
 {
-    use HasFactory;
+    use HasFactory, BelongsToCompany;
 
     protected $table = 'hostel_whatsapp_groups';
 

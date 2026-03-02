@@ -6,9 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\Company;
 use Modules\ProcurementInventory\Models\Item;
+use App\Models\Concerns\BelongsToCompany;
 
 class MaterialUsage extends Model
 {
+    use BelongsToCompany;
+
     protected $fillable = [
         'construction_project_id',
         'project_phase_id',

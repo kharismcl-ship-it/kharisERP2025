@@ -5,9 +5,12 @@ namespace Modules\Finance\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\Concerns\BelongsToCompany;
 
 class RecurringInvoice extends Model
 {
+    use BelongsToCompany;
+
     protected $fillable = [
         'company_id',
         'customer_name',

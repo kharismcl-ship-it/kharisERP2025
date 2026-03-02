@@ -26,9 +26,11 @@ use Modules\PaymentsChannel\Traits\HasPayments;
  * - Inactive statuses: cancelled, checked_out,no_show
  * - When creating a booking, check for existing active bookings for the same bed
  */
+use App\Models\Concerns\BelongsToCompany;
+
 class Booking extends Model
 {
-    use HasEvents, HasFactory, HasPayments;
+    use HasEvents, HasFactory, HasPayments, BelongsToCompany;
 
     /**
      * The attributes that are mass assignable.

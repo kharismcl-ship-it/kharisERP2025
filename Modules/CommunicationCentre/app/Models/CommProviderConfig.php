@@ -5,10 +5,11 @@ namespace Modules\CommunicationCentre\Models;
 use App\Models\Company;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Concerns\BelongsToCompany;
 
 class CommProviderConfig extends Model
 {
-    use HasFactory;
+    use HasFactory, BelongsToCompany;
 
     protected static function newFactory()
     {

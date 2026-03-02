@@ -7,9 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
+use App\Models\Concerns\BelongsToCompany;
 
 class MwPlant extends Model
 {
+    use BelongsToCompany;
+
     protected $table = 'mw_plants';
 
     protected $fillable = [

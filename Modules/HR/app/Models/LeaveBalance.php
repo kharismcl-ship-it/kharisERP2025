@@ -8,10 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Modules\HR\Events\LeaveAccrued;
 use Modules\HR\Events\LeaveBalanceUpdated;
+use App\Models\Concerns\BelongsToCompany;
 
 class LeaveBalance extends Model
 {
-    use HasFactory;
+    use HasFactory, BelongsToCompany;
 
     /**
      * The events that should be dispatched.

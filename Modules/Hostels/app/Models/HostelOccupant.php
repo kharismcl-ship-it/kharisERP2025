@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Modules\CommunicationCentre\Traits\HasCommunicationProfile;
 use Modules\Hostels\Database\factories\HostelOccupantFactory;
+use App\Models\Concerns\BelongsToCompany;
 
 class HostelOccupant extends Model
 {
-    use HasCommunicationProfile, HasFactory;
+    use HasCommunicationProfile, HasFactory, BelongsToCompany;
 
     /**
      * The attributes that are mass assignable.

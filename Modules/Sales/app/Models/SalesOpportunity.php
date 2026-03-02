@@ -7,9 +7,12 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\Concerns\BelongsToCompany;
 
 class SalesOpportunity extends Model
 {
+    use BelongsToCompany;
+
     protected $fillable = [
         'company_id',
         'title',

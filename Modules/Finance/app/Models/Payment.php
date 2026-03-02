@@ -6,10 +6,11 @@ use App\Models\Company;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Finance\Events\PaymentReceiptReady;
+use App\Models\Concerns\BelongsToCompany;
 
 class Payment extends Model
 {
-    use HasFactory;
+    use HasFactory, BelongsToCompany;
 
     /**
      * The attributes that are mass assignable.

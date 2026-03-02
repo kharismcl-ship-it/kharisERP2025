@@ -5,9 +5,12 @@ namespace Modules\ManufacturingPaper\Models;
 use App\Models\Company;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\Concerns\BelongsToCompany;
 
 class MpEquipmentLog extends Model
 {
+    use BelongsToCompany;
+
     protected $table = 'mp_equipment_logs';
 
     protected $fillable = [

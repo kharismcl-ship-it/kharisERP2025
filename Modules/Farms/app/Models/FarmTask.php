@@ -4,9 +4,12 @@ namespace Modules\Farms\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\Concerns\BelongsToCompany;
 
 class FarmTask extends Model
 {
+    use BelongsToCompany;
+
     protected $table = 'farm_tasks';
 
     protected $fillable = [

@@ -6,9 +6,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\Company;
 use Modules\ProcurementInventory\Models\Item;
+use App\Models\Concerns\BelongsToCompany;
 
 class CropInputApplication extends Model
 {
+    use BelongsToCompany;
+
     protected $fillable = [
         'crop_cycle_id',
         'farm_id',

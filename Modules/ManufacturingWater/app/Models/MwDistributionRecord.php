@@ -7,9 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Str;
 use Modules\ManufacturingWater\Events\MwDistributionCompleted;
+use App\Models\Concerns\BelongsToCompany;
 
 class MwDistributionRecord extends Model
 {
+    use BelongsToCompany;
+
     protected $table = 'mw_distribution_records';
 
     protected $fillable = [

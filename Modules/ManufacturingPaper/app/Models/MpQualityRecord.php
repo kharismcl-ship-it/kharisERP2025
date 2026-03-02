@@ -6,9 +6,12 @@ use App\Models\Company;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Modules\ManufacturingPaper\Events\MpQualityFailed;
+use App\Models\Concerns\BelongsToCompany;
 
 class MpQualityRecord extends Model
 {
+    use BelongsToCompany;
+
     protected $table = 'mp_quality_records';
 
     protected $fillable = [

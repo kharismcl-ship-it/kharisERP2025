@@ -6,9 +6,12 @@ use App\Models\Company;
 use Illuminate\Database\Eloquent\Model;
 use Modules\HR\Events\EmployeeCompanyAssignmentCreated;
 use Modules\HR\Events\EmployeeCompanyAssignmentUpdated;
+use App\Models\Concerns\BelongsToCompany;
 
 class EmployeeCompanyAssignment extends Model
 {
+    use BelongsToCompany;
+
     protected $fillable = [
         'employee_id',
         'company_id',

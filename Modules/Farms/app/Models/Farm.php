@@ -7,9 +7,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 use App\Models\Company;
+use App\Models\Concerns\BelongsToCompany;
 
 class Farm extends Model
 {
+    use BelongsToCompany;
+
     protected $fillable = [
         'company_id',
         'name',

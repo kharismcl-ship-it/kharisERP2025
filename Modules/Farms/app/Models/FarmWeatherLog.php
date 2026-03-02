@@ -5,9 +5,12 @@ namespace Modules\Farms\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\Company;
+use App\Models\Concerns\BelongsToCompany;
 
 class FarmWeatherLog extends Model
 {
+    use BelongsToCompany;
+
     protected $table = 'farm_weather_logs';
 
     protected $fillable = [

@@ -49,7 +49,32 @@ class CompanyAdminPanelProvider extends PanelProvider
             // ── Filament Multi-Tenancy ────────────────────────────────────────
             // Tenant = Company. Filament stores the selected company in the session
             // and makes it available via Filament::getTenant() on every request.
+            //
+            // Group / HQ companies (type = 'hq') automatically see data from all
+            // their subsidiaries via the TenantScope global scope attached to every
+            // model through the BelongsToCompany trait.  No extra configuration is
+            // needed here — the scope expands company_id lookups to
+            // selfAndDescendantIds() whenever an HQ tenant is active.
             ->tenant(Company::class)
+            ->tenantMenuItems([
+                // Show a badge on the tenant switcher so the user knows when they
+                // are operating in group (multi-subsidiary) mode.
+                \Filament\Navigation\MenuItem::make()
+                    ->label(fn () => \App\Models\Company::find(
+                        optional(\Filament\Facades\Filament::getTenant())->getKey()
+                    )?->isGroupCompany()
+                        ? 'Group view (all subsidiaries visible)'
+                        : 'Company view'
+                    )
+                    ->icon(fn () => \App\Models\Company::find(
+                        optional(\Filament\Facades\Filament::getTenant())->getKey()
+                    )?->isGroupCompany()
+                        ? 'heroicon-o-building-office-2'
+                        : 'heroicon-o-building-office'
+                    )
+                    ->url('#')
+                    ->visible(true),
+            ])
 
             // ── Resources & Pages ─────────────────────────────────────────────
             ->discoverResources(in: app_path('Filament/CompanyAdmin/Resources'), for: 'App\Filament\CompanyAdmin\Resources')

@@ -6,10 +6,11 @@ use App\Models\Company;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Modules\HR\Database\factories\DepartmentFactory;
+use App\Models\Concerns\BelongsToCompany;
 
 class Department extends Model
 {
-    use HasFactory;
+    use HasFactory, BelongsToCompany;
 
     /**
      * The table associated with the model.

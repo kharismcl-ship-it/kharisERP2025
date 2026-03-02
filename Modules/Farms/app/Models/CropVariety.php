@@ -5,9 +5,12 @@ namespace Modules\Farms\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\Company;
+use App\Models\Concerns\BelongsToCompany;
 
 class CropVariety extends Model
 {
+    use BelongsToCompany;
+
     protected $table = 'crop_varieties';
 
     protected $fillable = [

@@ -8,9 +8,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Modules\Sales\Events\SalesOrderConfirmed;
 use Modules\Sales\Events\SalesOrderFulfilled;
+use App\Models\Concerns\BelongsToCompany;
 
 class SalesOrder extends Model
 {
+    use BelongsToCompany;
+
     protected $fillable = [
         'company_id',
         'quotation_id',

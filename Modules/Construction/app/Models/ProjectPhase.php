@@ -8,9 +8,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\Company;
 use Modules\Construction\Events\ProjectMilestoneCompleted;
 use Modules\Construction\Events\ProjectPhaseApproved;
+use App\Models\Concerns\BelongsToCompany;
 
 class ProjectPhase extends Model
 {
+    use BelongsToCompany;
+
     protected $fillable = [
         'construction_project_id',
         'company_id',

@@ -6,10 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Modules\Farms\Events\FarmSaleCreated;
 use Modules\PaymentsChannel\Traits\HasPayments;
+use App\Models\Concerns\BelongsToCompany;
 
 class FarmSale extends Model
 {
-    use HasPayments;
+    use HasPayments, BelongsToCompany;
 
     protected $table = 'farm_sales';
 
