@@ -5,6 +5,7 @@ namespace Modules\HR\Filament\Resources;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
@@ -76,7 +77,14 @@ class PerformanceCycleResource extends Resource
                     ->date()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('status')
-                    ->searchable(),
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'open'    => 'success',
+                        'planned' => 'info',
+                        'closed'  => 'gray',
+                        default   => 'gray',
+                    })
+                    ->formatStateUsing(fn ($state) => ucfirst($state)),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -97,6 +105,7 @@ class PerformanceCycleResource extends Resource
                     ]),
             ])
             ->actions([
+                ViewAction::make(),
                 EditAction::make(),
             ])
             ->bulkActions([
@@ -116,9 +125,10 @@ class PerformanceCycleResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListPerformanceCycles::route('/'),
+            'index'  => Pages\ListPerformanceCycles::route('/'),
             'create' => Pages\CreatePerformanceCycle::route('/create'),
-            'edit' => Pages\EditPerformanceCycle::route('/{record}/edit'),
+            'view'   => Pages\ViewPerformanceCycle::route('/{record}'),
+            'edit'   => Pages\EditPerformanceCycle::route('/{record}/edit'),
         ];
     }
 }

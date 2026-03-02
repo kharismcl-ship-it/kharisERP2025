@@ -5,6 +5,7 @@ namespace Modules\HR\Filament\Resources;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
@@ -102,6 +103,7 @@ class HostelStaffAssignmentResource extends Resource
                     ->relationship('hostel', 'name'),
             ])
             ->actions([
+                ViewAction::make(),
                 EditAction::make(),
             ])
             ->bulkActions([
@@ -121,9 +123,10 @@ class HostelStaffAssignmentResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListHostelStaffAssignments::route('/'),
+            'index'  => Pages\ListHostelStaffAssignments::route('/'),
             'create' => Pages\CreateHostelStaffAssignment::route('/create'),
-            'edit' => Pages\EditHostelStaffAssignment::route('/{record}/edit'),
+            'view'   => Pages\ViewHostelStaffAssignment::route('/{record}'),
+            'edit'   => Pages\EditHostelStaffAssignment::route('/{record}/edit'),
         ];
     }
 }

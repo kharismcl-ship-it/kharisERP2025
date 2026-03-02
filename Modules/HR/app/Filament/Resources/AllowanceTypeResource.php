@@ -143,6 +143,7 @@ class AllowanceTypeResource extends Resource
         return [
             'index'  => Pages\ListAllowanceTypes::route('/'),
             'create' => Pages\CreateAllowanceType::route('/create'),
+            'view'   => Pages\ViewAllowanceType::route('/{record}'),
             'edit'   => Pages\EditAllowanceType::route('/{record}/edit'),
         ];
     }

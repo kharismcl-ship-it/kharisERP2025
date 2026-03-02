@@ -2,8 +2,10 @@
 
 namespace Modules\HR\Providers;
 
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
+use Modules\HR\Console\Commands\ProcessLeaveCarryOverCommand;
 use Modules\HR\Console\Commands\SyncEmployeeUsers;
 use Modules\HR\Console\Commands\TestCompanyAssignment;
 use Modules\HR\Models\Employee;
@@ -102,6 +104,7 @@ class HRServiceProvider extends ServiceProvider
         $this->commands([
             TestCompanyAssignment::class,
             SyncEmployeeUsers::class,
+            ProcessLeaveCarryOverCommand::class,
         ]);
     }
 
@@ -110,10 +113,15 @@ class HRServiceProvider extends ServiceProvider
      */
     protected function registerCommandSchedules(): void
     {
-        // $this->app->booted(function () {
-        //     $schedule = $this->app->make(Schedule::class);
-        //     $schedule->command('inspire')->hourly();
-        // });
+        $this->app->booted(function () {
+            $schedule = $this->app->make(Schedule::class);
+
+            // Run leave carry-over every year on Jan 1 at 00:30 (non-interactively)
+            $schedule->command('hr:leave:carry-over', ['--from-year' => now()->subYear()->year, '--to-year' => now()->year])
+                ->yearlyOn(1, 1, '00:30')
+                ->withoutOverlapping()
+                ->runInBackground();
+        });
     }
 
     /**

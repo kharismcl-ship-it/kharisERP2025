@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\HR\App\Console\Commands;
+namespace Modules\HR\Console\Commands;
 
 use Illuminate\Console\Command;
 use Modules\HR\Services\LeaveAccrualService;

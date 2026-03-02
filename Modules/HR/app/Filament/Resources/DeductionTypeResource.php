@@ -129,6 +129,7 @@ class DeductionTypeResource extends Resource
         return [
             'index'  => Pages\ListDeductionTypes::route('/'),
             'create' => Pages\CreateDeductionType::route('/create'),
+            'view'   => Pages\ViewDeductionType::route('/{record}'),
             'edit'   => Pages\EditDeductionType::route('/{record}/edit'),
         ];
     }

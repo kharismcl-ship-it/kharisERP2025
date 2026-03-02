@@ -3,6 +3,10 @@
 namespace Modules\HR\Services;
 
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
+use Modules\Finance\Models\Account;
+use Modules\Finance\Models\JournalEntry;
+use Modules\Finance\Models\JournalLine;
 use Modules\HR\Models\AllowanceType;
 use Modules\HR\Models\DeductionType;
 use Modules\HR\Models\Employee;
@@ -145,11 +149,74 @@ class PayrollService
     }
 
     /**
-     * Post finalized payroll totals to Finance (stub — implement when Finance integration ready).
+     * Post finalized payroll to Finance as a Journal Entry.
+     *
+     * Debit entries:
+     *   5210  Salaries & Wages       = total gross pay
+     *   5220  SSNIT Employer Contrib = total SSNIT employer portion
+     *
+     * Credit entries:
+     *   2120  Accrued Liabilities    = total net pay (salary payable to employees)
+     *   2140  Income Tax Payable     = total PAYE tax
+     *   2150  Pension Payable (SSNIT)= SSNIT employee + SSNIT employer
      */
-    public function postToFinance(PayrollRun $run): void
+    public function postToFinance(PayrollRun $run): JournalEntry
     {
-        // TODO: create Journal Entry in Finance module for total payroll cost
+        $lines = $run->lines();
+
+        $totalGross        = (float) $lines->sum('gross_salary');
+        $totalNet          = (float) $lines->sum('net_salary');
+        $totalPaye         = (float) $lines->sum('paye_tax');
+        $totalSsnitEmployee= (float) $lines->sum('ssnit_employee');
+        $totalSsnitEmployer= (float) $lines->sum('ssnit_employer');
+        $totalSsnit        = round($totalSsnitEmployee + $totalSsnitEmployer, 2);
+
+        $month  = str_pad($run->period_month, 2, '0', STR_PAD_LEFT);
+        $ref    = "PAY-{$run->period_year}-{$month}";
+        $desc   = "Payroll for {$ref} ({$run->employee_count} employees)";
+
+        // Resolve GL account IDs by standard chart-of-accounts codes
+        $accountMap = Account::where('company_id', $run->company_id)
+            ->whereIn('code', ['5210', '5220', '2120', '2140', '2150'])
+            ->get()
+            ->keyBy('code');
+
+        $entry = JournalEntry::create([
+            'company_id'  => $run->company_id,
+            'date'        => now()->toDateString(),
+            'reference'   => $ref,
+            'description' => $desc,
+            'is_locked'   => false,
+        ]);
+
+        // Helper to create a line (skips if account not found and logs a warning)
+        $addLine = function (string $code, float $debit, float $credit) use ($entry, $accountMap): void {
+            $account = $accountMap->get($code);
+
+            if (! $account) {
+                Log::warning("PayrollService::postToFinance — account code '{$code}' not found for company {$entry->company_id}. Journal line skipped.");
+
+                return;
+            }
+
+            JournalLine::create([
+                'journal_entry_id' => $entry->id,
+                'account_id'       => $account->id,
+                'debit'            => $debit,
+                'credit'           => $credit,
+            ]);
+        };
+
+        // Debit lines
+        $addLine('5210', $totalGross,        0);
+        $addLine('5220', $totalSsnitEmployer, 0);
+
+        // Credit lines
+        $addLine('2120', 0, $totalNet);
+        $addLine('2140', 0, $totalPaye);
+        $addLine('2150', 0, $totalSsnit);
+
+        return $entry;
     }
 
     // -------------------------------------------------------------------------
