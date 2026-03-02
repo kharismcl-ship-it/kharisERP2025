@@ -2,7 +2,9 @@
 
 namespace App\Models\Concerns;
 
+use App\Models\Company;
 use App\Models\Scopes\TenantScope;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Adds automatic tenant scoping to any Eloquent model that owns a
@@ -21,5 +23,15 @@ trait BelongsToCompany
     public static function bootBelongsToCompany(): void
     {
         static::addGlobalScope(new TenantScope());
+    }
+
+    /**
+     * Every model using this trait has a company_id FK.
+     * Filament's tenant ownership check requires a 'company' relationship.
+     * Models that define their own company() override this automatically.
+     */
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(Company::class);
     }
 }
