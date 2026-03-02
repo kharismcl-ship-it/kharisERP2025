@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Resources\Users;
 
 use App\Models\Company;
+use App\Models\Role;
 use App\Models\User;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -17,6 +18,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
 
 class UserResource extends Resource
 {
@@ -79,24 +81,166 @@ class UserResource extends Resource
                     ])->columns(2),
 
                 Section::make('Membership')
+                    ->description('Assign this user to companies and grant them a role within each.')
                     ->schema([
 
-                        // Using Select Component
-                        // Forms\Components\Select::make('roles_company_id')
-                        //     ->label('Company')
-                        //     ->options(Company::query()->pluck('name', 'id'))
-                        //     ->reactive()
-                        //     ->required(),
+                        Forms\Components\Select::make('companies')
+                            ->label('Company Assignments')
+                            ->multiple()
+                            ->relationship('companies', 'name')
+                            ->searchable()
+                            ->preload()
+                            ->helperText('Which companies can this user access in the tenant switcher?'),
 
-                        // Forms\Components\Select::make('roles')
-                        //     ->label('Roles')
-                        //     ->relationship('roles', 'name', fn (Builder $query, Get $get) =>
-                        //         $get('roles_company_id')
-                        //             ? $query->where('company_id', $get('roles_company_id'))
-                        //             : $query
-                        //     )
-                        //     ->multiple()
-                        //     ->required(),
+                        Forms\Components\Toggle::make('is_global_super_admin')
+                            ->label('Global Super Admin')
+                            ->helperText('Grants unrestricted access to all panels and all companies. Bypasses all role checks.')
+                            ->dehydrated(false)
+                            ->afterStateHydrated(function ($record, $set) {
+                                if (! $record) {
+                                    return;
+                                }
+                                $teamKey  = config('permission.column_names.team_foreign_key', 'company_id');
+                                $tables   = config('permission.table_names');
+                                $isGlobal = DB::table($tables['model_has_roles'])
+                                    ->join($tables['roles'], $tables['roles'] . '.id', '=', $tables['model_has_roles'] . '.role_id')
+                                    ->where($tables['model_has_roles'] . '.model_type', get_class($record))
+                                    ->where($tables['model_has_roles'] . '.model_id', $record->getKey())
+                                    ->where($tables['roles'] . '.name', 'super_admin')
+                                    ->whereNull($tables['model_has_roles'] . '.' . $teamKey)
+                                    ->exists();
+                                $set('is_global_super_admin', $isGlobal);
+                            })
+                            ->saveRelationshipsUsing(function ($record, bool $state) {
+                                $teamKey = config('permission.column_names.team_foreign_key', 'company_id');
+                                $tables  = config('permission.table_names');
+
+                                $globalRole = DB::table($tables['roles'])
+                                    ->where('name', 'super_admin')
+                                    ->where('guard_name', 'web')
+                                    ->whereNull($teamKey)
+                                    ->first();
+
+                                if ($state) {
+                                    if (! $globalRole) {
+                                        $globalRoleId = DB::table($tables['roles'])->insertGetId([
+                                            'name'       => 'super_admin',
+                                            'guard_name' => 'web',
+                                            $teamKey     => null,
+                                            'created_at' => now(),
+                                            'updated_at' => now(),
+                                        ]);
+                                    } else {
+                                        $globalRoleId = $globalRole->id;
+                                    }
+
+                                    DB::table($tables['model_has_roles'])->updateOrInsert(
+                                        ['role_id' => $globalRoleId, 'model_type' => get_class($record), 'model_id' => $record->getKey(), $teamKey => null],
+                                        ['role_id' => $globalRoleId, 'model_type' => get_class($record), 'model_id' => $record->getKey(), $teamKey => null]
+                                    );
+
+                                    // Invalidate cache so EnsureGlobalSuperAdminRole propagates immediately
+                                    \Illuminate\Support\Facades\Cache::forget("super_admin_synced_{$record->getKey()}");
+                                } elseif ($globalRole) {
+                                    DB::table($tables['model_has_roles'])
+                                        ->where('role_id', $globalRole->id)
+                                        ->where('model_type', get_class($record))
+                                        ->where('model_id', $record->getKey())
+                                        ->whereNull($teamKey)
+                                        ->delete();
+                                }
+                            }),
+
+                        Forms\Components\Repeater::make('role_assignments')
+                            ->label('Per-Company Role Assignments')
+                            ->helperText('Assign a role for this user within each company. Only roles belonging to the selected company are shown.')
+                            ->schema([
+                                Forms\Components\Select::make('company_id')
+                                    ->label('Company')
+                                    ->options(Company::orderBy('name')->pluck('name', 'id'))
+                                    ->required()
+                                    ->live()
+                                    ->distinct(),
+
+                                Forms\Components\Select::make('role_id')
+                                    ->label('Role')
+                                    ->options(function (Get $get): array {
+                                        $companyId = $get('company_id');
+                                        if (! $companyId) {
+                                            return [];
+                                        }
+                                        $teamKey = config('permission.column_names.team_foreign_key', 'company_id');
+                                        return Role::where($teamKey, $companyId)
+                                            ->orderBy('name')
+                                            ->pluck('name', 'id')
+                                            ->mapWithKeys(fn ($name, $id) => [
+                                                $id => str($name)->headline()->toString(),
+                                            ])
+                                            ->all();
+                                    })
+                                    ->required()
+                                    ->live(),
+                            ])
+                            ->columns(2)
+                            ->addActionLabel('Add role assignment')
+                            ->reorderable(false)
+                            ->afterStateHydrated(function ($record, $set) {
+                                if (! $record) {
+                                    return;
+                                }
+                                $teamKey = config('permission.column_names.team_foreign_key', 'company_id');
+                                $tables  = config('permission.table_names');
+
+                                $assignments = DB::table($tables['model_has_roles'])
+                                    ->join($tables['roles'], $tables['roles'] . '.id', '=', $tables['model_has_roles'] . '.role_id')
+                                    ->where($tables['model_has_roles'] . '.model_type', get_class($record))
+                                    ->where($tables['model_has_roles'] . '.model_id', $record->getKey())
+                                    ->whereNotNull($tables['model_has_roles'] . '.' . $teamKey)
+                                    ->select(
+                                        $tables['model_has_roles'] . '.' . $teamKey . ' as company_id',
+                                        $tables['roles'] . '.id as role_id'
+                                    )
+                                    ->get()
+                                    ->map(fn ($row) => [
+                                        'company_id' => $row->company_id,
+                                        'role_id'    => $row->role_id,
+                                    ])
+                                    ->toArray();
+
+                                $set('role_assignments', $assignments);
+                            })
+                            ->saveRelationshipsUsing(function ($record, ?array $state) {
+                                $teamKey = config('permission.column_names.team_foreign_key', 'company_id');
+                                $tables  = config('permission.table_names');
+
+                                // Remove all existing company-scoped role assignments
+                                DB::table($tables['model_has_roles'])
+                                    ->where('model_type', get_class($record))
+                                    ->where('model_id', $record->getKey())
+                                    ->whereNotNull($teamKey)
+                                    ->delete();
+
+                                // Re-insert from the repeater state
+                                foreach ($state ?? [] as $row) {
+                                    if (empty($row['company_id']) || empty($row['role_id'])) {
+                                        continue;
+                                    }
+                                    DB::table($tables['model_has_roles'])->updateOrInsert(
+                                        [
+                                            'role_id'    => $row['role_id'],
+                                            'model_type' => get_class($record),
+                                            'model_id'   => $record->getKey(),
+                                            $teamKey     => $row['company_id'],
+                                        ],
+                                        [
+                                            'role_id'    => $row['role_id'],
+                                            'model_type' => get_class($record),
+                                            'model_id'   => $record->getKey(),
+                                            $teamKey     => $row['company_id'],
+                                        ]
+                                    );
+                                }
+                            }),
 
                     ]),
 
