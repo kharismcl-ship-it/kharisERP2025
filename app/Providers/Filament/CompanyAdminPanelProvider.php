@@ -24,7 +24,9 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Modules\Construction\Filament\ConstructionFilamentPlugin;
 use Modules\Core\Filament\CoreFilamentPlugin;
 use Modules\Farms\Filament\FarmsFilamentPlugin;
+use Modules\Finance\Filament\FinanceFilamentPlugin;
 use Modules\Fleet\Filament\FleetFilamentPlugin;
+use Modules\HR\Filament\HRFilamentPlugin;
 use Modules\Hostels\Filament\HostelsFilamentPlugin;
 use Modules\ManufacturingPaper\Filament\ManufacturingPaperFilamentPlugin;
 use Modules\ManufacturingWater\Filament\ManufacturingWaterFilamentPlugin;
@@ -116,6 +118,8 @@ class CompanyAdminPanelProvider extends PanelProvider
                 FilamentShieldPlugin::make()
                     ->scopeToTenant(true)
                     ->tenantOwnershipRelationshipName('team'),
+                HRFilamentPlugin::make(),
+                FinanceFilamentPlugin::make(),
                 HostelsFilamentPlugin::make(),
                 CoreFilamentPlugin::make(),
                 ProcurementInventoryFilamentPlugin::make(),
