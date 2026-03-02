@@ -89,7 +89,7 @@ class QuotationResource extends Resource
             ->filters([
                 SelectFilter::make('status')->options(array_combine(SalesQuotation::STATUSES, array_map('ucfirst', SalesQuotation::STATUSES))),
             ])
-            ->recordActions([EditAction::make()])
+            ->actions([EditAction::make()])
             ->bulkActions([BulkActionGroup::make([DeleteBulkAction::make()])]);
     }
 

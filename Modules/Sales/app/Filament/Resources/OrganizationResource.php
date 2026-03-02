@@ -56,7 +56,7 @@ class OrganizationResource extends Resource
                 TextColumn::make('contacts_count')->counts('contacts')->label('Contacts'),
                 TextColumn::make('created_at')->dateTime()->sortable()->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->recordActions([EditAction::make()])
+            ->actions([EditAction::make()])
             ->bulkActions([BulkActionGroup::make([DeleteBulkAction::make()])]);
     }
 

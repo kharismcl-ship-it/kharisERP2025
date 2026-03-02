@@ -122,11 +122,11 @@ class RoleResource extends Resource
             ->filters([
                 //
             ])
-            ->recordActions([
+            ->actions([
                 EditAction::make(),
                 DeleteAction::make(),
             ])
-            ->toolbarActions([
+            ->bulkActions([
                 DeleteBulkAction::make(),
             ]);
     }

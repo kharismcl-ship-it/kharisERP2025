@@ -79,7 +79,7 @@ class CatalogItemResource extends Resource
                     ->options(array_combine(SalesCatalog::SOURCE_MODULES, SalesCatalog::SOURCE_MODULES)),
                 TernaryFilter::make('is_active'),
             ])
-            ->recordActions([EditAction::make()])
+            ->actions([EditAction::make()])
             ->bulkActions([BulkActionGroup::make([DeleteBulkAction::make()])]);
     }
 

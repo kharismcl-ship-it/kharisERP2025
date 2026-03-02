@@ -87,7 +87,7 @@ class SalesOrderResource extends Resource
             ->filters([
                 SelectFilter::make('status')->options(array_combine(SalesOrder::STATUSES, array_map('ucfirst', SalesOrder::STATUSES))),
             ])
-            ->recordActions([EditAction::make()])
+            ->actions([EditAction::make()])
             ->bulkActions([BulkActionGroup::make([DeleteBulkAction::make()])]);
     }
 

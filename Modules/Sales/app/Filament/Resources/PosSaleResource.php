@@ -69,7 +69,7 @@ class PosSaleResource extends Resource
                 TextColumn::make('total')->money('GHS')->sortable(),
                 TextColumn::make('created_at')->dateTime()->sortable(),
             ])
-            ->recordActions([EditAction::make()])
+            ->actions([EditAction::make()])
             ->bulkActions([BulkActionGroup::make([DeleteBulkAction::make()])]);
     }
 

@@ -49,7 +49,7 @@ class PriceListResource extends Resource
                 ToggleColumn::make('is_default')->label('Default'),
                 TextColumn::make('items_count')->counts('items')->label('Items'),
             ])
-            ->recordActions([EditAction::make()])
+            ->actions([EditAction::make()])
             ->bulkActions([BulkActionGroup::make([DeleteBulkAction::make()])]);
     }
 

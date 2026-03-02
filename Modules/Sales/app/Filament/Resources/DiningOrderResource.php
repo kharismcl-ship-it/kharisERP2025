@@ -89,7 +89,7 @@ class DiningOrderResource extends Resource
             ->filters([
                 SelectFilter::make('status')->options(array_combine(DiningOrder::STATUSES, array_map('ucfirst', DiningOrder::STATUSES))),
             ])
-            ->recordActions([EditAction::make()])
+            ->actions([EditAction::make()])
             ->bulkActions([BulkActionGroup::make([DeleteBulkAction::make()])]);
     }
 

@@ -260,7 +260,7 @@ class HostelOccupantResource extends Resource
                     ])
                     ->label('Occupancy Status'),
             ])
-            ->recordActions([
+            ->actions([
                 EditAction::make(),
                 DeleteAction::make(),
                 Action::make('checkIn')
@@ -416,7 +416,7 @@ class HostelOccupantResource extends Resource
                         $record->bookings()->where('status', 'checked_in')->exists()
                     ),
             ])
-            ->toolbarActions([
+            ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),

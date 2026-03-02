@@ -118,11 +118,11 @@ class HostelBillingCycleResource extends Resource
             ->filters([
                 // Filters can be added here
             ])
-            ->recordActions([
+            ->actions([
                 EditAction::make(),
                 DeleteAction::make(),
             ])
-            ->toolbarActions([
+            ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),

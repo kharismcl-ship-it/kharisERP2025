@@ -819,7 +819,7 @@ class BookingResource extends Resource
                     ),
 
             ])
-            ->recordActions([
+            ->actions([
                 ActionGroup::make([
                     EditAction::make(),
                     ViewAction::make(),
@@ -896,7 +896,7 @@ class BookingResource extends Resource
                 ]),
 
             ])
-            ->toolbarActions([
+            ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),

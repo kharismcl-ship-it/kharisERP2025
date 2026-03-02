@@ -68,7 +68,7 @@ class ContactResource extends Resource
                     ->label('Organization')
                     ->relationship('organization', 'name'),
             ])
-            ->recordActions([EditAction::make()])
+            ->actions([EditAction::make()])
             ->bulkActions([BulkActionGroup::make([DeleteBulkAction::make()])]);
     }
 

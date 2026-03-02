@@ -62,7 +62,7 @@ class DiningTableResource extends Resource
             ->filters([
                 SelectFilter::make('status')->options(array_combine(DiningTable::STATUSES, array_map('ucfirst', DiningTable::STATUSES))),
             ])
-            ->recordActions([EditAction::make()])
+            ->actions([EditAction::make()])
             ->bulkActions([BulkActionGroup::make([DeleteBulkAction::make()])]);
     }
 

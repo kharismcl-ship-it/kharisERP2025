@@ -170,11 +170,11 @@ class HostelInventoryItemResource extends Resource
                 \Filament\Tables\Filters\TernaryFilter::make('status')
                     ->label('Active Status'),
             ])
-            ->recordActions([
+            ->actions([
                 EditAction::make(),
                 DeleteAction::make(),
             ])
-            ->toolbarActions([
+            ->bulkActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),

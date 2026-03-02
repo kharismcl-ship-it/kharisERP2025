@@ -65,7 +65,7 @@ class PosSessionResource extends Resource
             ->filters([
                 SelectFilter::make('status')->options(['open' => 'Open', 'closed' => 'Closed']),
             ])
-            ->recordActions([EditAction::make()])
+            ->actions([EditAction::make()])
             ->bulkActions([BulkActionGroup::make([DeleteBulkAction::make()])]);
     }
 

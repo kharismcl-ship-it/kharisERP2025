@@ -77,7 +77,7 @@ class OpportunityResource extends Resource
                 SelectFilter::make('stage')
                     ->options(array_combine(SalesOpportunity::STAGES, array_map('ucwords', array_map(fn ($s) => str_replace('_', ' ', $s), SalesOpportunity::STAGES)))),
             ])
-            ->recordActions([EditAction::make()])
+            ->actions([EditAction::make()])
             ->bulkActions([BulkActionGroup::make([DeleteBulkAction::make()])]);
     }
 

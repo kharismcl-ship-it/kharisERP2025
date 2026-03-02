@@ -79,7 +79,7 @@ class LeadResource extends Resource
                 SelectFilter::make('status')->options(array_combine(SalesLead::STATUSES, array_map('ucfirst', SalesLead::STATUSES))),
                 SelectFilter::make('source')->options(array_combine(SalesLead::SOURCES, array_map('ucfirst', SalesLead::SOURCES))),
             ])
-            ->recordActions([ViewAction::make(), EditAction::make()])
+            ->actions([ViewAction::make(), EditAction::make()])
             ->bulkActions([BulkActionGroup::make([DeleteBulkAction::make()])]);
     }
 

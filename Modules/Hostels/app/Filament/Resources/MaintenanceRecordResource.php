@@ -211,11 +211,11 @@ class MaintenanceRecordResource extends Resource
                     ->sortable()
                     ->label('Cost'),
             ])
-            ->recordActions([
+            ->actions([
                 EditAction::make(),
                 DeleteAction::make(),
             ])
-            ->toolbarActions([
+            ->bulkActions([
                 // Create action is handled in pages
             ])
             ->bulkActions([
