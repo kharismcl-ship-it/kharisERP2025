@@ -9,7 +9,7 @@ use Modules\HR\Models\PayrollRun;
 
 class HrPayrollTrendChartWidget extends ChartWidget
 {
-    protected static ?string $heading = 'Payroll Trend — Gross vs Net (Last 6 Paid Runs)';
+    protected ?string $heading = 'Payroll Trend — Gross vs Net (Last 6 Paid Runs)';
 
     protected int | string | array $columnSpan = 'full';
 

@@ -9,7 +9,7 @@ use Modules\HR\Models\Employee;
 
 class HrHeadcountChartWidget extends ChartWidget
 {
-    protected static ?string $heading = 'Active Headcount by Department';
+    protected ?string $heading = 'Active Headcount by Department';
 
     protected int | string | array $columnSpan = 2;
 

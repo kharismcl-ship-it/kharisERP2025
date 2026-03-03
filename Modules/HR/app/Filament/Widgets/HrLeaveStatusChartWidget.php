@@ -9,7 +9,7 @@ use Modules\HR\Models\LeaveRequest;
 
 class HrLeaveStatusChartWidget extends ChartWidget
 {
-    protected static ?string $heading = 'Leave Requests (Last 30 Days)';
+    protected ?string $heading = 'Leave Requests (Last 30 Days)';
 
     protected int | string | array $columnSpan = 1;
 
