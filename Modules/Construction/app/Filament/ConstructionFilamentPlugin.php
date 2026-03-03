@@ -4,6 +4,7 @@ namespace Modules\Construction\Filament;
 
 use Filament\Contracts\Plugin;
 use Filament\Panel;
+use Modules\Construction\Filament\Pages\ConstructionDashboard;
 use Modules\Construction\Filament\Pages\ProjectPhaseKanban;
 use Modules\Construction\Filament\Pages\ProjectTaskKanban;
 use Modules\Construction\Filament\Resources\ConstructionDocumentResource;
@@ -45,6 +46,7 @@ class ConstructionFilamentPlugin implements Plugin
         ]);
 
         $panel->pages([
+            ConstructionDashboard::class,
             ProjectTaskKanban::class,
             ProjectPhaseKanban::class,
         ]);
