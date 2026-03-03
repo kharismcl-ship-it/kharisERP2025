@@ -1,0 +1,11 @@
+{
+    "name": "Requisition",
+    "alias": "requisition",
+    "description": "Cross-company requisition and approval system",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Requisition\\Providers\\RequisitionServiceProvider"
+    ],
+    "files": []
+}

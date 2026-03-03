@@ -32,6 +32,9 @@ use Modules\ManufacturingPaper\Filament\ManufacturingPaperFilamentPlugin;
 use Modules\ManufacturingWater\Filament\ManufacturingWaterFilamentPlugin;
 use Modules\ProcurementInventory\Filament\ProcurementInventoryFilamentPlugin;
 use Modules\Sales\Filament\SalesFilamentPlugin;
+use Modules\Requisition\Filament\RequisitionFilamentPlugin;
+use Modules\ClientService\Filament\ClientServiceFilamentPlugin;
+use Modules\ITSupport\Filament\ITSupportFilamentPlugin;
 
 class CompanyAdminPanelProvider extends PanelProvider
 {
@@ -129,6 +132,9 @@ class CompanyAdminPanelProvider extends PanelProvider
                 ManufacturingPaperFilamentPlugin::make(),
                 ManufacturingWaterFilamentPlugin::make(),
                 SalesFilamentPlugin::make(),
+                RequisitionFilamentPlugin::make(),
+                ClientServiceFilamentPlugin::make(),
+                ITSupportFilamentPlugin::make(),
             ])
 
             ->authMiddleware([

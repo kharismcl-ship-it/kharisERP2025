@@ -11,5 +11,8 @@
     "Finance": true,
     "CommunicationCentre": true,
     "PaymentsChannel": true,
-    "Sales": true
+    "Sales": true,
+    "Requisition": true,
+    "ClientService": true,
+    "ITSupport": true
 }

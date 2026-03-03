@@ -1,0 +1,11 @@
+{
+    "name": "ITSupport",
+    "alias": "itsupport",
+    "description": "IT assistance requests, training and activity tracking",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\ITSupport\\Providers\\ITSupportServiceProvider"
+    ],
+    "files": []
+}

@@ -1,0 +1,11 @@
+{
+    "name": "ClientService",
+    "alias": "clientservice",
+    "description": "Employee attendance and visitor management",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\ClientService\\Providers\\ClientServiceServiceProvider"
+    ],
+    "files": []
+}
