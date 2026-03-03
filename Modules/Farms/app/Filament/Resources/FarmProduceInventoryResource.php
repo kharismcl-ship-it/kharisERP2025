@@ -18,6 +18,7 @@ use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Modules\Farms\Filament\Clusters\FarmFinanceCluster;
 use Filament\Resources\Resource;
 use Modules\Farms\Filament\Resources\FarmProduceInventoryResource\Pages;
 use Modules\Farms\Models\FarmProduceInventory;
@@ -25,6 +26,8 @@ use Modules\Farms\Models\FarmProduceInventory;
 class FarmProduceInventoryResource extends Resource
 {
     protected static ?string $model = FarmProduceInventory::class;
+
+    protected static ?string $cluster = FarmFinanceCluster::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-archive-box';
 

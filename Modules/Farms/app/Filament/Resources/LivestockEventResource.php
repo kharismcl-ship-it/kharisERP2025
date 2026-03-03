@@ -16,6 +16,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Modules\Farms\Filament\Clusters\LivestockCluster;
 use Filament\Resources\Resource;
 use Modules\Farms\Filament\Resources\LivestockEventResource\Pages;
 use Modules\Farms\Models\LivestockEvent;
@@ -23,6 +24,8 @@ use Modules\Farms\Models\LivestockEvent;
 class LivestockEventResource extends Resource
 {
     protected static ?string $model = LivestockEvent::class;
+
+    protected static ?string $cluster = LivestockCluster::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-clipboard-document-list';
 

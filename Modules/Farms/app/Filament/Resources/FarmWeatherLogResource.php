@@ -16,6 +16,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Modules\Farms\Filament\Clusters\FarmOperationsCluster;
 use Filament\Resources\Resource;
 use Modules\Farms\Filament\Resources\FarmWeatherLogResource\Pages;
 use Modules\Farms\Models\FarmWeatherLog;
@@ -23,6 +24,8 @@ use Modules\Farms\Models\FarmWeatherLog;
 class FarmWeatherLogResource extends Resource
 {
     protected static ?string $model = FarmWeatherLog::class;
+
+    protected static ?string $cluster = FarmOperationsCluster::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-cloud';
 

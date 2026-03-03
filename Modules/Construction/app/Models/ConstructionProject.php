@@ -22,6 +22,8 @@ class ConstructionProject extends Model
         'slug',
         'description',
         'location',
+        'latitude',
+        'longitude',
         'client_name',
         'client_contact',
         'client_email',
@@ -47,6 +49,8 @@ class ConstructionProject extends Model
         'contract_value'    => 'decimal:2',
         'budget'            => 'decimal:2',
         'total_spent'       => 'decimal:2',
+        'latitude'          => 'decimal:7',
+        'longitude'         => 'decimal:7',
     ];
 
     const STATUSES = ['planning', 'active', 'on_hold', 'completed', 'cancelled'];

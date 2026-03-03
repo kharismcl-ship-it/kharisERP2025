@@ -15,18 +15,23 @@ class FarmWorker extends Model
 
     protected $fillable = [
         'farm_id', 'employee_id', 'company_id',
-        'name', 'role', 'daily_rate', 'is_active', 'notes',
+        'name', 'role', 'worker_type', 'contract_start', 'contract_end',
+        'daily_rate', 'is_active', 'notes',
     ];
 
     protected $casts = [
-        'daily_rate' => 'decimal:2',
-        'is_active'  => 'boolean',
+        'daily_rate'     => 'decimal:2',
+        'is_active'      => 'boolean',
+        'contract_start' => 'date',
+        'contract_end'   => 'date',
     ];
 
     const ROLES = [
-        'labourer', 'supervisor', 'tractor_operator',
+        'manager', 'supervisor', 'labourer', 'tractor_operator',
         'irrigation_specialist', 'vet_assistant', 'guard', 'other',
     ];
+
+    const WORKER_TYPES = ['permanent', 'daily', 'contract'];
 
     public function farm(): BelongsTo
     {
@@ -46,6 +51,16 @@ class FarmWorker extends Model
     public function tasks(): HasMany
     {
         return $this->hasMany(FarmTask::class, 'assigned_to_worker_id');
+    }
+
+    public function attendances(): HasMany
+    {
+        return $this->hasMany(FarmWorkerAttendance::class);
+    }
+
+    public function dailyReports(): HasMany
+    {
+        return $this->hasMany(FarmDailyReport::class);
     }
 
     /**

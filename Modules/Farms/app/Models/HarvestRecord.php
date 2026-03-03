@@ -23,6 +23,7 @@ class HarvestRecord extends Model
         'buyer_name',
         'storage_location',
         'notes',
+        'attachments',
     ];
 
     protected $casts = [
@@ -30,6 +31,7 @@ class HarvestRecord extends Model
         'quantity'      => 'decimal:3',
         'unit_price'    => 'decimal:4',
         'total_revenue' => 'decimal:2',
+        'attachments'   => 'array',
     ];
 
     protected static function booted(): void

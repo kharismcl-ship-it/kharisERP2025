@@ -3,6 +3,7 @@
 namespace Modules\Farms\Filament\Resources\FarmResource\RelationManagers;
 
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -32,6 +33,13 @@ class HarvestRecordsRelationManager extends RelationManager
             TextInput::make('buyer_name')->label('Buyer')->maxLength(255),
             TextInput::make('storage_location')->label('Storage Location')->maxLength(255),
             Textarea::make('notes')->rows(2)->columnSpanFull(),
+            FileUpload::make('attachments')
+                ->multiple()
+                ->image()
+                ->acceptedFileTypes(['image/*', 'application/pdf'])
+                ->maxFiles(5)
+                ->directory('farm-harvest-records')
+                ->columnSpanFull(),
         ]);
     }
 

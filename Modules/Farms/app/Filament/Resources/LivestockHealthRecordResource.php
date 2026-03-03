@@ -8,6 +8,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -16,6 +17,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Modules\Farms\Filament\Clusters\LivestockCluster;
 use Filament\Resources\Resource;
 use Modules\Farms\Filament\Resources\LivestockHealthRecordResource\Pages;
 use Modules\Farms\Models\LivestockHealthRecord;
@@ -23,6 +25,8 @@ use Modules\Farms\Models\LivestockHealthRecord;
 class LivestockHealthRecordResource extends Resource
 {
     protected static ?string $model = LivestockHealthRecord::class;
+
+    protected static ?string $cluster = LivestockCluster::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-heart';
 
@@ -72,6 +76,19 @@ class LivestockHealthRecordResource extends Resource
                 ->collapsible()
                 ->schema([
                     Textarea::make('notes')->rows(2)->columnSpanFull(),
+                ]),
+
+            Section::make('Attachments')
+                ->collapsible()
+                ->collapsed()
+                ->schema([
+                    FileUpload::make('attachments')
+                        ->multiple()
+                        ->image()
+                        ->acceptedFileTypes(['image/*', 'application/pdf'])
+                        ->maxFiles(5)
+                        ->directory('farm-livestock-health')
+                        ->columnSpanFull(),
                 ]),
         ]);
     }

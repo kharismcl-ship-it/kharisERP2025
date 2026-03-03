@@ -15,6 +15,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Modules\Farms\Filament\Clusters\FarmFinanceCluster;
 use Filament\Resources\Resource;
 use Modules\Farms\Filament\Resources\FarmBudgetResource\Pages;
 use Modules\Farms\Models\FarmBudget;
@@ -22,6 +23,8 @@ use Modules\Farms\Models\FarmBudget;
 class FarmBudgetResource extends Resource
 {
     protected static ?string $model = FarmBudget::class;
+
+    protected static ?string $cluster = FarmFinanceCluster::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-calculator';
 

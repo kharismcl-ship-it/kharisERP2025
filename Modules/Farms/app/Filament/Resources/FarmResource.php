@@ -2,6 +2,8 @@
 
 namespace Modules\Farms\Filament\Resources;
 
+use EduardoRibeiroDev\FilamentLeaflet\Fields\MapPicker;
+use EduardoRibeiroDev\FilamentLeaflet\Tables\MapColumn;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -28,7 +30,7 @@ class FarmResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'Farms';
 
-    protected static ?int $navigationSort = 1;
+    protected static ?int $navigationSort = 2;
 
     public static function form(Schema $schema): Schema
     {
@@ -58,6 +60,16 @@ class FarmResource extends Resource
                 Textarea::make('description')->rows(3)->columnSpanFull(),
                 Textarea::make('notes')->rows(2)->columnSpanFull(),
             ]),
+
+            Section::make('Location on Map')
+                ->collapsible()
+                ->schema([
+                    MapPicker::make('map_coordinates')
+                        ->latitudeFieldName('latitude')
+                        ->longitudeFieldName('longitude')
+                        ->height(350)
+                        ->columnSpanFull(),
+                ]),
         ]);
     }
 
@@ -78,6 +90,11 @@ class FarmResource extends Resource
                         'fallow'   => 'warning',
                         default    => 'gray',
                     }),
+                MapColumn::make('map_pin')
+                    ->latitudeFieldName('latitude')
+                    ->longitudeFieldName('longitude')
+                    ->label('Map')
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 SelectFilter::make('type')
@@ -105,6 +122,7 @@ class FarmResource extends Resource
             RelationManagers\FarmEquipmentRelationManager::class,
             RelationManagers\WeatherLogsRelationManager::class,
             RelationManagers\SoilTestRecordsRelationManager::class,
+            RelationManagers\FarmDocumentsRelationManager::class,
         ];
     }
 

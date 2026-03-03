@@ -20,12 +20,17 @@ class FarmPlot extends Model
         'area',
         'area_unit',
         'soil_type',
+        'location',
+        'latitude',
+        'longitude',
         'status',
         'notes',
     ];
 
     protected $casts = [
-        'area' => 'decimal:4',
+        'area'      => 'decimal:4',
+        'latitude'  => 'decimal:7',
+        'longitude' => 'decimal:7',
     ];
 
     const SOIL_TYPES = ['clay', 'sandy', 'loam', 'silty', 'peaty', 'chalky'];

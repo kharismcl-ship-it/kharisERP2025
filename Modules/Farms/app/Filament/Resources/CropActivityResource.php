@@ -8,6 +8,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -16,6 +17,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Modules\Farms\Filament\Clusters\CropsCluster;
 use Filament\Resources\Resource;
 use Modules\Farms\Filament\Resources\CropActivityResource\Pages;
 use Modules\Farms\Models\CropActivity;
@@ -23,6 +25,8 @@ use Modules\Farms\Models\CropActivity;
 class CropActivityResource extends Resource
 {
     protected static ?string $model = CropActivity::class;
+
+    protected static ?string $cluster = CropsCluster::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-calendar-days';
 
@@ -74,6 +78,18 @@ class CropActivityResource extends Resource
             Section::make('Notes')
                 ->collapsible()
                 ->schema([Textarea::make('notes')->rows(2)->columnSpanFull()]),
+
+            Section::make('Attachments')
+                ->collapsible()
+                ->collapsed()
+                ->schema([
+                    FileUpload::make('attachments')
+                        ->multiple()
+                        ->image()
+                        ->maxFiles(10)
+                        ->directory('farm-activities')
+                        ->columnSpanFull(),
+                ]),
         ]);
     }
 

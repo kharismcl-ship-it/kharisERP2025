@@ -21,6 +21,19 @@ class EventServiceProvider extends ServiceProvider
         \Modules\Farms\Events\FarmSaleCreated::class => [
             \Modules\Farms\Listeners\SendFarmSaleConfirmation::class,
         ],
+        // Phase 2 — new event listeners
+        \Modules\Farms\Events\FarmDailyReportSubmitted::class => [
+            \Modules\Farms\Listeners\NotifyFarmDailyReportSubmitted::class,
+        ],
+        \Modules\Farms\Events\FarmRequestStatusChanged::class => [
+            \Modules\Farms\Listeners\NotifyFarmRequestStatusChanged::class,
+        ],
+        \Modules\Farms\Events\FarmWorkerAssigned::class => [
+            \Modules\Farms\Listeners\NotifyFarmWorkerAssigned::class,
+        ],
+        \Modules\Farms\Events\CropCycleStarted::class => [
+            \Modules\Farms\Listeners\NotifyCropCycleStarted::class,
+        ],
     ];
 
     /**

@@ -22,11 +22,13 @@ class FarmExpense extends Model
         'amount',
         'supplier',
         'notes',
+        'attachments',
     ];
 
     protected $casts = [
         'expense_date' => 'date',
         'amount'       => 'decimal:2',
+        'attachments'  => 'array',
     ];
 
     const CATEGORIES = ['seeds', 'fertilizer', 'pesticides', 'labour', 'equipment', 'irrigation', 'other'];

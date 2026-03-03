@@ -24,12 +24,14 @@ class LivestockHealthRecord extends Model
         'administered_by',
         'next_due_date',
         'notes',
+        'attachments',
     ];
 
     protected $casts = [
         'event_date'    => 'date',
         'next_due_date' => 'date',
         'cost'          => 'decimal:2',
+        'attachments'   => 'array',
     ];
 
     const EVENT_TYPES = ['treatment', 'vaccination', 'vet_visit', 'deworming', 'other'];

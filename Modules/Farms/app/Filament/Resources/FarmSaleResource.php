@@ -17,6 +17,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Modules\Farms\Filament\Clusters\FarmFinanceCluster;
 use Filament\Resources\Resource;
 use Modules\Farms\Filament\Resources\FarmSaleResource\Pages;
 use Modules\Farms\Models\FarmSale;
@@ -24,6 +25,8 @@ use Modules\Farms\Models\FarmSale;
 class FarmSaleResource extends Resource
 {
     protected static ?string $model = FarmSale::class;
+
+    protected static ?string $cluster = FarmFinanceCluster::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-banknotes';
 

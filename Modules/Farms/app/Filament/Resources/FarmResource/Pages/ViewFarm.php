@@ -2,6 +2,7 @@
 
 namespace Modules\Farms\Filament\Resources\FarmResource\Pages;
 
+use EduardoRibeiroDev\FilamentLeaflet\Infolists\MapEntry;
 use Filament\Actions\EditAction;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Pages\ViewRecord;
@@ -152,6 +153,17 @@ class ViewFarm extends ViewRecord
                 ->schema([
                     TextEntry::make('created_at')->dateTime()->label('Created'),
                     TextEntry::make('updated_at')->dateTime()->label('Last Updated'),
+                ]),
+
+            Section::make('Location on Map')
+                ->collapsible()
+                ->collapsed()
+                ->schema([
+                    MapEntry::make('map_coordinates')
+                        ->latitudeFieldName('latitude')
+                        ->longitudeFieldName('longitude')
+                        ->height(300)
+                        ->columnSpanFull(),
                 ]),
         ]);
     }

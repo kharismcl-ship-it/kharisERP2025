@@ -118,6 +118,149 @@ EOD,
             ],
         ];
 
+        // Phase 2 — Daily Report Submitted
+        $templates[] = [
+            'code'        => 'farms_daily_report_submitted',
+            'channel'     => 'email',
+            'name'        => 'Farms: Daily Report Submitted',
+            'subject'     => 'Farm Daily Report Submitted — {{farm_name}} ({{report_date}})',
+            'body'        => <<<'EOD'
+Dear Farm Manager,
+
+A daily report has been submitted for your farm.
+
+Farm:             {{farm_name}}
+Reporter:         {{worker_name}}
+Report Date:      {{report_date}}
+Weather:          {{weather}}
+
+Summary:
+{{summary}}
+
+Activities Done:
+{{activities_done}}
+
+Issues Noted:
+{{issues_noted}}
+
+Please review and take any necessary action.
+
+Best regards,
+Farm Management System
+EOD,
+            'description' => 'Sent to company contact when a farm daily report is submitted.',
+        ];
+
+        // Phase 2 — Request Approved
+        $templates[] = [
+            'code'        => 'farms_request_approved',
+            'channel'     => 'email',
+            'name'        => 'Farms: Request Approved',
+            'subject'     => 'Farm Request Approved — {{reference}} ({{title}})',
+            'body'        => <<<'EOD'
+Dear {{worker_name}},
+
+Your farm request has been approved.
+
+Farm:         {{farm_name}}
+Reference:    {{reference}}
+Title:        {{title}}
+Type:         {{request_type}}
+Urgency:      {{urgency}}
+Status:       {{status}}
+
+Notes:
+{{notes}}
+
+The procurement team will process this request shortly.
+
+Best regards,
+Farm Management System
+EOD,
+            'description' => 'Sent to requesting worker when a farm request is approved.',
+        ];
+
+        // Phase 2 — Request Rejected
+        $templates[] = [
+            'code'        => 'farms_request_rejected',
+            'channel'     => 'email',
+            'name'        => 'Farms: Request Rejected',
+            'subject'     => 'Farm Request Rejected — {{reference}} ({{title}})',
+            'body'        => <<<'EOD'
+Dear {{worker_name}},
+
+Unfortunately, your farm request has been rejected.
+
+Farm:             {{farm_name}}
+Reference:        {{reference}}
+Title:            {{title}}
+Type:             {{request_type}}
+Status:           {{status}}
+
+Reason for Rejection:
+{{rejection_reason}}
+
+Please contact your farm manager for further assistance.
+
+Best regards,
+Farm Management System
+EOD,
+            'description' => 'Sent to requesting worker when a farm request is rejected.',
+        ];
+
+        // Phase 2 — Worker Task Assigned
+        $templates[] = [
+            'code'        => 'farms_worker_task_assigned',
+            'channel'     => 'email',
+            'name'        => 'Farms: Task Assigned to Worker',
+            'subject'     => 'Farm Task Assigned — {{task_title}} at {{farm_name}}',
+            'body'        => <<<'EOD'
+Dear {{worker_name}},
+
+A new farm task has been assigned to you.
+
+Farm:        {{farm_name}}
+Task:        {{task_title}}
+Type:        {{task_type}}
+Priority:    {{priority}}
+Due Date:    {{due_date}}
+
+Description:
+{{description}}
+
+Please confirm receipt and complete the task by the due date.
+
+Best regards,
+Farm Management System
+EOD,
+            'description' => 'Sent to a farm worker when a task is assigned to them.',
+        ];
+
+        // Phase 2 — Crop Cycle Started
+        $templates[] = [
+            'code'        => 'farms_crop_cycle_started',
+            'channel'     => 'email',
+            'name'        => 'Farms: Crop Cycle Started',
+            'subject'     => 'Crop Cycle Started — {{crop_name}} at {{farm_name}}',
+            'body'        => <<<'EOD'
+Dear Farm Manager,
+
+A new crop cycle has been started on your farm.
+
+Farm:            {{farm_name}}
+Crop:            {{crop_name}} ({{variety}})
+Planting Date:   {{planting_date}}
+Expected Harvest:{{expected_harvest_date}}
+Planted Area:    {{planted_area}}
+
+Please ensure all inputs and activities are recorded in the system.
+
+Best regards,
+Farm Management System
+EOD,
+            'description' => 'Sent to company contact when a new crop cycle is started.',
+        ];
+
         // Sale confirmation template
         $templates[] = [
             'code'        => 'farms_sale_confirmation',

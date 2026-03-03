@@ -18,6 +18,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Modules\Farms\Filament\Clusters\CropsCluster;
 use Filament\Resources\Resource;
 use Modules\Farms\Filament\Resources\CropVarietyResource\Pages;
 use Modules\Farms\Models\CropVariety;
@@ -25,6 +26,8 @@ use Modules\Farms\Models\CropVariety;
 class CropVarietyResource extends Resource
 {
     protected static ?string $model = CropVariety::class;
+
+    protected static ?string $cluster = CropsCluster::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-book-open';
 

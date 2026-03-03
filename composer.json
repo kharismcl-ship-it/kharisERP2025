@@ -10,6 +10,7 @@
         "alizharb/filament-module-manager": "^1.1",
         "bezhansalleh/filament-shield": "^4.0",
         "dotswan/filament-map-picker": "^2.0",
+        "eduardoribeirodev/filament-leaflet": "^4.6",
         "filament/filament": "^4.2",
         "guava/calendar": "^2.0",
         "laravel/fortify": "^1.30",

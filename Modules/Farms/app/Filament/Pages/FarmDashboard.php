@@ -3,6 +3,7 @@
 namespace Modules\Farms\Filament\Pages;
 
 use Filament\Pages\Page;
+use Modules\Farms\Filament\Widgets\FarmsMapWidget;
 use Modules\Farms\Models\CropCycle;
 use Modules\Farms\Models\Farm;
 use Modules\Farms\Models\FarmBudget;
@@ -28,6 +29,11 @@ class FarmDashboard extends Page
     public array $stats = [];
 
     public array $alerts = [];
+
+    protected function getHeaderWidgets(): array
+    {
+        return [FarmsMapWidget::class];
+    }
 
     public function mount(): void
     {

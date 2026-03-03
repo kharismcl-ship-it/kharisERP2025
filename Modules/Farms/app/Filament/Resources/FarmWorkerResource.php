@@ -7,6 +7,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -19,12 +20,15 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
+use Modules\Farms\Filament\Clusters\FarmOperationsCluster;
 use Modules\Farms\Filament\Resources\FarmWorkerResource\Pages;
 use Modules\Farms\Models\FarmWorker;
 
 class FarmWorkerResource extends Resource
 {
     protected static ?string $model = FarmWorker::class;
+
+    protected static ?string $cluster = FarmOperationsCluster::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-users';
 
@@ -68,6 +72,16 @@ class FarmWorkerResource extends Resource
                         ))
                         ->default('labourer'),
 
+                    Select::make('worker_type')
+                        ->label('Worker Type')
+                        ->options([
+                            'permanent' => 'Permanent',
+                            'daily'     => 'Daily',
+                            'contract'  => 'Contract',
+                        ])
+                        ->default('permanent')
+                        ->live(),
+
                     TextInput::make('daily_rate')
                         ->label('Daily Rate (GHS)')
                         ->numeric()
@@ -77,6 +91,14 @@ class FarmWorkerResource extends Resource
                     Toggle::make('is_active')
                         ->label('Active')
                         ->default(true),
+
+                    DatePicker::make('contract_start')
+                        ->label('Contract Start')
+                        ->visible(fn ($get) => $get('worker_type') === 'contract'),
+
+                    DatePicker::make('contract_end')
+                        ->label('Contract End')
+                        ->visible(fn ($get) => $get('worker_type') === 'contract'),
                 ]),
 
             Section::make('Notes')
@@ -104,6 +126,16 @@ class FarmWorkerResource extends Resource
                     ->badge()
                     ->formatStateUsing(fn ($state) => ucwords(str_replace('_', ' ', $state)))
                     ->color('primary'),
+
+                TextColumn::make('worker_type')
+                    ->badge()
+                    ->formatStateUsing(fn ($state) => ucfirst($state))
+                    ->color(fn (string $state): string => match ($state) {
+                        'permanent' => 'success',
+                        'daily'     => 'warning',
+                        'contract'  => 'info',
+                        default     => 'gray',
+                    }),
 
                 TextColumn::make('farm.name')->label('Farm')->sortable(),
 

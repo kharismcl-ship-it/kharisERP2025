@@ -16,6 +16,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Modules\Farms\Filament\Clusters\CropsCluster;
 use Filament\Resources\Resource;
 use Modules\Farms\Filament\Resources\CropCycleResource\Pages;
 use Modules\Farms\Filament\Resources\CropCycleResource\RelationManagers;
@@ -24,6 +25,8 @@ use Modules\Farms\Models\CropCycle;
 class CropCycleResource extends Resource
 {
     protected static ?string $model = CropCycle::class;
+
+    protected static ?string $cluster = CropsCluster::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-sparkles';
 

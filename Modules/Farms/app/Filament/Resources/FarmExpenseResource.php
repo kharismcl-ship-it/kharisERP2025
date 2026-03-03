@@ -3,6 +3,7 @@
 namespace Modules\Farms\Filament\Resources;
 
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -17,6 +18,7 @@ use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Modules\Farms\Filament\Clusters\FarmFinanceCluster;
 use Filament\Resources\Resource;
 use Modules\Farms\Filament\Resources\FarmExpenseResource\Pages;
 use Modules\Farms\Models\FarmExpense;
@@ -24,6 +26,8 @@ use Modules\Farms\Models\FarmExpense;
 class FarmExpenseResource extends Resource
 {
     protected static ?string $model = FarmExpense::class;
+
+    protected static ?string $cluster = FarmFinanceCluster::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-banknotes';
 
@@ -58,6 +62,18 @@ class FarmExpenseResource extends Resource
                 TextInput::make('supplier')->maxLength(255),
                 Textarea::make('notes')->rows(2)->columnSpanFull(),
             ]),
+
+            Section::make('Receipts & Attachments')
+                ->collapsible()
+                ->collapsed()
+                ->schema([
+                    FileUpload::make('attachments')
+                        ->multiple()
+                        ->acceptedFileTypes(['image/*', 'application/pdf'])
+                        ->maxFiles(5)
+                        ->directory('farm-expense-receipts')
+                        ->columnSpanFull(),
+                ]),
         ]);
     }
 

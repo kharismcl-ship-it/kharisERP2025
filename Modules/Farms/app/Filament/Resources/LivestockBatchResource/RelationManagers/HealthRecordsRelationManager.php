@@ -8,6 +8,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -38,6 +39,13 @@ class HealthRecordsRelationManager extends RelationManager
             TextInput::make('cost')->numeric()->prefix('GHS')->step(0.01),
             DatePicker::make('next_due_date')->label('Next Due Date'),
             Textarea::make('notes')->rows(2)->columnSpanFull(),
+            FileUpload::make('attachments')
+                ->multiple()
+                ->image()
+                ->acceptedFileTypes(['image/*', 'application/pdf'])
+                ->maxFiles(5)
+                ->directory('farm-livestock-health')
+                ->columnSpanFull(),
         ]);
     }
 

@@ -2,6 +2,7 @@
 
 namespace Modules\Construction\Filament\Resources;
 
+use EduardoRibeiroDev\FilamentLeaflet\Fields\MapPicker;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -75,6 +76,16 @@ class ConstructionProjectResource extends Resource
                     Textarea::make('notes')->rows(2),
                 ]),
             ]),
+
+            Section::make('Location on Map')
+                ->collapsible()
+                ->schema([
+                    MapPicker::make('map_coordinates')
+                        ->latitudeFieldName('latitude')
+                        ->longitudeFieldName('longitude')
+                        ->height(350)
+                        ->columnSpanFull(),
+                ]),
         ]);
     }
 

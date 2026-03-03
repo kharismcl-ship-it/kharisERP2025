@@ -25,12 +25,14 @@ class CropScoutingRecord extends Model
         'follow_up_date',
         'resolved_at',
         'notes',
+        'attachments',
     ];
 
     protected $casts = [
         'scouting_date'  => 'date',
         'follow_up_date' => 'date',
         'resolved_at'    => 'datetime',
+        'attachments'    => 'array',
     ];
 
     const FINDING_TYPES = ['pest', 'disease', 'weed', 'nutrient_deficiency', 'weather_damage', 'normal', 'other'];

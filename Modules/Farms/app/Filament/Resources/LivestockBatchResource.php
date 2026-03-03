@@ -16,6 +16,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Modules\Farms\Filament\Clusters\LivestockCluster;
 use Filament\Resources\Resource;
 use Modules\Farms\Filament\Resources\LivestockBatchResource\Pages;
 use Modules\Farms\Models\LivestockBatch;
@@ -23,6 +24,8 @@ use Modules\Farms\Models\LivestockBatch;
 class LivestockBatchResource extends Resource
 {
     protected static ?string $model = LivestockBatch::class;
+
+    protected static ?string $cluster = LivestockCluster::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-user-group';
 

@@ -23,6 +23,7 @@ class CropActivity extends Model
         'labour_count',
         'cost',
         'notes',
+        'attachments',
     ];
 
     protected $casts = [
@@ -30,6 +31,7 @@ class CropActivity extends Model
         'duration_hours' => 'decimal:2',
         'cost'           => 'decimal:2',
         'labour_count'   => 'integer',
+        'attachments'    => 'array',
     ];
 
     const ACTIVITY_TYPES = ['planting', 'weeding', 'spraying', 'irrigation', 'pruning', 'harvesting', 'soil_prep', 'other'];

@@ -28,6 +28,14 @@ use Modules\Farms\Models\LivestockFeedRecord;
 use Modules\Farms\Models\LivestockHealthRecord;
 use Modules\Farms\Models\LivestockMortalityLog;
 use Modules\Farms\Models\LivestockWeightRecord;
+// Phase 2 — new models
+use Modules\Farms\Models\FarmWorkerAttendance;
+use Modules\Farms\Models\FarmDailyReport;
+use Modules\Farms\Models\FarmDocument;
+use Modules\Farms\Models\FarmRequest;
+use Modules\Farms\Models\FarmRequestItem;
+use Modules\Farms\Models\FarmSeason;
+use Modules\Farms\Models\FarmMilestone;
 use Modules\Farms\Policies\CropActivityPolicy;
 use Modules\Farms\Policies\CropCyclePolicy;
 use Modules\Farms\Policies\FarmBudgetPolicy;
@@ -51,6 +59,14 @@ use Modules\Farms\Policies\LivestockFeedRecordPolicy;
 use Modules\Farms\Policies\LivestockHealthRecordPolicy;
 use Modules\Farms\Policies\LivestockMortalityLogPolicy;
 use Modules\Farms\Policies\LivestockWeightRecordPolicy;
+// Phase 2 — new policies
+use Modules\Farms\Policies\FarmWorkerAttendancePolicy;
+use Modules\Farms\Policies\FarmDailyReportPolicy;
+use Modules\Farms\Policies\FarmDocumentPolicy;
+use Modules\Farms\Policies\FarmRequestPolicy;
+use Modules\Farms\Policies\FarmRequestItemPolicy;
+use Modules\Farms\Policies\FarmSeasonPolicy;
+use Modules\Farms\Policies\FarmMilestonePolicy;
 use Modules\Farms\Services\FarmService;
 use Nwidart\Modules\Traits\PathNamespace;
 use RecursiveDirectoryIterator;
@@ -126,6 +142,14 @@ class FarmsServiceProvider extends ServiceProvider
         Gate::policy(FarmWeatherLog::class, FarmWeatherLogPolicy::class);
         Gate::policy(SoilTestRecord::class, SoilTestRecordPolicy::class);
         Gate::policy(CropVariety::class, CropVarietyPolicy::class);
+        // Phase 2 — new model policies
+        Gate::policy(FarmWorkerAttendance::class, FarmWorkerAttendancePolicy::class);
+        Gate::policy(FarmDailyReport::class, FarmDailyReportPolicy::class);
+        Gate::policy(FarmDocument::class, FarmDocumentPolicy::class);
+        Gate::policy(FarmRequest::class, FarmRequestPolicy::class);
+        Gate::policy(FarmRequestItem::class, FarmRequestItemPolicy::class);
+        Gate::policy(FarmSeason::class, FarmSeasonPolicy::class);
+        Gate::policy(FarmMilestone::class, FarmMilestonePolicy::class);
     }
 
     /**

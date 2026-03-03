@@ -19,6 +19,8 @@ class Farm extends Model
         'slug',
         'description',
         'location',
+        'latitude',
+        'longitude',
         'total_area',
         'area_unit',
         'type',
@@ -30,6 +32,8 @@ class Farm extends Model
 
     protected $casts = [
         'total_area' => 'decimal:4',
+        'latitude'   => 'decimal:7',
+        'longitude'  => 'decimal:7',
     ];
 
     const TYPES    = ['crop', 'livestock', 'mixed', 'aquaculture'];
@@ -92,5 +96,35 @@ class Farm extends Model
     public function produceInventories(): HasMany
     {
         return $this->hasMany(FarmProduceInventory::class);
+    }
+
+    public function workers(): HasMany
+    {
+        return $this->hasMany(FarmWorker::class);
+    }
+
+    public function attendances(): HasMany
+    {
+        return $this->hasMany(FarmWorkerAttendance::class);
+    }
+
+    public function dailyReports(): HasMany
+    {
+        return $this->hasMany(FarmDailyReport::class);
+    }
+
+    public function documents(): HasMany
+    {
+        return $this->hasMany(FarmDocument::class);
+    }
+
+    public function requests(): HasMany
+    {
+        return $this->hasMany(FarmRequest::class);
+    }
+
+    public function seasons(): HasMany
+    {
+        return $this->hasMany(FarmSeason::class);
     }
 }
