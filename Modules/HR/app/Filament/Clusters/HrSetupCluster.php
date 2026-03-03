@@ -7,7 +7,7 @@ use Filament\Support\Icons\Heroicon;
 
 class HrSetupCluster extends Cluster
 {
-    protected static ?string $navigationLabel = 'Setup';
+    protected static ?string $navigationLabel = 'HR Setup';
 
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedCog6Tooth;
 

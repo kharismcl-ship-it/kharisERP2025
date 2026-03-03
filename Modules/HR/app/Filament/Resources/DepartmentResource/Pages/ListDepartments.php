@@ -14,7 +14,8 @@ class ListDepartments extends ListRecords
     {
         return [
             CreateAction::make()
-                ->slideOver(),
+                ->label('Create Department')
+                ->modal(),
         ];
     }
 }
