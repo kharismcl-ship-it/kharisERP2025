@@ -5,9 +5,15 @@ namespace Modules\HR\Providers;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
+use Livewire\Livewire;
 use Modules\HR\Console\Commands\ProcessLeaveCarryOverCommand;
 use Modules\HR\Console\Commands\SyncEmployeeUsers;
 use Modules\HR\Console\Commands\TestCompanyAssignment;
+use Modules\HR\Filament\Widgets\HrHeadcountChartWidget;
+use Modules\HR\Filament\Widgets\HrLeaveStatusChartWidget;
+use Modules\HR\Filament\Widgets\HrOperationsStatsWidget;
+use Modules\HR\Filament\Widgets\HrPayrollTrendChartWidget;
+use Modules\HR\Filament\Widgets\HrWorkforceStatsWidget;
 use Modules\HR\Models\Employee;
 use Modules\HR\Observers\EmployeeObserver;
 use Modules\HR\Services\AnnouncementService;
@@ -40,6 +46,14 @@ class HRServiceProvider extends ServiceProvider
 
         // Register the Employee observer
         Employee::observe(EmployeeObserver::class);
+
+        // Register HR dashboard widgets with Livewire so module classes
+        // are resolvable by the alias Livewire generates from the namespace.
+        Livewire::component('modules.h-r.filament.widgets.hr-workforce-stats-widget', HrWorkforceStatsWidget::class);
+        Livewire::component('modules.h-r.filament.widgets.hr-operations-stats-widget', HrOperationsStatsWidget::class);
+        Livewire::component('modules.h-r.filament.widgets.hr-headcount-chart-widget', HrHeadcountChartWidget::class);
+        Livewire::component('modules.h-r.filament.widgets.hr-leave-status-chart-widget', HrLeaveStatusChartWidget::class);
+        Livewire::component('modules.h-r.filament.widgets.hr-payroll-trend-chart-widget', HrPayrollTrendChartWidget::class);
 
         $this->registerCommands();
         $this->registerCommandSchedules();
