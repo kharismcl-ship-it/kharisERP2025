@@ -1,552 +1,422 @@
 <x-filament-panels::page>
 
-    @assets
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
-    @endassets
-
     {{-- ══════════════════════════════════════════════════════════════════════
          PAGE HEADER
     ══════════════════════════════════════════════════════════════════════════ --}}
-    <div class="mb-6 flex flex-wrap items-center justify-between gap-2">
-        <div>
-            <p class="text-sm text-gray-500 dark:text-gray-400">
-                {{ now()->format('l, F j, Y') }}
-                @if($companyName)
-                    &mdash;
-                    <span class="font-semibold text-primary-600 dark:text-primary-400">{{ $companyName }}</span>
-                @else
-                    &mdash;
-                    <span class="font-semibold text-gray-700 dark:text-gray-300">All Companies (HQ Aggregate View)</span>
-                @endif
-            </p>
-        </div>
-        <span class="text-xs text-gray-400 dark:text-gray-500">Refreshed at {{ now()->format('H:i') }}</span>
+    <div class="mb-4 flex items-center justify-between">
+        <p class="text-sm text-gray-500 dark:text-gray-400">
+            {{ now()->format('l, F j, Y') }}
+            @if($companyName)
+                &mdash; <span class="font-semibold text-primary-600 dark:text-primary-400">{{ $companyName }}</span>
+            @else
+                &mdash; <span class="font-semibold text-gray-700 dark:text-gray-300">All Companies (HQ View)</span>
+            @endif
+        </p>
+        <span class="text-xs text-gray-400">Refreshed {{ now()->format('H:i') }}</span>
     </div>
 
     {{-- ══════════════════════════════════════════════════════════════════════
-         SECTION 1 — WORKFORCE
+         WORKFORCE
     ══════════════════════════════════════════════════════════════════════════ --}}
-    <div class="mb-2">
-        <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">Workforce</h3>
+    <div class="mb-1">
+        <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">Workforce</p>
     </div>
-    <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5 mb-6">
+    <div class="grid grid-cols-2 gap-4 md:grid-cols-5 mb-6">
 
-        {{-- Total Employees --}}
-        <div class="relative rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-gray-900">
-            <div class="absolute inset-x-0 top-0 h-1 rounded-t-xl bg-primary-500"></div>
-            <div class="flex items-start gap-3 pt-1">
-                <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary-50 text-primary-600 dark:bg-primary-500/10 dark:text-primary-400">
-                    <x-filament::icon icon="heroicon-o-users" class="h-5 w-5" />
-                </div>
-                <div>
-                    <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Total Employees</p>
-                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $stats['total'] }}</p>
-                    <p class="text-xs text-gray-400 dark:text-gray-500">{{ $stats['inactive'] }} inactive</p>
-                </div>
-            </div>
-        </div>
+        <x-filament::card>
+            <div class="text-sm font-medium text-primary-600 dark:text-primary-400">Total Employees</div>
+            <div class="mt-1 text-3xl font-bold text-gray-900 dark:text-white">{{ $stats['total'] }}</div>
+            <div class="mt-1 text-xs text-gray-400">{{ $stats['inactive'] }} inactive</div>
+        </x-filament::card>
 
-        {{-- Active Employees --}}
-        <div class="relative rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-gray-900">
-            <div class="absolute inset-x-0 top-0 h-1 rounded-t-xl bg-success-500"></div>
-            <div class="flex items-start gap-3 pt-1">
-                <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-success-50 text-success-600 dark:bg-success-500/10 dark:text-success-400">
-                    <x-filament::icon icon="heroicon-o-check-circle" class="h-5 w-5" />
-                </div>
-                <div>
-                    <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Active</p>
-                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $stats['active'] }}</p>
-                    @if($stats['total'] > 0)
-                        <p class="text-xs text-gray-400 dark:text-gray-500">{{ round($stats['active'] / $stats['total'] * 100) }}% of workforce</p>
-                    @endif
-                </div>
+        <x-filament::card>
+            <div class="text-sm font-medium text-green-600">Active</div>
+            <div class="mt-1 text-3xl font-bold text-green-600">{{ $stats['active'] }}</div>
+            <div class="mt-1 text-xs text-gray-400">
+                @if($stats['total'] > 0){{ round($stats['active'] / $stats['total'] * 100) }}% of workforce@endif
             </div>
-        </div>
+        </x-filament::card>
 
-        {{-- On Leave Today --}}
-        <div class="relative rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-gray-900">
-            <div class="absolute inset-x-0 top-0 h-1 rounded-t-xl bg-warning-500"></div>
-            <div class="flex items-start gap-3 pt-1">
-                <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-warning-50 text-warning-600 dark:bg-warning-500/10 dark:text-warning-400">
-                    <x-filament::icon icon="heroicon-o-calendar-days" class="h-5 w-5" />
-                </div>
-                <div>
-                    <p class="text-xs font-medium text-gray-500 dark:text-gray-400">On Leave Today</p>
-                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $stats['onLeaveToday'] }}</p>
-                    <p class="text-xs text-gray-400 dark:text-gray-500">{{ $stats['pendingLeave'] }} requests pending</p>
-                </div>
-            </div>
-        </div>
+        <x-filament::card>
+            <div class="text-sm font-medium text-amber-600">On Leave Today</div>
+            <div class="mt-1 text-3xl font-bold text-amber-600">{{ $stats['onLeaveToday'] }}</div>
+            <div class="mt-1 text-xs text-gray-400">{{ $stats['pendingLeave'] }} requests pending</div>
+        </x-filament::card>
 
-        {{-- Pending Leave --}}
-        <div class="relative rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-gray-900">
-            <div class="absolute inset-x-0 top-0 h-1 rounded-t-xl bg-amber-500"></div>
-            <div class="flex items-start gap-3 pt-1">
-                <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400">
-                    <x-filament::icon icon="heroicon-o-clock" class="h-5 w-5" />
-                </div>
-                <div>
-                    <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Pending Approvals</p>
-                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $stats['pendingLeave'] }}</p>
-                    <p class="text-xs text-gray-400 dark:text-gray-500">{{ $stats['approvedThisMonth'] }} approved this month</p>
-                </div>
-            </div>
-        </div>
+        <x-filament::card>
+            <div class="text-sm font-medium text-orange-500">Pending Approvals</div>
+            <div class="mt-1 text-3xl font-bold text-orange-500">{{ $stats['pendingLeave'] }}</div>
+            <div class="mt-1 text-xs text-gray-400">{{ $stats['approvedThisMonth'] }} approved this month</div>
+        </x-filament::card>
 
-        {{-- New Hires --}}
-        <div class="relative rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-gray-900">
-            <div class="absolute inset-x-0 top-0 h-1 rounded-t-xl bg-sky-500"></div>
-            <div class="flex items-start gap-3 pt-1">
-                <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-sky-50 text-sky-600 dark:bg-sky-500/10 dark:text-sky-400">
-                    <x-filament::icon icon="heroicon-o-user-plus" class="h-5 w-5" />
-                </div>
-                <div>
-                    <p class="text-xs font-medium text-gray-500 dark:text-gray-400">New Hires</p>
-                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $stats['newHires'] }}</p>
-                    <p class="text-xs text-gray-400 dark:text-gray-500">This month</p>
-                </div>
-            </div>
-        </div>
+        <x-filament::card>
+            <div class="text-sm font-medium text-blue-600">New Hires</div>
+            <div class="mt-1 text-3xl font-bold text-blue-600">{{ $stats['newHires'] }}</div>
+            <div class="mt-1 text-xs text-gray-400">This month</div>
+        </x-filament::card>
 
     </div>
 
     {{-- ══════════════════════════════════════════════════════════════════════
-         SECTION 2 — OPERATIONS KPIs
+         OPERATIONS
     ══════════════════════════════════════════════════════════════════════════ --}}
-    <div class="mb-2">
-        <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">Operations</h3>
+    <div class="mb-1">
+        <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">Operations</p>
     </div>
-    <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5 mb-6">
+    <div class="grid grid-cols-2 gap-4 md:grid-cols-5 mb-6">
 
-        {{-- Last Payroll --}}
-        <div class="relative rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-gray-900">
-            <div class="absolute inset-x-0 top-0 h-1 rounded-t-xl bg-violet-500"></div>
-            <div class="flex items-start gap-3 pt-1">
-                <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-violet-50 text-violet-600 dark:bg-violet-500/10 dark:text-violet-400">
-                    <x-filament::icon icon="heroicon-o-banknotes" class="h-5 w-5" />
-                </div>
-                <div class="min-w-0">
-                    <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Last Payroll</p>
-                    @if($stats['lastPayroll'])
-                        <p class="text-base font-bold text-gray-900 dark:text-white truncate">{{ $stats['lastPayroll']->period_label }}</p>
-                        <p class="text-xs text-gray-400 dark:text-gray-500">Net: {{ number_format($stats['lastPayroll']->total_net, 0) }}</p>
-                    @else
-                        <p class="text-base font-bold text-gray-400">None yet</p>
-                    @endif
-                    @if($stats['draftPayrolls'] > 0)
-                        <p class="text-xs text-warning-600 dark:text-warning-400">{{ $stats['draftPayrolls'] }} draft</p>
-                    @endif
-                </div>
-            </div>
-        </div>
+        <x-filament::card>
+            <div class="text-sm font-medium text-violet-600 dark:text-violet-400">Last Payroll</div>
+            @if($stats['lastPayroll'])
+                <div class="mt-1 text-lg font-bold text-gray-900 dark:text-white">{{ $stats['lastPayroll']->period_label }}</div>
+                <div class="mt-1 text-xs text-gray-400">Net: {{ number_format($stats['lastPayroll']->total_net, 0) }}</div>
+            @else
+                <div class="mt-1 text-lg font-bold text-gray-400">None yet</div>
+            @endif
+            @if($stats['draftPayrolls'] > 0)
+                <div class="mt-1 text-xs text-amber-600">{{ $stats['draftPayrolls'] }} draft / in-progress</div>
+            @endif
+        </x-filament::card>
 
-        {{-- Active Loans --}}
-        <div class="relative rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-gray-900">
-            <div class="absolute inset-x-0 top-0 h-1 rounded-t-xl bg-rose-500"></div>
-            <div class="flex items-start gap-3 pt-1">
-                <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400">
-                    <x-filament::icon icon="heroicon-o-credit-card" class="h-5 w-5" />
-                </div>
-                <div>
-                    <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Active Loans</p>
-                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $stats['activeLoans'] }}</p>
-                    <p class="text-xs text-gray-400 dark:text-gray-500">{{ number_format($stats['totalOutstanding'], 0) }} outstanding</p>
-                </div>
-            </div>
-        </div>
+        <x-filament::card>
+            <div class="text-sm font-medium text-rose-600">Active Loans</div>
+            <div class="mt-1 text-3xl font-bold text-rose-600">{{ $stats['activeLoans'] }}</div>
+            <div class="mt-1 text-xs text-gray-400">{{ number_format($stats['totalOutstanding'], 0) }} outstanding</div>
+        </x-filament::card>
 
-        {{-- Open Vacancies --}}
-        <div class="relative rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-gray-900">
-            <div class="absolute inset-x-0 top-0 h-1 rounded-t-xl bg-indigo-500"></div>
-            <div class="flex items-start gap-3 pt-1">
-                <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400">
-                    <x-filament::icon icon="heroicon-o-briefcase" class="h-5 w-5" />
-                </div>
-                <div>
-                    <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Open Vacancies</p>
-                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $stats['openVacancies'] }}</p>
-                    @if($stats['closingSoon'] > 0)
-                        <p class="text-xs text-warning-600 dark:text-warning-400">{{ $stats['closingSoon'] }} closing soon</p>
-                    @else
-                        <p class="text-xs text-gray-400 dark:text-gray-500">No closures this week</p>
-                    @endif
-                </div>
+        <x-filament::card>
+            <div class="text-sm font-medium text-indigo-600">Open Vacancies</div>
+            <div class="mt-1 text-3xl font-bold text-indigo-600">{{ $stats['openVacancies'] }}</div>
+            <div class="mt-1 text-xs {{ $stats['closingSoon'] > 0 ? 'text-amber-600' : 'text-gray-400' }}">
+                {{ $stats['closingSoon'] > 0 ? $stats['closingSoon'].' closing this week' : 'None closing soon' }}
             </div>
-        </div>
+        </x-filament::card>
 
-        {{-- Training --}}
-        <div class="relative rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-gray-900">
-            <div class="absolute inset-x-0 top-0 h-1 rounded-t-xl bg-emerald-500"></div>
-            <div class="flex items-start gap-3 pt-1">
-                <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400">
-                    <x-filament::icon icon="heroicon-o-academic-cap" class="h-5 w-5" />
-                </div>
-                <div>
-                    <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Training Programs</p>
-                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $stats['ongoingTraining'] }}</p>
-                    <p class="text-xs text-gray-400 dark:text-gray-500">{{ $stats['plannedTraining'] }} planned &middot; {{ $stats['completedTraining'] }} done this year</p>
-                </div>
-            </div>
-        </div>
+        <x-filament::card>
+            <div class="text-sm font-medium text-emerald-600">Training</div>
+            <div class="mt-1 text-3xl font-bold text-emerald-600">{{ $stats['ongoingTraining'] }}</div>
+            <div class="mt-1 text-xs text-gray-400">{{ $stats['plannedTraining'] }} planned &middot; {{ $stats['completedTraining'] }} done</div>
+        </x-filament::card>
 
-        {{-- Open Cases --}}
-        <div class="relative rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-gray-900">
-            <div class="absolute inset-x-0 top-0 h-1 rounded-t-xl {{ ($stats['openDisciplinary'] + $stats['openGrievances']) > 0 ? 'bg-danger-500' : 'bg-gray-300 dark:bg-gray-600' }}"></div>
-            <div class="flex items-start gap-3 pt-1">
-                <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-danger-50 text-danger-600 dark:bg-danger-500/10 dark:text-danger-400">
-                    <x-filament::icon icon="heroicon-o-scale" class="h-5 w-5" />
-                </div>
-                <div>
-                    <p class="text-xs font-medium text-gray-500 dark:text-gray-400">Open Cases</p>
-                    <p class="text-2xl font-bold text-gray-900 dark:text-white">{{ $stats['openDisciplinary'] + $stats['openGrievances'] }}</p>
-                    <p class="text-xs text-gray-400 dark:text-gray-500">{{ $stats['openDisciplinary'] }} disciplinary &middot; {{ $stats['openGrievances'] }} grievance</p>
-                </div>
+        <x-filament::card>
+            <div class="text-sm font-medium {{ ($stats['openDisciplinary'] + $stats['openGrievances']) > 0 ? 'text-red-600' : 'text-gray-500 dark:text-gray-400' }}">
+                Open Cases
             </div>
-        </div>
+            <div class="mt-1 text-3xl font-bold {{ ($stats['openDisciplinary'] + $stats['openGrievances']) > 0 ? 'text-red-600' : 'text-gray-900 dark:text-white' }}">
+                {{ $stats['openDisciplinary'] + $stats['openGrievances'] }}
+            </div>
+            <div class="mt-1 text-xs text-gray-400">{{ $stats['openDisciplinary'] }} disciplinary &middot; {{ $stats['openGrievances'] }} grievance</div>
+        </x-filament::card>
 
     </div>
 
     {{-- ══════════════════════════════════════════════════════════════════════
-         SECTION 3 — PERFORMANCE & GENDER (mini stats)
+         PERFORMANCE + GENDER + MINI CHARTS
     ══════════════════════════════════════════════════════════════════════════ --}}
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-4 mb-6">
 
         {{-- Avg Performance Rating --}}
-        <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-gray-900">
-            <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Avg Performance Rating</p>
-            <div class="flex items-end gap-2">
-                <span class="text-3xl font-bold text-gray-900 dark:text-white">{{ $stats['avgRating'] > 0 ? $stats['avgRating'] : '—' }}</span>
-                @if($stats['avgRating'] > 0)
-                    <span class="text-sm text-gray-400 dark:text-gray-500 mb-1">/ 5.0</span>
-                @endif
+        <x-filament::card>
+            <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Avg Performance Rating</div>
+            <div class="mt-1 text-3xl font-bold text-gray-900 dark:text-white">
+                {{ $stats['avgRating'] > 0 ? $stats['avgRating'] : '—' }}
+                @if($stats['avgRating'] > 0)<span class="text-base font-normal text-gray-400"> / 5.0</span>@endif
             </div>
-            <div class="mt-2 flex gap-0.5">
+            <div class="mt-2 flex gap-1">
                 @for($i = 1; $i <= 5; $i++)
-                    <div class="h-1.5 flex-1 rounded-full {{ $i <= round($stats['avgRating']) ? 'bg-amber-400' : 'bg-gray-200 dark:bg-gray-700' }}"></div>
+                    <div style="height:6px; flex:1; border-radius:9999px; background: {{ $i <= round($stats['avgRating']) ? '#f59e0b' : '#e5e7eb' }}"></div>
                 @endfor
             </div>
-        </div>
+        </x-filament::card>
 
         {{-- Gender Breakdown --}}
-        <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-gray-900">
-            <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-3">Gender Breakdown (Active)</p>
+        <x-filament::card>
+            <div class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Gender (Active Staff)</div>
             @forelse($stats['genderCounts'] as $gender => $count)
-                <div class="flex items-center justify-between mb-1.5">
+                <div class="flex items-center justify-between mb-1">
                     <span class="text-xs capitalize text-gray-600 dark:text-gray-400">{{ $gender ?: 'Unknown' }}</span>
                     <span class="text-xs font-semibold text-gray-800 dark:text-gray-200">{{ $count }}</span>
                 </div>
-                @if($stats['active'] > 0)
-                    <div class="mb-2 h-1.5 w-full overflow-hidden rounded-full bg-gray-100 dark:bg-gray-700">
-                        <div class="h-full rounded-full {{ $gender === 'male' ? 'bg-sky-500' : ($gender === 'female' ? 'bg-pink-500' : 'bg-gray-400') }}"
-                            style="width: {{ round($count / $stats['active'] * 100) }}%"></div>
-                    </div>
-                @endif
+                <div style="height:5px; width:100%; border-radius:9999px; background:#e5e7eb; margin-bottom:8px; overflow:hidden;">
+                    <div style="height:100%; border-radius:9999px; width:{{ $stats['active'] > 0 ? round($count / $stats['active'] * 100) : 0 }}%; background: {{ $gender === 'male' ? '#3b82f6' : ($gender === 'female' ? '#ec4899' : '#9ca3af') }}"></div>
+                </div>
             @empty
-                <p class="text-xs text-gray-400">No data</p>
+                <p class="text-xs text-gray-400">No gender data</p>
             @endforelse
-        </div>
+        </x-filament::card>
 
-        {{-- Employment Type --}}
-        <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-gray-900">
-            <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Employment Types</p>
-            <div class="h-28 flex items-center justify-center" wire:ignore>
+        {{-- Employment Type mini chart --}}
+        <x-filament::card>
+            <div class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Employment Types</div>
+            <div wire:ignore style="position:relative; height:110px;">
                 <canvas id="empTypeChart"></canvas>
             </div>
-        </div>
+        </x-filament::card>
 
-        {{-- Attendance This Week --}}
-        <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-gray-900">
-            <p class="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Attendance This Week</p>
-            <div class="h-28 flex items-center justify-center" wire:ignore>
+        {{-- Attendance This Week mini chart --}}
+        <x-filament::card>
+            <div class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Attendance This Week</div>
+            <div wire:ignore style="position:relative; height:110px;">
                 <canvas id="attendanceChart"></canvas>
             </div>
-        </div>
+        </x-filament::card>
 
     </div>
 
     {{-- ══════════════════════════════════════════════════════════════════════
-         SECTION 4 — CHARTS ROW
+         CHARTS ROW
     ══════════════════════════════════════════════════════════════════════════ --}}
-    <div class="grid grid-cols-1 gap-6 lg:grid-cols-5 mb-6">
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-3 mb-6">
 
-        {{-- Headcount by Department (wider) --}}
-        <div class="lg:col-span-3 rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-gray-900">
-            <p class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">Active Headcount by Department</p>
-            <div class="h-56" wire:ignore>
-                <canvas id="deptChart"></canvas>
-            </div>
+        {{-- Dept Headcount (spans 2 cols) --}}
+        <div class="md:col-span-2">
+            <x-filament::card>
+                <div class="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-4">Active Headcount by Department</div>
+                <div wire:ignore style="position:relative; height:220px;">
+                    <canvas id="deptChart"></canvas>
+                </div>
+            </x-filament::card>
         </div>
 
-        {{-- Leave Status Last 30 Days --}}
-        <div class="lg:col-span-2 rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-gray-900">
-            <p class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">Leave Requests (Last 30 Days)</p>
-            <div class="h-56 flex items-center justify-center" wire:ignore>
-                <canvas id="leaveStatusChart"></canvas>
-            </div>
+        {{-- Leave Status Doughnut --}}
+        <div>
+            <x-filament::card>
+                <div class="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-4">Leave Requests (30 days)</div>
+                <div wire:ignore style="position:relative; height:220px;">
+                    <canvas id="leaveStatusChart"></canvas>
+                </div>
+            </x-filament::card>
         </div>
 
     </div>
 
     {{-- Payroll Trend --}}
     @if(count($charts['payroll_trend']['labels']) > 0)
-    <div class="mb-6 rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-gray-900">
-        <p class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-4">Payroll Trend — Gross vs Net (Last 6 Paid Runs)</p>
-        <div class="h-52" wire:ignore>
-            <canvas id="payrollChart"></canvas>
-        </div>
+    <div class="mb-6">
+        <x-filament::card>
+            <div class="text-sm font-semibold text-gray-700 dark:text-gray-200 mb-4">Payroll Trend — Gross vs Net (Last 6 Paid Runs)</div>
+            <div wire:ignore style="position:relative; height:200px;">
+                <canvas id="payrollChart"></canvas>
+            </div>
+        </x-filament::card>
     </div>
     @endif
 
     {{-- ══════════════════════════════════════════════════════════════════════
-         SECTION 5 — ACTIVITY LISTS
+         ACTIVITY LISTS
     ══════════════════════════════════════════════════════════════════════════ --}}
-    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
 
         {{-- Recent Leave Requests --}}
-        <div class="rounded-xl border border-gray-200 bg-white shadow-sm dark:border-white/10 dark:bg-gray-900">
-            <div class="flex items-center justify-between border-b border-gray-100 px-5 py-4 dark:border-white/10">
-                <p class="text-sm font-semibold text-gray-700 dark:text-gray-300">Recent Leave Requests</p>
-                <span class="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-500 dark:bg-gray-800 dark:text-gray-400">
-                    {{ count($recentLeave) }}
-                </span>
+        <x-filament::card>
+            <div class="flex items-center justify-between mb-3">
+                <div class="text-sm font-semibold text-gray-700 dark:text-gray-200">Recent Leave Requests</div>
+                <span class="text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-full">{{ count($recentLeave) }}</span>
             </div>
             @if(count($recentLeave))
-                <ul class="divide-y divide-gray-50 dark:divide-white/5">
-                    @foreach($recentLeave as $leave)
-                        <li class="flex items-center justify-between px-5 py-3 text-sm">
-                            <div class="min-w-0">
-                                <p class="font-medium text-gray-800 dark:text-gray-200 truncate">{{ $leave['employee'] }}</p>
-                                <p class="text-xs text-gray-400 dark:text-gray-500">{{ $leave['type'] }} &middot; {{ $leave['start_date'] }}–{{ $leave['end_date'] }} ({{ $leave['days'] }}d)</p>
-                            </div>
-                            @php
-                                $badge = match($leave['status']) {
-                                    'approved'  => 'bg-success-100 text-success-700 dark:bg-success-500/10 dark:text-success-400',
-                                    'pending'   => 'bg-warning-100 text-warning-700 dark:bg-warning-500/10 dark:text-warning-400',
-                                    'rejected'  => 'bg-danger-100 text-danger-700 dark:bg-danger-500/10 dark:text-danger-400',
-                                    default     => 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400',
-                                };
-                            @endphp
-                            <span class="ml-3 shrink-0 rounded-full px-2 py-0.5 text-xs font-medium {{ $badge }}">
-                                {{ ucfirst($leave['status']) }}
-                            </span>
-                        </li>
-                    @endforeach
-                </ul>
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="border-b border-gray-100 dark:border-gray-800">
+                            <th class="pb-2 text-left text-xs font-medium text-gray-400">Employee</th>
+                            <th class="pb-2 text-left text-xs font-medium text-gray-400">Type</th>
+                            <th class="pb-2 text-center text-xs font-medium text-gray-400">Days</th>
+                            <th class="pb-2 text-right text-xs font-medium text-gray-400">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($recentLeave as $leave)
+                            <tr class="border-b border-gray-50 dark:border-gray-800">
+                                <td class="py-2 text-xs font-medium text-gray-800 dark:text-gray-200">{{ $leave['employee'] }}</td>
+                                <td class="py-2 text-xs text-gray-500">{{ $leave['type'] }}</td>
+                                <td class="py-2 text-center text-xs text-gray-500">{{ $leave['days'] }}</td>
+                                <td class="py-2 text-right">
+                                    @php
+                                        $color = match($leave['status']) {
+                                            'approved'  => 'color:#16a34a',
+                                            'pending'   => 'color:#d97706',
+                                            'rejected'  => 'color:#dc2626',
+                                            default     => 'color:#6b7280',
+                                        };
+                                    @endphp
+                                    <span style="font-size:11px; font-weight:600; {{ $color }}">{{ ucfirst($leave['status']) }}</span>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
             @else
-                <p class="px-5 py-6 text-center text-sm text-gray-400 dark:text-gray-500">No recent leave requests.</p>
+                <p class="text-sm text-gray-400 text-center py-4">No recent leave requests.</p>
             @endif
-        </div>
+        </x-filament::card>
 
-        {{-- Open Disciplinary & Grievance Cases --}}
-        <div class="rounded-xl border border-gray-200 bg-white shadow-sm dark:border-white/10 dark:bg-gray-900">
-            <div class="flex items-center justify-between border-b border-gray-100 px-5 py-4 dark:border-white/10">
-                <p class="text-sm font-semibold text-gray-700 dark:text-gray-300">Open Cases</p>
-                <span class="rounded-full {{ count($openCases) > 0 ? 'bg-danger-100 text-danger-600 dark:bg-danger-500/10 dark:text-danger-400' : 'bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400' }} px-2 py-0.5 text-xs font-medium">
+        {{-- Open Cases --}}
+        <x-filament::card>
+            <div class="flex items-center justify-between mb-3">
+                <div class="text-sm font-semibold text-gray-700 dark:text-gray-200">Open Cases</div>
+                <span class="text-xs font-medium {{ count($openCases) > 0 ? 'text-red-600 bg-red-50 dark:bg-red-900/20' : 'text-gray-500 bg-gray-100 dark:bg-gray-800' }} px-2 py-0.5 rounded-full">
                     {{ count($openCases) }}
                 </span>
             </div>
             @if(count($openCases))
-                <ul class="divide-y divide-gray-50 dark:divide-white/5">
-                    @foreach($openCases as $case)
-                        <li class="flex items-center justify-between px-5 py-3 text-sm">
-                            <div class="min-w-0">
-                                <div class="flex items-center gap-2">
-                                    <span class="rounded px-1.5 py-0.5 text-xs font-medium {{ $case['kind'] === 'Disciplinary' ? 'bg-rose-100 text-rose-700 dark:bg-rose-500/10 dark:text-rose-400' : 'bg-orange-100 text-orange-700 dark:bg-orange-500/10 dark:text-orange-400' }}">
-                                        {{ $case['kind'] }}
-                                    </span>
-                                    <p class="font-medium text-gray-800 dark:text-gray-200 truncate">{{ $case['employee'] }}</p>
-                                </div>
-                                <p class="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{{ $case['type'] }} &middot; {{ $case['date'] }}</p>
-                            </div>
-                            <span class="ml-3 shrink-0 rounded-full px-2 py-0.5 text-xs font-medium {{ $case['color'] === 'danger' ? 'bg-danger-100 text-danger-700 dark:bg-danger-500/10 dark:text-danger-400' : 'bg-warning-100 text-warning-700 dark:bg-warning-500/10 dark:text-warning-400' }}">
-                                {{ $case['status'] }}
-                            </span>
-                        </li>
-                    @endforeach
-                </ul>
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="border-b border-gray-100 dark:border-gray-800">
+                            <th class="pb-2 text-left text-xs font-medium text-gray-400">Employee</th>
+                            <th class="pb-2 text-left text-xs font-medium text-gray-400">Kind / Type</th>
+                            <th class="pb-2 text-left text-xs font-medium text-gray-400">Date</th>
+                            <th class="pb-2 text-right text-xs font-medium text-gray-400">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($openCases as $case)
+                            <tr class="border-b border-gray-50 dark:border-gray-800">
+                                <td class="py-2 text-xs font-medium text-gray-800 dark:text-gray-200">{{ $case['employee'] }}</td>
+                                <td class="py-2 text-xs text-gray-500">
+                                    <span style="font-size:10px; font-weight:600; {{ $case['kind'] === 'Disciplinary' ? 'color:#e11d48' : 'color:#d97706' }}">{{ $case['kind'] }}</span>
+                                    <span class="block text-gray-400">{{ $case['type'] }}</span>
+                                </td>
+                                <td class="py-2 text-xs text-gray-400">{{ $case['date'] }}</td>
+                                <td class="py-2 text-right">
+                                    <span style="font-size:11px; font-weight:600; {{ $case['color'] === 'danger' ? 'color:#dc2626' : 'color:#d97706' }}">{{ $case['status'] }}</span>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
             @else
-                <p class="px-5 py-6 text-center text-sm text-gray-400 dark:text-gray-500">No open cases. All clear.</p>
+                <p class="text-sm text-gray-400 text-center py-4">No open cases. All clear.</p>
             @endif
-        </div>
+        </x-filament::card>
 
     </div>
 
     {{-- ══════════════════════════════════════════════════════════════════════
-         CHART.JS INITIALISATION
+         CHART INITIALISATION — Alpine x-init with dynamic Chart.js load
     ══════════════════════════════════════════════════════════════════════════ --}}
-    @script
-    <script>
-        const isDark = document.documentElement.classList.contains('dark');
+    <div
+        x-data
+        x-init="
+            $nextTick(function() {
+                function initCharts() {
+                    var dark = document.documentElement.classList.contains('dark');
+                    var grid = dark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.06)';
+                    var label = dark ? 'rgba(255,255,255,0.45)' : 'rgba(0,0,0,0.4)';
+                    var border = dark ? '#111827' : '#ffffff';
 
-        const gridColor   = isDark ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.06)';
-        const labelColor  = isDark ? 'rgba(255,255,255,0.5)'  : 'rgba(0,0,0,0.45)';
-        const font        = { family: 'inherit', size: 11 };
+                    Chart.defaults.font = { family: 'inherit', size: 11 };
+                    Chart.defaults.color = label;
 
-        Chart.defaults.font    = font;
-        Chart.defaults.color   = labelColor;
+                    // 1. Dept Headcount bar
+                    var deptEl = document.getElementById('deptChart');
+                    if (deptEl && {{ count($charts['dept_headcount']['data']) }} > 0) {
+                        new Chart(deptEl, {
+                            type: 'bar',
+                            data: {
+                                labels: @json($charts['dept_headcount']['labels']),
+                                datasets: [{ label: 'Employees', data: @json($charts['dept_headcount']['data']),
+                                    backgroundColor: 'rgba(99,102,241,0.75)', borderColor: 'rgba(99,102,241,1)',
+                                    borderWidth: 1, borderRadius: 4 }]
+                            },
+                            options: {
+                                responsive: true, maintainAspectRatio: false,
+                                plugins: { legend: { display: false } },
+                                scales: {
+                                    x: { grid: { color: grid }, ticks: { maxRotation: 35 } },
+                                    y: { grid: { color: grid }, beginAtZero: true, ticks: { stepSize: 1 } }
+                                }
+                            }
+                        });
+                    }
 
-        // ── 1. Headcount by Department ──────────────────────────────────────
-        const deptCtx = document.getElementById('deptChart');
-        if (deptCtx && @json(count($charts['dept_headcount']['data'])) > 0) {
-            new Chart(deptCtx, {
-                type: 'bar',
-                data: {
-                    labels:   @json($charts['dept_headcount']['labels']),
-                    datasets: [{
-                        label:           'Employees',
-                        data:            @json($charts['dept_headcount']['data']),
-                        backgroundColor: 'rgba(99,102,241,0.75)',
-                        borderColor:     'rgba(99,102,241,1)',
-                        borderWidth:     1,
-                        borderRadius:    4,
-                    }],
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        x: { grid: { color: gridColor }, ticks: { maxRotation: 30 } },
-                        y: { grid: { color: gridColor }, beginAtZero: true, ticks: { stepSize: 1 } },
-                    },
-                },
+                    // 2. Payroll Trend line
+                    var payEl = document.getElementById('payrollChart');
+                    if (payEl && {{ count($charts['payroll_trend']['labels']) }} > 0) {
+                        new Chart(payEl, {
+                            type: 'line',
+                            data: {
+                                labels: @json($charts['payroll_trend']['labels']),
+                                datasets: [
+                                    { label: 'Gross', data: @json($charts['payroll_trend']['gross']),
+                                      borderColor: 'rgba(139,92,246,0.9)', backgroundColor: 'rgba(139,92,246,0.1)',
+                                      fill: true, tension: 0.35, pointRadius: 3 },
+                                    { label: 'Net', data: @json($charts['payroll_trend']['net']),
+                                      borderColor: 'rgba(34,197,94,0.9)', backgroundColor: 'rgba(34,197,94,0.08)',
+                                      fill: true, tension: 0.35, pointRadius: 3 },
+                                    { label: 'Deductions', data: @json($charts['payroll_trend']['deductions']),
+                                      borderColor: 'rgba(239,68,68,0.8)', backgroundColor: 'transparent',
+                                      borderDash: [4,3], tension: 0.35, pointRadius: 3 }
+                                ]
+                            },
+                            options: {
+                                responsive: true, maintainAspectRatio: false,
+                                plugins: { legend: { position: 'top', labels: { boxWidth: 12 } } },
+                                scales: {
+                                    x: { grid: { color: grid } },
+                                    y: { grid: { color: grid }, beginAtZero: false }
+                                }
+                            }
+                        });
+                    }
+
+                    // 3. Attendance doughnut
+                    var attEl = document.getElementById('attendanceChart');
+                    if (attEl && {{ count($charts['attendance']['data']) }} > 0) {
+                        new Chart(attEl, {
+                            type: 'doughnut',
+                            data: {
+                                labels: @json($charts['attendance']['labels']),
+                                datasets: [{ data: @json($charts['attendance']['data']),
+                                    backgroundColor: ['rgba(34,197,94,0.8)','rgba(239,68,68,0.8)','rgba(245,158,11,0.8)','rgba(14,165,233,0.8)'],
+                                    borderWidth: 2, borderColor: border }]
+                            },
+                            options: { responsive: true, maintainAspectRatio: false, cutout: '60%',
+                                plugins: { legend: { position: 'right', labels: { boxWidth: 10, padding: 6 } } } }
+                        });
+                    }
+
+                    // 4. Leave Status doughnut
+                    var lvEl = document.getElementById('leaveStatusChart');
+                    if (lvEl && {{ count($charts['leave_status']['data']) }} > 0) {
+                        new Chart(lvEl, {
+                            type: 'doughnut',
+                            data: {
+                                labels: @json($charts['leave_status']['labels']),
+                                datasets: [{ data: @json($charts['leave_status']['data']),
+                                    backgroundColor: ['rgba(245,158,11,0.8)','rgba(34,197,94,0.8)','rgba(239,68,68,0.8)','rgba(156,163,175,0.8)'],
+                                    borderWidth: 2, borderColor: border }]
+                            },
+                            options: { responsive: true, maintainAspectRatio: false, cutout: '58%',
+                                plugins: { legend: { position: 'right', labels: { boxWidth: 10, padding: 6 } } } }
+                        });
+                    }
+
+                    // 5. Employment Type doughnut
+                    var etEl = document.getElementById('empTypeChart');
+                    if (etEl && {{ count($charts['emp_type']['data']) }} > 0) {
+                        new Chart(etEl, {
+                            type: 'doughnut',
+                            data: {
+                                labels: @json($charts['emp_type']['labels']),
+                                datasets: [{ data: @json($charts['emp_type']['data']),
+                                    backgroundColor: ['rgba(99,102,241,0.8)','rgba(14,165,233,0.8)','rgba(168,85,247,0.8)','rgba(34,197,94,0.8)','rgba(245,158,11,0.8)'],
+                                    borderWidth: 2, borderColor: border }]
+                            },
+                            options: { responsive: true, maintainAspectRatio: false, cutout: '60%',
+                                plugins: { legend: { display: false } } }
+                        });
+                    }
+                }
+
+                if (window.Chart) {
+                    initCharts();
+                } else {
+                    var s = document.createElement('script');
+                    s.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js';
+                    s.onload = initCharts;
+                    document.head.appendChild(s);
+                }
             });
-        }
-
-        // ── 2. Payroll Trend ────────────────────────────────────────────────
-        const payrollCtx = document.getElementById('payrollChart');
-        if (payrollCtx && @json(count($charts['payroll_trend']['labels'])) > 0) {
-            new Chart(payrollCtx, {
-                type: 'line',
-                data: {
-                    labels:   @json($charts['payroll_trend']['labels']),
-                    datasets: [
-                        {
-                            label:       'Gross',
-                            data:        @json($charts['payroll_trend']['gross']),
-                            borderColor: 'rgba(139,92,246,0.9)',
-                            backgroundColor: 'rgba(139,92,246,0.1)',
-                            fill:        true,
-                            tension:     0.35,
-                            pointRadius: 3,
-                        },
-                        {
-                            label:       'Net',
-                            data:        @json($charts['payroll_trend']['net']),
-                            borderColor: 'rgba(34,197,94,0.9)',
-                            backgroundColor: 'rgba(34,197,94,0.08)',
-                            fill:        true,
-                            tension:     0.35,
-                            pointRadius: 3,
-                        },
-                        {
-                            label:       'Deductions',
-                            data:        @json($charts['payroll_trend']['deductions']),
-                            borderColor: 'rgba(239,68,68,0.8)',
-                            backgroundColor: 'transparent',
-                            borderDash:  [4,3],
-                            tension:     0.35,
-                            pointRadius: 3,
-                        },
-                    ],
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { position: 'top', labels: { boxWidth: 12 } } },
-                    scales: {
-                        x: { grid: { color: gridColor } },
-                        y: { grid: { color: gridColor }, beginAtZero: false },
-                    },
-                },
-            });
-        }
-
-        // ── 3. Attendance Doughnut ──────────────────────────────────────────
-        const attCtx = document.getElementById('attendanceChart');
-        if (attCtx && @json(count($charts['attendance']['data'])) > 0) {
-            new Chart(attCtx, {
-                type: 'doughnut',
-                data: {
-                    labels:   @json($charts['attendance']['labels']),
-                    datasets: [{
-                        data:            @json($charts['attendance']['data']),
-                        backgroundColor: [
-                            'rgba(34,197,94,0.8)',
-                            'rgba(239,68,68,0.8)',
-                            'rgba(245,158,11,0.8)',
-                            'rgba(14,165,233,0.8)',
-                        ],
-                        borderWidth: 2,
-                        borderColor: isDark ? '#1f2937' : '#ffffff',
-                    }],
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '60%',
-                    plugins: { legend: { position: 'right', labels: { boxWidth: 10, padding: 8 } } },
-                },
-            });
-        }
-
-        // ── 4. Leave Status Doughnut ────────────────────────────────────────
-        const leaveCtx = document.getElementById('leaveStatusChart');
-        if (leaveCtx && @json(count($charts['leave_status']['data'])) > 0) {
-            new Chart(leaveCtx, {
-                type: 'doughnut',
-                data: {
-                    labels:   @json($charts['leave_status']['labels']),
-                    datasets: [{
-                        data:            @json($charts['leave_status']['data']),
-                        backgroundColor: [
-                            'rgba(245,158,11,0.8)',
-                            'rgba(34,197,94,0.8)',
-                            'rgba(239,68,68,0.8)',
-                            'rgba(156,163,175,0.8)',
-                        ],
-                        borderWidth: 2,
-                        borderColor: isDark ? '#1f2937' : '#ffffff',
-                    }],
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '58%',
-                    plugins: { legend: { position: 'right', labels: { boxWidth: 10, padding: 8 } } },
-                },
-            });
-        }
-
-        // ── 5. Employment Type Doughnut ─────────────────────────────────────
-        const empTypeCtx = document.getElementById('empTypeChart');
-        if (empTypeCtx && @json(count($charts['emp_type']['data'])) > 0) {
-            new Chart(empTypeCtx, {
-                type: 'doughnut',
-                data: {
-                    labels:   @json($charts['emp_type']['labels']),
-                    datasets: [{
-                        data:            @json($charts['emp_type']['data']),
-                        backgroundColor: [
-                            'rgba(99,102,241,0.8)',
-                            'rgba(14,165,233,0.8)',
-                            'rgba(168,85,247,0.8)',
-                            'rgba(34,197,94,0.8)',
-                            'rgba(245,158,11,0.8)',
-                        ],
-                        borderWidth: 2,
-                        borderColor: isDark ? '#1f2937' : '#ffffff',
-                    }],
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '60%',
-                    plugins: { legend: { display: false } },
-                },
-            });
-        }
-    </script>
-    @endscript
+        "
+    ></div>
 
 </x-filament-panels::page>
