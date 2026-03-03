@@ -11,4 +11,8 @@ class FarmOperationsCluster extends Cluster
     protected static ?string $navigationLabel = 'Operations';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Farms';
+
+    protected static ?int $navigationSort = 30;
+
+    protected static ?string $slug = 'farms-operations';
 }

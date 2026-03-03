@@ -71,7 +71,15 @@ class FarmsFilamentPlugin implements Plugin
             FarmProduceInventoryResource::class,
         ]);
 
-        $panel->pages([FarmDashboard::class]);
+        // Clusters extend Page — register via pages() so Filament recognises
+        // them as navigatable cluster containers in the sidebar.
+        $panel->pages([
+            CropsCluster::class,
+            LivestockCluster::class,
+            FarmOperationsCluster::class,
+            FarmFinanceCluster::class,
+            FarmDashboard::class,
+        ]);
     }
 
     public function boot(Panel $panel): void

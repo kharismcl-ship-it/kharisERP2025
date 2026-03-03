@@ -9,11 +9,13 @@ use Modules\ManufacturingPaper\Models\MpEquipmentLog;
 use Modules\ManufacturingPaper\Models\MpPaperGrade;
 use Modules\ManufacturingPaper\Models\MpPlant;
 use Modules\ManufacturingPaper\Models\MpProductionBatch;
+use Modules\ManufacturingPaper\Models\MpProductionLine;
 use Modules\ManufacturingPaper\Models\MpQualityRecord;
 use Modules\ManufacturingPaper\Policies\MpEquipmentLogPolicy;
 use Modules\ManufacturingPaper\Policies\MpPaperGradePolicy;
 use Modules\ManufacturingPaper\Policies\MpPlantPolicy;
 use Modules\ManufacturingPaper\Policies\MpProductionBatchPolicy;
+use Modules\ManufacturingPaper\Policies\MpProductionLinePolicy;
 use Modules\ManufacturingPaper\Policies\MpQualityRecordPolicy;
 use Modules\ManufacturingPaper\Services\ManufacturingPaperService;
 use Nwidart\Modules\Traits\PathNamespace;
@@ -55,6 +57,7 @@ class ManufacturingPaperServiceProvider extends ServiceProvider
         Gate::policy(MpPlant::class, MpPlantPolicy::class);
         Gate::policy(MpProductionBatch::class, MpProductionBatchPolicy::class);
         Gate::policy(MpPaperGrade::class, MpPaperGradePolicy::class);
+        Gate::policy(MpProductionLine::class, MpProductionLinePolicy::class);
         Gate::policy(MpQualityRecord::class, MpQualityRecordPolicy::class);
         Gate::policy(MpEquipmentLog::class, MpEquipmentLogPolicy::class);
     }

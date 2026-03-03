@@ -15,6 +15,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -62,7 +63,7 @@ class SiteMonitorResource extends Resource
                     ->options(fn () => Employee::all()->pluck('full_name', 'id')->toArray())
                     ->searchable()
                     ->nullable()
-                    ->visible(fn (\Filament\Forms\Get $get) => $get('monitor_type') === 'internal'),
+                    ->visible(fn (Get $get) => $get('monitor_type') === 'internal'),
                 Grid::make(2)->schema([
                     TextInput::make('name')->required()->maxLength(255),
                     TextInput::make('email')->email()->maxLength(255),

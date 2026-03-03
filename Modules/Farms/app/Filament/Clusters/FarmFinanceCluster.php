@@ -11,4 +11,8 @@ class FarmFinanceCluster extends Cluster
     protected static ?string $navigationLabel = 'Finance';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Farms';
+
+    protected static ?int $navigationSort = 40;
+
+    protected static ?string $slug = 'farms-finance';
 }

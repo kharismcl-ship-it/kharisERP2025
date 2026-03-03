@@ -11,4 +11,8 @@ class CropsCluster extends Cluster
     protected static ?string $navigationLabel = 'Crops';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Farms';
+
+    protected static ?int $navigationSort = 10;
+
+    protected static ?string $slug = 'farms-crops';
 }

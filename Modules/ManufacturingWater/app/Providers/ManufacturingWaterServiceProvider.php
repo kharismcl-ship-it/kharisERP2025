@@ -9,11 +9,13 @@ use Modules\ManufacturingWater\Models\MwChemicalUsage;
 use Modules\ManufacturingWater\Models\MwDistributionRecord;
 use Modules\ManufacturingWater\Models\MwPlant;
 use Modules\ManufacturingWater\Models\MwTankLevel;
+use Modules\ManufacturingWater\Models\MwTreatmentStage;
 use Modules\ManufacturingWater\Models\MwWaterTestRecord;
 use Modules\ManufacturingWater\Policies\MwChemicalUsagePolicy;
 use Modules\ManufacturingWater\Policies\MwDistributionRecordPolicy;
 use Modules\ManufacturingWater\Policies\MwPlantPolicy;
 use Modules\ManufacturingWater\Policies\MwTankLevelPolicy;
+use Modules\ManufacturingWater\Policies\MwTreatmentStagePolicy;
 use Modules\ManufacturingWater\Policies\MwWaterTestRecordPolicy;
 use Modules\ManufacturingWater\Services\ManufacturingWaterService;
 use Nwidart\Modules\Traits\PathNamespace;
@@ -55,6 +57,7 @@ class ManufacturingWaterServiceProvider extends ServiceProvider
         Gate::policy(MwPlant::class, MwPlantPolicy::class);
         Gate::policy(MwWaterTestRecord::class, MwWaterTestRecordPolicy::class);
         Gate::policy(MwDistributionRecord::class, MwDistributionRecordPolicy::class);
+        Gate::policy(MwTreatmentStage::class, MwTreatmentStagePolicy::class);
         Gate::policy(MwChemicalUsage::class, MwChemicalUsagePolicy::class);
         Gate::policy(MwTankLevel::class, MwTankLevelPolicy::class);
     }
