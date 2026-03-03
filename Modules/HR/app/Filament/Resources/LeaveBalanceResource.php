@@ -13,6 +13,8 @@ use Filament\Actions\ViewAction;
 use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables;
@@ -26,7 +28,6 @@ class LeaveBalanceResource extends Resource
     protected static ?string $model = LeaveBalance::class;
 
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedChartBar;
-
 
     protected static ?int $navigationSort = 21;
 
@@ -64,30 +65,63 @@ class LeaveBalanceResource extends Resource
                             ->required()
                             ->numeric()
                             ->step(0.5)
-                            ->minValue(0),
+                            ->minValue(0)
+                            ->live()
+                            ->afterStateUpdated(function (Set $set, Get $get) {
+                                $initial = (float) ($get('initial_balance') ?? 0);
+                                $used = (float) ($get('used_balance') ?? 0);
+                                $carriedOver = (float) ($get('carried_over') ?? 0);
+                                $adjustments = (float) ($get('adjustments') ?? 0);
+                                $set('current_balance', round($initial + $carriedOver + $adjustments - $used, 2));
+                            }),
                         Forms\Components\TextInput::make('used_balance')
                             ->label('Used Balance')
                             ->required()
                             ->numeric()
                             ->step(0.5)
-                            ->minValue(0),
-                        Forms\Components\TextInput::make('current_balance')
-                            ->label('Current Balance')
-                            ->required()
-                            ->numeric()
-                            ->step(0.5)
-                            ->readOnly(),
+                            ->minValue(0)
+                            ->live()
+                            ->afterStateUpdated(function (Set $set, Get $get) {
+                                $initial = (float) ($get('initial_balance') ?? 0);
+                                $used = (float) ($get('used_balance') ?? 0);
+                                $carriedOver = (float) ($get('carried_over') ?? 0);
+                                $adjustments = (float) ($get('adjustments') ?? 0);
+                                $set('current_balance', round($initial + $carriedOver + $adjustments - $used, 2));
+                            }),
                         Forms\Components\TextInput::make('carried_over')
                             ->label('Carried Over')
                             ->required()
                             ->numeric()
                             ->step(0.5)
-                            ->minValue(0),
+                            ->minValue(0)
+                            ->live()
+                            ->afterStateUpdated(function (Set $set, Get $get) {
+                                $initial = (float) ($get('initial_balance') ?? 0);
+                                $used = (float) ($get('used_balance') ?? 0);
+                                $carriedOver = (float) ($get('carried_over') ?? 0);
+                                $adjustments = (float) ($get('adjustments') ?? 0);
+                                $set('current_balance', round($initial + $carriedOver + $adjustments - $used, 2));
+                            }),
                         Forms\Components\TextInput::make('adjustments')
                             ->label('Adjustments')
                             ->required()
                             ->numeric()
-                            ->step(0.5),
+                            ->step(0.5)
+                            ->live()
+                            ->afterStateUpdated(function (Set $set, Get $get) {
+                                $initial = (float) ($get('initial_balance') ?? 0);
+                                $used = (float) ($get('used_balance') ?? 0);
+                                $carriedOver = (float) ($get('carried_over') ?? 0);
+                                $adjustments = (float) ($get('adjustments') ?? 0);
+                                $set('current_balance', round($initial + $carriedOver + $adjustments - $used, 2));
+                            }),
+                        Forms\Components\TextInput::make('current_balance')
+                            ->label('Current Balance')
+                            ->required()
+                            ->numeric()
+                            ->step(0.5)
+                            ->readOnly()
+                            ->helperText('Auto-calculated: Initial + Carried Over + Adjustments − Used'),
                     ]),
 
                 Section::make('Notes')
@@ -122,7 +156,11 @@ class LeaveBalanceResource extends Resource
                 Tables\Columns\TextColumn::make('current_balance')
                     ->numeric()
                     ->sortable()
-                    ->color(fn ($record) => $record->current_balance < 0 ? 'danger' : 'success'),
+                    ->color(fn ($record) => match (true) {
+                        $record->current_balance <= 0 => 'danger',
+                        $record->current_balance <= 3 => 'warning',
+                        default => 'success',
+                    }),
                 Tables\Columns\TextColumn::make('carried_over')
                     ->numeric()
                     ->sortable(),

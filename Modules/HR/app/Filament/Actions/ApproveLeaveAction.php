@@ -29,7 +29,7 @@ class ApproveLeaveAction extends Action
             ->color('success')
             ->icon('heroicon-o-check-circle')
             ->visible(fn ($record) => $record->status === 'pending' &&
-                (Filament::auth()->user()->hasRole('super_admin') || $record->employee->manager_id === Filament::auth()->user()->employee?->id))
+                (Filament::auth()->user()->hasRole('super_admin') || $record->employee->reporting_to_employee_id === Filament::auth()->user()->employee?->id))
             ->requiresConfirmation()
             ->modalHeading('Approve Leave Request')
             ->modalDescription(function ($record) {
@@ -122,7 +122,7 @@ class ApproveLeaveAction extends Action
             // Update leave request status
             $record->update([
                 'status' => 'approved',
-                'approved_by' => $approvingEmployeeId,
+                'approved_by_employee_id' => $approvingEmployeeId,
                 'approved_at' => now(),
             ]);
 

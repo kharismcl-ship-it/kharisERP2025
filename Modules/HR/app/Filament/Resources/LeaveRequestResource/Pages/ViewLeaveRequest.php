@@ -135,29 +135,16 @@ class ViewLeaveRequest extends ViewRecord
                         'xl' => 3,
                     ])
                     ->schema([
-                        IconEntry::make('status')
+                        TextEntry::make('status')
                             ->label('Status')
-                            ->icon(function ($get) {
-                                $state = $get('status');
-
-                                return match ($state) {
-                                    'approved' => 'heroicon-o-check-circle',
-                                    'rejected' => 'heroicon-o-x-circle',
-                                    'pending' => 'heroicon-o-clock',
-                                    'cancelled' => 'heroicon-o-ban',
-                                    default => 'heroicon-o-question-mark-circle',
-                                };
-                            })
-                            ->color(function ($get) {
-                                $state = $get('status');
-
-                                return match ($state) {
-                                    'approved' => 'success',
-                                    'rejected' => 'danger',
-                                    'pending' => 'warning',
-                                    'cancelled' => 'gray',
-                                    default => 'gray',
-                                };
+                            ->badge()
+                            ->color(fn ($state) => match ($state) {
+                                'approved' => 'success',
+                                'rejected' => 'danger',
+                                'pending' => 'warning',
+                                'cancelled' => 'gray',
+                                'draft' => 'secondary',
+                                default => 'gray',
                             }),
                         TextEntry::make('approved_by_employee.full_name')
                             ->label('Approved By')

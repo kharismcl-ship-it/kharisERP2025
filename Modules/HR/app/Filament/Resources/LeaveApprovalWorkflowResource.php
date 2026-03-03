@@ -29,7 +29,6 @@ class LeaveApprovalWorkflowResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedArrowPath;
 
-
     protected static ?int $navigationSort = 22;
 
     public static function form(Schema $schema): Schema
@@ -38,6 +37,9 @@ class LeaveApprovalWorkflowResource extends Resource
             ->components([
                 Section::make('Workflow Details')
                     ->schema([
+                        Forms\Components\Select::make('company_id')
+                            ->relationship('company', 'name')
+                            ->required(),
                         Forms\Components\TextInput::make('name')
                             ->required()
                             ->maxLength(255),
@@ -79,14 +81,20 @@ class LeaveApprovalWorkflowResource extends Resource
                                         'hr' => 'HR Representative',
                                     ])
                                     ->required()
-                                    ->reactive(),
+                                    ->live(),
                                 Forms\Components\Select::make('approver_employee_id')
                                     ->label('Specific Employee')
-                                    ->options(fn () => \Modules\HR\Models\Employee::all()->pluck('full_name', 'id'))
+                                    ->options(fn (Get $get) => \Modules\HR\Models\Employee::query()
+                                        ->orderBy('full_name')
+                                        ->pluck('full_name', 'id'))
+                                    ->searchable()
                                     ->visible(fn (Get $get) => $get('approver_type') === 'specific_employee'),
                                 Forms\Components\Select::make('approver_department_id')
                                     ->label('Department')
-                                    ->options(fn () => \Modules\HR\Models\Department::all()->pluck('name', 'id'))
+                                    ->options(fn (Get $get) => \Modules\HR\Models\Department::query()
+                                        ->orderBy('name')
+                                        ->pluck('name', 'id'))
+                                    ->searchable()
                                     ->visible(fn (Get $get) => $get('approver_type') === 'department_head'),
                                 Forms\Components\TextInput::make('approver_role')
                                     ->label('Role Pattern')
@@ -102,6 +110,13 @@ class LeaveApprovalWorkflowResource extends Resource
                                     ->required()
                                     ->default(1),
                             ])
+                            ->itemLabel(fn (array $state) => 'Level '.(int) ($state['level_number'] ?? '?').' — '.(match ($state['approver_type'] ?? null) {
+                                'manager' => 'Direct Manager',
+                                'department_head' => 'Department Head',
+                                'specific_employee' => 'Specific Employee',
+                                'hr' => 'HR Representative',
+                                default => 'Not set',
+                            }))
                             ->defaultItems(1)
                             ->columnSpanFull()
                             ->orderable('approval_order'),
@@ -113,6 +128,9 @@ class LeaveApprovalWorkflowResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('company.name')
+                    ->sortable()
+                    ->label('Company'),
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
                     ->sortable(),

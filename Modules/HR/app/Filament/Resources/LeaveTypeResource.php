@@ -7,8 +7,10 @@ use Modules\HR\Filament\Clusters\HrSetupCluster;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -24,79 +26,83 @@ class LeaveTypeResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocument;
 
-
     protected static ?int $navigationSort = 20;
 
     public static function form(Schema $schema): Schema
     {
         return $schema
             ->components([
-                Forms\Components\Select::make('company_id')
-                    ->relationship('company', 'name')
-                    ->required(),
-                Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('code')
-                    ->label('Code')
-                    ->required()
-                    ->maxLength(50)
-                    ->unique(ignoreRecord: true),
-                Forms\Components\Textarea::make('description')
-                    ->columnSpanFull(),
-                Forms\Components\TextInput::make('max_days_per_year')
-                    ->label('Max Days Per Year')
-                    ->required()
-                    ->numeric()
-                    ->minValue(0)
-                    ->default(0),
-                Forms\Components\Toggle::make('requires_approval')
-                    ->label('Requires Approval')
-                    ->default(true),
-                Forms\Components\Toggle::make('is_paid')
-                    ->label('Is Paid Leave')
-                    ->default(true),
-                Forms\Components\Toggle::make('is_active')
-                    ->label('Is Active')
-                    ->default(true),
-                Forms\Components\Toggle::make('has_accrual')
-                    ->label('Has Accrual')
-                    ->default(true)
-                    ->reactive(),
-                Forms\Components\TextInput::make('accrual_rate')
-                    ->label('Accrual Rate (days/month)')
-                    ->numeric()
-                    ->minValue(0)
-                    ->step(0.01)
-                    ->default(1.67)
-                    ->visible(fn (Get $get) => $get('has_accrual')),
-                Forms\Components\Select::make('accrual_frequency')
-                    ->label('Accrual Frequency')
-                    ->options([
-                        'monthly' => 'Monthly',
-                        'quarterly' => 'Quarterly',
-                        'annually' => 'Annually',
-                    ])
-                    ->default('monthly')
-                    ->visible(fn (Get $get) => $get('has_accrual')),
-                Forms\Components\TextInput::make('carryover_limit')
-                    ->label('Carryover Limit (days)')
-                    ->numeric()
-                    ->minValue(0)
-                    ->step(0.5)
-                    ->default(0)
-                    ->visible(fn (Get $get) => $get('has_accrual')),
-                Forms\Components\TextInput::make('max_balance')
-                    ->label('Maximum Balance Cap (days)')
-                    ->numeric()
-                    ->minValue(0)
-                    ->step(0.5)
-                    ->nullable()
-                    ->visible(fn (Get $get) => $get('has_accrual')),
-                Forms\Components\Toggle::make('pro_rata_enabled')
-                    ->label('Enable Pro-Rata Calculations')
-                    ->default(true)
-                    ->visible(fn (Get $get) => $get('has_accrual')),
+                Section::make('Leave Type Configuration')
+                    ->columns(2)
+                    ->schema([
+                        Forms\Components\Select::make('company_id')
+                            ->relationship('company', 'name')
+                            ->required(),
+                        Forms\Components\TextInput::make('name')
+                            ->required()
+                            ->maxLength(255),
+                        Forms\Components\TextInput::make('code')
+                            ->label('Code')
+                            ->required()
+                            ->maxLength(50)
+                            ->unique(ignoreRecord: true),
+                        Forms\Components\TextInput::make('max_days_per_year')
+                            ->label('Max Days Per Year')
+                            ->required()
+                            ->numeric()
+                            ->minValue(0)
+                            ->default(0),
+                        Forms\Components\Toggle::make('requires_approval')
+                            ->label('Requires Approval')
+                            ->default(true),
+                        Forms\Components\Toggle::make('is_paid')
+                            ->label('Is Paid Leave')
+                            ->default(true),
+                        Forms\Components\Toggle::make('is_active')
+                            ->label('Is Active')
+                            ->default(true),
+                        Forms\Components\Toggle::make('has_accrual')
+                            ->label('Has Accrual')
+                            ->default(true)
+                            ->live(),
+                        Forms\Components\Textarea::make('description')
+                            ->columnSpanFull(),
+                    ]),
+
+                Section::make('Accrual Settings')
+                    ->columns(2)
+                    ->visible(fn (Get $get) => (bool) $get('has_accrual'))
+                    ->schema([
+                        Forms\Components\TextInput::make('accrual_rate')
+                            ->label('Accrual Rate (days/month)')
+                            ->numeric()
+                            ->minValue(0)
+                            ->step(0.01)
+                            ->default(1.67),
+                        Forms\Components\Select::make('accrual_frequency')
+                            ->label('Accrual Frequency')
+                            ->options([
+                                'monthly' => 'Monthly',
+                                'quarterly' => 'Quarterly',
+                                'annually' => 'Annually',
+                            ])
+                            ->default('monthly'),
+                        Forms\Components\TextInput::make('carryover_limit')
+                            ->label('Carryover Limit (days)')
+                            ->numeric()
+                            ->minValue(0)
+                            ->step(0.5)
+                            ->default(0),
+                        Forms\Components\TextInput::make('max_balance')
+                            ->label('Maximum Balance Cap (days)')
+                            ->numeric()
+                            ->minValue(0)
+                            ->step(0.5)
+                            ->nullable(),
+                        Forms\Components\Toggle::make('pro_rata_enabled')
+                            ->label('Enable Pro-Rata Calculations')
+                            ->default(true),
+                    ]),
             ]);
     }
 
@@ -119,9 +125,11 @@ class LeaveTypeResource extends Resource
                 Tables\Columns\IconColumn::make('is_paid')
                     ->boolean()
                     ->label('Paid'),
-                Tables\Columns\IconColumn::make('is_active')
-                    ->boolean()
-                    ->label('Active'),
+                Tables\Columns\TextColumn::make('is_active')
+                    ->label('Active')
+                    ->badge()
+                    ->color(fn ($state) => $state ? 'success' : 'danger')
+                    ->formatStateUsing(fn ($state) => $state ? 'Active' : 'Inactive'),
                 Tables\Columns\IconColumn::make('has_accrual')
                     ->boolean()
                     ->label('Accrual'),
@@ -146,6 +154,7 @@ class LeaveTypeResource extends Resource
                     ->relationship('company', 'name'),
             ])
             ->actions([
+                ViewAction::make(),
                 EditAction::make()
                     ->slideOver(),
             ])
