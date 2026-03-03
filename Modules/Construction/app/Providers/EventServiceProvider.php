@@ -22,6 +22,20 @@ class EventServiceProvider extends ServiceProvider
         \Modules\Construction\Events\ProjectCompleted::class => [
             \Modules\Construction\Listeners\SendProjectCompletionNotification::class,
         ],
+        // Phase 2 events
+        \Modules\Construction\Events\WorkerCheckedIn::class => [
+            \Modules\Construction\Listeners\NotifyWorkerCheckIn::class,
+        ],
+        \Modules\Construction\Events\ContractorRequestSubmitted::class => [
+            \Modules\Construction\Listeners\NotifyContractorRequestSubmitted::class,
+        ],
+        \Modules\Construction\Events\ContractorRequestDecided::class => [
+            \Modules\Construction\Listeners\NotifyContractorRequestDecision::class,
+            \Modules\Construction\Listeners\AutoCreatePOOrInvoiceOnApproval::class,
+        ],
+        \Modules\Construction\Events\MonitoringReportSubmitted::class => [
+            \Modules\Construction\Listeners\NotifyMonitoringReportSubmitted::class,
+        ],
     ];
 
     /**

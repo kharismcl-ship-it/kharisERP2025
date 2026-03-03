@@ -10,6 +10,7 @@ use Modules\HR\Filament\Clusters\HrRecordsCluster;
 use Modules\HR\Filament\Clusters\HrRecruitmentCluster;
 use Modules\HR\Filament\Clusters\HrRelationsCluster;
 use Modules\HR\Filament\Clusters\HrSetupCluster;
+use Modules\HR\Filament\Pages\ApplicantKanban;
 use Modules\HR\Filament\Pages\HrAnalyticsDashboard;
 use Modules\HR\Filament\Resources\AllowanceTypeResource;
 use Modules\HR\Filament\Resources\AnnouncementResource;
@@ -172,6 +173,7 @@ class HRFilamentPlugin implements Plugin
             HrLearningCluster::class,
             HrRecordsCluster::class,
             HrAnalyticsDashboard::class,
+            ApplicantKanban::class,
         ]);
     }
 

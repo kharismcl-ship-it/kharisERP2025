@@ -13,6 +13,8 @@ class ConstructionDatabaseSeeder extends Seeder
     {
         $this->call([
             ConstructionCommTemplateSeeder::class,
+            ConstructionNotificationTemplatesSeeder::class,
+            ConstructionProjectsSeeder::class,
         ]);
     }
 }

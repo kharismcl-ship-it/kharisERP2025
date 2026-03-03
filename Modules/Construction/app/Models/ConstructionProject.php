@@ -99,6 +99,31 @@ class ConstructionProject extends Model
         return $this->hasMany(MaterialUsage::class);
     }
 
+    public function workers(): HasMany
+    {
+        return $this->hasMany(ConstructionWorker::class);
+    }
+
+    public function siteMonitors(): HasMany
+    {
+        return $this->hasMany(SiteMonitor::class);
+    }
+
+    public function documents(): HasMany
+    {
+        return $this->hasMany(ConstructionDocument::class);
+    }
+
+    public function contractorRequests(): HasMany
+    {
+        return $this->hasMany(ContractorRequest::class);
+    }
+
+    public function monitoringReports(): HasMany
+    {
+        return $this->hasMany(MonitoringReport::class);
+    }
+
     public function getPaymentDescription(): ?string
     {
         return "Construction Project: {$this->name}";

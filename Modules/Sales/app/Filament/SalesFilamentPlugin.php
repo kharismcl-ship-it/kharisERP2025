@@ -4,6 +4,7 @@ namespace Modules\Sales\Filament;
 
 use Filament\Contracts\Plugin;
 use Filament\Panel;
+use Modules\Sales\Filament\Pages\SalesOpportunityKanban;
 use Modules\Sales\Filament\Resources\CatalogItemResource;
 use Modules\Sales\Filament\Resources\ContactResource;
 use Modules\Sales\Filament\Resources\DiningOrderResource;
@@ -52,6 +53,10 @@ class SalesFilamentPlugin implements Plugin
             // Restaurant
             DiningTableResource::class,
             DiningOrderResource::class,
+        ]);
+
+        $panel->pages([
+            SalesOpportunityKanban::class,
         ]);
     }
 

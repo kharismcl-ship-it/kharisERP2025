@@ -125,6 +125,11 @@ class ConstructionProjectResource extends Resource
             RelationManagers\ProjectTasksRelationManager::class,
             RelationManagers\MaterialUsagesRelationManager::class,
             RelationManagers\ProjectBudgetItemsRelationManager::class,
+            RelationManagers\WorkersRelationManager::class,
+            RelationManagers\SiteMonitorsRelationManager::class,
+            RelationManagers\MonitoringReportsRelationManager::class,
+            RelationManagers\ConstructionDocumentsRelationManager::class,
+            RelationManagers\ContractorRequestsRelationManager::class,
         ];
     }
 
