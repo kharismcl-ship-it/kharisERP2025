@@ -4,6 +4,7 @@ namespace Modules\Hostels\Filament\Resources\RoomResource\Pages;
 
 use Filament\Actions;
 use Filament\Actions\DeleteAction;
+use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
 use Modules\Hostels\Filament\Resources\RoomResource;
 
@@ -18,6 +19,7 @@ class EditRoom extends EditRecord
                 ->label('Back')
                 ->icon('heroicon-o-arrow-left')
                 ->url($this->getResource()::getUrl('index')),
+            ViewAction::make(),
             DeleteAction::make(),
         ];
     }

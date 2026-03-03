@@ -34,7 +34,7 @@ class HostelChargeResource extends Resource
 
     protected static ?string $slug = 'hostel-charges';
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedReceiptPercent;
 
     protected static string|\UnitEnum|null $navigationGroup = 'Billing';
 

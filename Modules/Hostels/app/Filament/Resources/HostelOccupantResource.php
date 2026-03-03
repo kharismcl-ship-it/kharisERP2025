@@ -8,6 +8,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
@@ -32,7 +33,7 @@ class HostelOccupantResource extends Resource
 
     protected static ?string $slug = 'hostel-occupants';
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUsers;
 
     protected static string|\UnitEnum|null $navigationGroup = 'Hostels';
 
@@ -261,6 +262,7 @@ class HostelOccupantResource extends Resource
                     ->label('Occupancy Status'),
             ])
             ->actions([
+                ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),
                 Action::make('checkIn')
@@ -435,6 +437,7 @@ class HostelOccupantResource extends Resource
         return [
             'index' => Pages\ListHostelOccupants::route('/'),
             'create' => Pages\CreateHostelOccupant::route('/create'),
+            'view' => Pages\ViewHostelOccupant::route('/{record}'),
             'edit' => Pages\EditHostelOccupant::route('/{record}/edit'),
         ];
     }

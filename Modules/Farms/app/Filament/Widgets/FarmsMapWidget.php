@@ -8,11 +8,11 @@ use Modules\Farms\Models\Farm;
 
 class FarmsMapWidget extends MapWidget
 {
-    protected static string $view = 'filament-leaflet::widgets.map-widget';
+    protected string $view = 'filament-leaflet::widgets.map-widget';
 
     protected ?string $heading = 'Farm Locations';
 
-    protected int | string $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
 
     protected function getMarkers(): array
     {

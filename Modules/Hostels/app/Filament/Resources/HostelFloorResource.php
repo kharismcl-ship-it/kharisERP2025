@@ -32,7 +32,7 @@ class HostelFloorResource extends Resource
 
     protected static ?string $slug = 'hostel-floors';
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBuildingOffice;
 
     protected static string|\UnitEnum|null $navigationGroup = 'Hostels';
 

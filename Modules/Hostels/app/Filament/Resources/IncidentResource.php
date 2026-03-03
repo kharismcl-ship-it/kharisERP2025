@@ -7,6 +7,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -32,7 +33,7 @@ class IncidentResource extends Resource
 
     protected static ?string $slug = 'incidents';
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedExclamationTriangle;
 
     protected static string|\UnitEnum|null $navigationGroup = 'Hostels';
 
@@ -143,6 +144,7 @@ class IncidentResource extends Resource
                 //
             ])
             ->actions([
+                ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),
             ])
@@ -158,6 +160,7 @@ class IncidentResource extends Resource
         return [
             'index' => Pages\ListIncidents::route('/'),
             'create' => Pages\CreateIncident::route('/create'),
+            'view' => Pages\ViewIncident::route('/{record}'),
             'edit' => Pages\EditIncident::route('/{record}/edit'),
         ];
     }

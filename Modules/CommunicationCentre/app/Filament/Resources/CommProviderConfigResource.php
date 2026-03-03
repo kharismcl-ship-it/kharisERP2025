@@ -53,11 +53,12 @@ class CommProviderConfigResource extends Resource
                     ->options(function () {
                         $providers = config('communicationcentre.providers', []);
                         $providerLabels = [
-                            'laravel_mail' => 'Laravel Mail',
-                            'mailtrap' => 'Mailtrap',
-                            'twilio' => 'Twilio',
-                            'mnotify' => 'mNotify',
-                            'wasender' => 'Wasender',
+                            'laravel_mail'      => 'Laravel Mail',
+                            'mailtrap'          => 'Mailtrap',
+                            'resend'            => 'Resend',
+                            'twilio'            => 'Twilio',
+                            'mnotify'           => 'mNotify',
+                            'wasender'          => 'Wasender',
                             'filament_database' => 'Filament Database',
                         ];
 

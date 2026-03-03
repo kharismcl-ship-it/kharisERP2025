@@ -18,7 +18,7 @@ class HostelWhatsAppGroupResource extends Resource
 {
     protected static ?string $model = HostelWhatsAppGroup::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|\BackedEnum|null $navigationIcon = Heroicon::OutlinedChatBubbleLeftRight;
 
     protected static string|\UnitEnum|null $navigationGroup = 'Hostels';
 

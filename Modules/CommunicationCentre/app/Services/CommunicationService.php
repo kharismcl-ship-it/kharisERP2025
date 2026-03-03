@@ -12,6 +12,7 @@ use Modules\CommunicationCentre\Services\ChannelProviders\FilamentDatabaseProvid
 use Modules\CommunicationCentre\Services\ChannelProviders\LaravelMailProvider;
 use Modules\CommunicationCentre\Services\ChannelProviders\MailtrapEmailProvider;
 use Modules\CommunicationCentre\Services\ChannelProviders\MnotifySmsProvider;
+use Modules\CommunicationCentre\Services\ChannelProviders\ResendEmailProvider;
 use Modules\CommunicationCentre\Services\ChannelProviders\TwilioWhatsAppProvider;
 use Modules\CommunicationCentre\Services\ChannelProviders\WasenderProvider;
 
@@ -196,6 +197,38 @@ class CommunicationService
     }
 
     /**
+     * Send a raw email to a specific address (no template required).
+     */
+    public function sendRawEmail(
+        string $toEmail,
+        ?string $toName,
+        string $subject,
+        string $body
+    ): CommMessage {
+        $companyId = $this->resolveCurrentCompanyId();
+        $provider  = $this->getDefaultProvider('email', $companyId);
+
+        $message = CommMessage::create([
+            'company_id' => $companyId,
+            'channel'    => 'email',
+            'provider'   => $provider,
+            'to_name'    => $toName,
+            'to_email'   => $toEmail,
+            'subject'    => $subject,
+            'body'       => $body,
+            'status'     => 'queued',
+        ]);
+
+        $this->queueMessage($message);
+
+        if ($provider) {
+            $this->rateLimitingService->incrementRateLimit($provider, 'email', $companyId);
+        }
+
+        return $message;
+    }
+
+    /**
      * Queue a message for sending.
      */
     protected function queueMessage(CommMessage $message): void
@@ -233,8 +266,12 @@ class CommunicationService
     protected function getProviderForChannel(string $channel, ?string $providerName = null): ?ChannelProviderInterface
     {
         $providerMap = [
-            'email' => $providerName === 'mailtrap' ? MailtrapEmailProvider::class : LaravelMailProvider::class,
-            'sms' => $providerName === 'mnotify' ? MnotifySmsProvider::class : null,
+            'email'    => match ($providerName) {
+                'mailtrap' => MailtrapEmailProvider::class,
+                'resend'   => ResendEmailProvider::class,
+                default    => LaravelMailProvider::class,
+            },
+            'sms'      => $providerName === 'mnotify' ? MnotifySmsProvider::class : null,
             'whatsapp' => $this->resolveWhatsAppProvider($providerName),
             'database' => FilamentDatabaseProvider::class,
         ];

@@ -8,6 +8,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -36,7 +37,7 @@ class RoomResource extends Resource
 
     protected static ?string $slug = 'rooms';
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedHome;
 
     protected static string|\UnitEnum|null $navigationGroup = 'Hostels';
 
@@ -219,6 +220,7 @@ class RoomResource extends Resource
                 //
             ])
             ->actions([
+                ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),
             ])
@@ -259,6 +261,7 @@ class RoomResource extends Resource
         return [
             'index' => Pages\ListRooms::route('/'),
             'create' => Pages\CreateRoom::route('/create'),
+            'view' => Pages\ViewRoom::route('/{record}'),
             'edit' => Pages\EditRoom::route('/{record}/edit'),
         ];
     }

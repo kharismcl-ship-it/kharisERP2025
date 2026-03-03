@@ -5,6 +5,7 @@ namespace Modules\Hostels\Filament;
 use Filament\Contracts\Plugin;
 use Filament\Panel;
 use Modules\Hostels\Filament\Pages\CheckInOutCalendar;
+use Modules\Hostels\Filament\Pages\HostelsDashboard;
 use Modules\Hostels\Filament\Pages\RoomAvailabilityCalendar;
 use Modules\Hostels\Filament\Resources\BedResource;
 use Modules\Hostels\Filament\Resources\BookingCancellationPolicyResource;
@@ -110,6 +111,7 @@ class HostelsFilamentPlugin implements Plugin
 
         // Register pages for both panels
         $panel->pages([
+            HostelsDashboard::class,
             CheckInOutCalendar::class,
             RoomAvailabilityCalendar::class,
         ]);

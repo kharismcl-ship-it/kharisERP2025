@@ -34,7 +34,7 @@ class BedResource extends Resource
 
     protected static ?string $slug = 'beds';
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCircleStack;
 
     protected static string|\UnitEnum|null $navigationGroup = 'Hostels';
 

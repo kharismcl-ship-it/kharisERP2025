@@ -30,6 +30,7 @@ return [
     'providers' => [
         'laravel_mail',
         'mailtrap',
+        'resend',
         'twilio',
         'mnotify',
         'wasender',
@@ -44,6 +45,21 @@ return [
     | Configuration for Mailtrap email service provider
     |
     */
+    /*
+    |--------------------------------------------------------------------------
+    | Resend Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for the Resend transactional email API.
+    | Get your API key at https://resend.com
+    |
+    */
+    'resend' => [
+        'api_key'    => env('RESEND_API_KEY'),
+        'from_email' => env('RESEND_FROM_EMAIL', 'no-reply@example.com'),
+        'from_name'  => env('RESEND_FROM_NAME', 'System Notification'),
+    ],
+
     'mailtrap' => [
         'api_token' => env('MAILTRAP_API_TOKEN'),
         'from_email' => env('MAILTRAP_FROM_EMAIL', 'no-reply@example.com'),

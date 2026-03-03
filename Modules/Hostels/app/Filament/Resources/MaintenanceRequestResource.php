@@ -7,6 +7,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -33,7 +34,7 @@ class MaintenanceRequestResource extends Resource
 
     protected static ?string $slug = 'maintenance-requests';
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedWrench;
 
     protected static string|\UnitEnum|null $navigationGroup = 'Hostels';
 
@@ -157,6 +158,7 @@ class MaintenanceRequestResource extends Resource
                 //
             ])
             ->actions([
+                ViewAction::make(),
                 EditAction::make(),
                 DeleteAction::make(),
             ])
@@ -172,6 +174,7 @@ class MaintenanceRequestResource extends Resource
         return [
             'index' => Pages\ListMaintenanceRequests::route('/'),
             'create' => Pages\CreateMaintenanceRequest::route('/create'),
+            'view' => Pages\ViewMaintenanceRequest::route('/{record}'),
             'edit' => Pages\EditMaintenanceRequest::route('/{record}/edit'),
         ];
     }

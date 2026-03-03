@@ -49,7 +49,7 @@ class HostelResource extends Resource
 
     protected static ?string $slug = 'hostels';
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedHomeModern;
 
     protected static string|\UnitEnum|null $navigationGroup = 'Hostels';
 
