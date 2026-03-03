@@ -24,7 +24,7 @@ class HrAnalyticsDashboard extends Page
 
     protected static string|\UnitEnum|null $navigationGroup = 'HR Manager';
 
-    protected static ?int $navigationSort = 10;
+    protected static ?int $navigationSort = 1;
 
     protected static ?string $navigationLabel = 'HR Dashboard';
 
