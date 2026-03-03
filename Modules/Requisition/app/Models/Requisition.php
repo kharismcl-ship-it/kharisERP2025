@@ -8,7 +8,7 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use KirschbaumDevelopment\Commentions\Traits\InteractsWithComments;
+use Kirschbaum\Commentions\HasComments;
 use Modules\HR\Models\Department;
 use Modules\HR\Models\Employee;
 use Modules\Requisition\Events\RequisitionStatusChanged;
@@ -16,7 +16,7 @@ use Modules\Requisition\Events\RequisitionShared;
 
 class Requisition extends Model
 {
-    use HasFactory, BelongsToCompany, SoftDeletes, InteractsWithComments;
+    use HasFactory, BelongsToCompany, SoftDeletes, HasComments;
 
     protected $fillable = [
         'company_id',

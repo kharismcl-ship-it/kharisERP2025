@@ -129,7 +129,7 @@ class CsVisitorResource extends Resource
                     ->query(fn ($query) => $query->whereDate('check_in_at', today())),
             ])
             ->actions([
-                \Filament\Tables\Actions\Action::make('check_out')
+                \Filament\Actions\Action::make('check_out')
                     ->label('Check Out')
                     ->icon('heroicon-o-arrow-right-on-rectangle')
                     ->color('warning')
