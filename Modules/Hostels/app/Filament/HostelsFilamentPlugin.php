@@ -93,18 +93,18 @@ class HostelsFilamentPlugin implements Plugin
         } elseif ($panel->getId() === 'company-admin') {
             // Company panel resources (operational/tenant-specific)
             $panel->resources([
-                // HostelOccupantResource::class,
-                // BookingResource::class,
-                // DepositResource::class,
-                // HostelBillingCycleResource::class,
-                // HostelChargeResource::class,
-                // HostelHousekeepingResource::class,
-                // MaintenanceRequestResource::class,
-                // MaintenanceRecordResource::class,
-                // IncidentResource::class,
-                // HostelStaffAttendanceResource::class,
-                // // RoomInventoryAssignmentResource::class,
-                // VisitorLogResource::class,
+                HostelOccupantResource::class,
+                BookingResource::class,
+                DepositResource::class,
+                HostelBillingCycleResource::class,
+                HostelChargeResource::class,
+                HostelHousekeepingResource::class,
+                MaintenanceRequestResource::class,
+                MaintenanceRecordResource::class,
+                IncidentResource::class,
+                HostelStaffAttendanceResource::class,
+                RoomInventoryAssignmentResource::class,
+                VisitorLogResource::class,
             ]);
         }
 

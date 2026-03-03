@@ -4,6 +4,7 @@ namespace Modules\CommunicationCentre\Filament;
 
 use Filament\Contracts\Plugin;
 use Filament\Panel;
+use Modules\CommunicationCentre\Filament\Pages\CommDashboard;
 use Modules\CommunicationCentre\Filament\Resources\CommMessageResource;
 use Modules\CommunicationCentre\Filament\Resources\CommPreferenceResource;
 use Modules\CommunicationCentre\Filament\Resources\CommProviderConfigResource;
@@ -31,7 +32,7 @@ class CommunicationCentreFilamentPlugin implements Plugin
         ]);
 
         $panel->pages([
-            // Register all Filament Pages Class
+            CommDashboard::class,
         ]);
 
         $panel->navigationItems([

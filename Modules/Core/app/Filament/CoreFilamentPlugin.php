@@ -5,6 +5,7 @@ namespace Modules\Core\Filament;
 use Filament\Contracts\Plugin;
 use Filament\Panel;
 use Modules\Core\Filament\Pages\ErpAnalyticsDashboard;
+use Modules\Core\Filament\Resources\AutomationLogResource;
 use Modules\Core\Filament\Resources\AutomationSettingResource;
 
 class CoreFilamentPlugin implements Plugin
@@ -23,6 +24,7 @@ class CoreFilamentPlugin implements Plugin
     {
         $panel->resources([
             AutomationSettingResource::class,
+            AutomationLogResource::class,
         ]);
 
         $panel->pages([

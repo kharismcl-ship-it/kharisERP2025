@@ -4,6 +4,7 @@ namespace Modules\PaymentsChannel\Filament;
 
 use Filament\Contracts\Plugin;
 use Filament\Panel;
+use Modules\PaymentsChannel\Filament\Pages\PaymentsDashboard;
 use Modules\PaymentsChannel\Filament\Resources\PayIntentResource;
 use Modules\PaymentsChannel\Filament\Resources\PayMethodResource;
 use Modules\PaymentsChannel\Filament\Resources\PayProviderConfigResource;
@@ -31,7 +32,7 @@ class PaymentsChannelFilamentPlugin implements Plugin
         ]);
 
         $panel->pages([
-            // Register all Filament Pages Class
+            PaymentsDashboard::class,
         ]);
 
         $panel->navigationItems([

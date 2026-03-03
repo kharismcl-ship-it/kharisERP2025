@@ -4,6 +4,7 @@ namespace Modules\Sales\Filament;
 
 use Filament\Contracts\Plugin;
 use Filament\Panel;
+use Modules\Sales\Filament\Pages\SalesDashboard;
 use Modules\Sales\Filament\Pages\SalesOpportunityKanban;
 use Modules\Sales\Filament\Resources\CatalogItemResource;
 use Modules\Sales\Filament\Resources\ContactResource;
@@ -56,6 +57,7 @@ class SalesFilamentPlugin implements Plugin
         ]);
 
         $panel->pages([
+            SalesDashboard::class,
             SalesOpportunityKanban::class,
         ]);
     }
