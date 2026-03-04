@@ -4,6 +4,8 @@ namespace Modules\ClientService\Providers;
 
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
+use Livewire\Livewire;
+use Modules\ClientService\Livewire\VisitorCheckIn;
 use Nwidart\Modules\Traits\PathNamespace;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -24,6 +26,9 @@ class ClientServiceServiceProvider extends ServiceProvider
                 return;
             }
         }
+
+        // Register Livewire components so the module namespace is discoverable.
+        Livewire::component('clientservice-visitor-check-in', VisitorCheckIn::class);
 
         $this->registerCommands();
         $this->registerCommandSchedules();

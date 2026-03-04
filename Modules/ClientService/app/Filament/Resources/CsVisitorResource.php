@@ -44,126 +44,147 @@ class CsVisitorResource extends Resource
 
     protected static ?string $navigationLabel = 'Visitor Log';
 
+    /**
+     * Shared wizard steps used by both the admin resource form and the
+     * public kiosk Livewire component. Keeps a single source of truth.
+     *
+     * @return Step[]
+     */
+    public static function wizardSteps(): array
+    {
+        return [
+            Step::make('Visitor Type')
+                ->schema([
+                    Radio::make('visitor_type')
+                        ->label('Visitor Type')
+                        ->options(['new' => 'New Visitor', 'returning' => 'Returning Visitor'])
+                        ->default('new')
+                        ->required()
+                        ->dehydrated(false)
+                        ->live(),
+                    TextInput::make('search_phone')
+                        ->label('Enter Phone Number to Look Up')
+                        ->tel()
+                        ->dehydrated(false)
+                        ->live(debounce: 500)
+                        ->visible(fn (Get $get) => $get('visitor_type') === 'returning'),
+                    Placeholder::make('visitor_lookup_hint')
+                        ->label('')
+                        ->content(function (Get $get) {
+                            if ($get('visitor_type') !== 'returning' || blank($get('search_phone'))) {
+                                return new HtmlString('');
+                            }
+                            $companyId = $get('company_id');
+                            $query = CsVisitor::query()->where('phone', $get('search_phone'));
+                            if ($companyId) {
+                                $query->withoutGlobalScopes()->where('company_id', $companyId);
+                            }
+                            $visitor = $query->latest()->first();
+                            if ($visitor) {
+                                return new HtmlString('<p class="text-sm font-medium text-success-600">Welcome back, ' . e($visitor->full_name) . '! Details pre-filled — please confirm and sign.</p>');
+                            }
+                            return new HtmlString('<p class="text-sm font-medium text-warning-600">No previous visit found. You will be registered as a new visitor.</p>');
+                        })
+                        ->visible(fn (Get $get) => $get('visitor_type') === 'returning' && filled($get('search_phone'))),
+                ])
+                ->afterValidation(function (Get $get, Set $set) {
+                    if ($get('visitor_type') !== 'returning') {
+                        return;
+                    }
+                    $phone = $get('search_phone');
+                    if (blank($phone)) {
+                        return;
+                    }
+                    $companyId = $get('company_id');
+                    $query = CsVisitor::query()->where('phone', $phone);
+                    if ($companyId) {
+                        $query->withoutGlobalScopes()->where('company_id', $companyId);
+                    }
+                    $visitor = $query->latest()->first();
+                    if (! $visitor) {
+                        return;
+                    }
+                    $set('full_name', $visitor->full_name);
+                    $set('phone', $visitor->phone);
+                    $set('email', $visitor->email);
+                    $set('id_type', $visitor->id_type);
+                    $set('id_number', $visitor->id_number);
+                    $set('organization', $visitor->organization);
+                }),
+
+            Step::make('Personal Details')
+                ->schema([
+                    Grid::make(3)->schema([
+                        TextInput::make('full_name')->required()->maxLength(255),
+                        TextInput::make('phone')->tel()->nullable(),
+                        TextInput::make('email')->email()->nullable(),
+                    ]),
+                    Grid::make(3)->schema([
+                        Select::make('id_type')
+                            ->options(CsVisitor::ID_TYPES)
+                            ->nullable(),
+                        TextInput::make('id_number')->nullable(),
+                        TextInput::make('organization')->nullable(),
+                    ]),
+                    FileUpload::make('photo_path')
+                        ->label('Photo')
+                        ->directory('visitor-photos')
+                        ->image()
+                        ->nullable()
+                        ->columnSpanFull(),
+                    SignaturePad::make('check_in_signature')
+                        ->label('Visitor Signature')
+                        ->clearAction(fn (Action $action) => $action->button())
+                        ->downloadAction(fn (Action $action) => $action->color('primary'))
+                        ->undoAction(fn (Action $action) => $action->icon('heroicon-o-pencil'))
+                        ->doneAction(fn (Action $action) => $action->iconButton()->icon('heroicon-o-thumbs-up')),
+                ]),
+
+            Step::make('Visit Details')
+                ->schema([
+                    Select::make('company_id')
+                        ->label('Hosting Company')
+                        ->relationship('company', 'name')
+                        ->searchable()
+                        ->preload()
+                        ->columnSpanFull(),
+                    Grid::make(2)->schema([
+                        Select::make('host_employee_id')
+                            ->label('Host Employee')
+                            ->relationship('hostEmployee', 'full_name')
+                            ->searchable()
+                            ->preload()
+                            ->nullable(),
+                        Select::make('department_id')
+                            ->label('Department')
+                            ->relationship('department', 'name')
+                            ->searchable()
+                            ->preload()
+                            ->nullable(),
+                    ]),
+                    Grid::make(2)->schema([
+                        TextInput::make('badge_number')->nullable(),
+                        Textarea::make('items_brought')->rows(2)->nullable(),
+                    ]),
+                    Textarea::make('purpose_of_visit')->required()->rows(3)->columnSpanFull(),
+                    Textarea::make('notes')->rows(2)->columnSpanFull(),
+                ]),
+
+            Step::make('Check In')
+                ->schema([
+                    Grid::make(2)->schema([
+                        DateTimePicker::make('check_in_at')->required()->default(now()),
+                        DateTimePicker::make('check_out_at')->nullable(),
+                    ]),
+                ]),
+        ];
+    }
+
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
-            Wizard::make([
-                Step::make('Visitor Type')
-                    ->schema([
-                        Radio::make('visitor_type')
-                            ->label('Visitor Type')
-                            ->options(['new' => 'New Visitor', 'returning' => 'Returning Visitor'])
-                            ->default('new')
-                            ->required()
-                            ->dehydrated(false)
-                            ->live(),
-                        TextInput::make('search_phone')
-                            ->label('Enter Phone Number to Look Up')
-                            ->tel()
-                            ->dehydrated(false)
-                            ->live(debounce: 500)
-                            ->visible(fn (Get $get) => $get('visitor_type') === 'returning'),
-                        Placeholder::make('visitor_lookup_hint')
-                            ->label('')
-                            ->content(function (Get $get) {
-                                if ($get('visitor_type') !== 'returning' || blank($get('search_phone'))) {
-                                    return new HtmlString('');
-                                }
-                                $visitor = CsVisitor::where('phone', $get('search_phone'))->latest()->first();
-                                if ($visitor) {
-                                    return new HtmlString('<p class="text-sm font-medium text-success-600">Welcome back, ' . e($visitor->full_name) . '! Details pre-filled — please confirm and sign.</p>');
-                                }
-                                return new HtmlString('<p class="text-sm font-medium text-warning-600">No previous visit found. You will be registered as a new visitor.</p>');
-                            })
-                            ->visible(fn (Get $get) => $get('visitor_type') === 'returning' && filled($get('search_phone'))),
-                    ])
-                    ->afterValidation(function (Get $get, Set $set) {
-                        if ($get('visitor_type') !== 'returning') {
-                            return;
-                        }
-                        $phone = $get('search_phone');
-                        if (blank($phone)) {
-                            return;
-                        }
-                        $visitor = CsVisitor::where('phone', $phone)->latest()->first();
-                        if (! $visitor) {
-                            return;
-                        }
-                        $set('full_name', $visitor->full_name);
-                        $set('phone', $visitor->phone);
-                        $set('email', $visitor->email);
-                        $set('id_type', $visitor->id_type);
-                        $set('id_number', $visitor->id_number);
-                        $set('organization', $visitor->organization);
-                    }),
-
-                Step::make('Personal Details')
-                    ->schema([
-                        Grid::make(3)->schema([
-                            TextInput::make('full_name')->required()->maxLength(255),
-                            TextInput::make('phone')->tel()->nullable(),
-                            TextInput::make('email')->email()->nullable(),
-                        ]),
-                        Grid::make(3)->schema([
-                            Select::make('id_type')
-                                ->options(CsVisitor::ID_TYPES)
-                                ->nullable(),
-                            TextInput::make('id_number')->nullable(),
-                            TextInput::make('organization')->nullable(),
-                        ]),
-                        FileUpload::make('photo_path')
-                            ->label('Photo')
-                            ->directory('visitor-photos')
-                            ->image()
-                            ->nullable()
-                            ->columnSpanFull(),
-                        SignaturePad::make('check_in_signature')
-                            ->label('Visitor Signature')
-                            ->clearAction(fn (Action $action) => $action->button())
-                            ->downloadAction(fn (Action $action) => $action->color('primary'))
-                            ->undoAction(fn (Action $action) => $action->icon('heroicon-o-pencil'))
-                            ->doneAction(fn (Action $action) => $action->iconButton()->icon('heroicon-o-thumbs-up')),
-                    ]),
-
-                Step::make('Visit Details')
-                    ->schema([
-                        Select::make('company_id')
-                            ->label('Hosting Company')
-                            ->relationship('company', 'name')
-                            ->searchable()
-                            ->preload()
-                            ->columnSpanFull(),
-                        Grid::make(2)->schema([
-                            Select::make('host_employee_id')
-                                ->label('Host Employee')
-                                ->relationship('hostEmployee', 'full_name')
-                                ->searchable()
-                                ->preload()
-                                ->nullable(),
-                            Select::make('department_id')
-                                ->label('Department')
-                                ->relationship('department', 'name')
-                                ->searchable()
-                                ->preload()
-                                ->nullable(),
-                        ]),
-                        Grid::make(2)->schema([
-                            TextInput::make('badge_number')->nullable(),
-                            Textarea::make('items_brought')->rows(2)->nullable(),
-                        ]),
-                        Textarea::make('purpose_of_visit')->required()->rows(3)->columnSpanFull(),
-                        Textarea::make('notes')->rows(2)->columnSpanFull(),
-                    ]),
-
-                Step::make('Check In')
-                    ->schema([
-                        Grid::make(2)->schema([
-                            DateTimePicker::make('check_in_at')->required()->default(now()),
-                            DateTimePicker::make('check_out_at')->nullable(),
-                        ]),
-                    ]),
-            ])
-            ->columnSpanFull(),
+            Wizard::make(static::wizardSteps())
+                ->columnSpanFull(),
         ]);
     }
 
