@@ -45,8 +45,8 @@ class TrainingProgramResource extends Resource
                     ->schema([
                         Forms\Components\Select::make('company_id')
                             ->relationship('company', 'name')
-                            ->searchable()->preload()->required(),
-                        Forms\Components\TextInput::make('title')->required()->maxLength(200),
+                            ->searchable()->preload(),
+                        Forms\Components\TextInput::make('title')->maxLength(200),
                         Forms\Components\Select::make('type')
                             ->options(TrainingProgram::TYPES)
                             ->required()->native(false),

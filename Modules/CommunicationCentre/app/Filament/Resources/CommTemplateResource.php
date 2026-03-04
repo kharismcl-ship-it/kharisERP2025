@@ -35,7 +35,7 @@ class CommTemplateResource extends Resource
                     ->live()
                     ->nullable(),
                 Forms\Components\TextInput::make('code')
-                    ->required()
+                    
                     ->maxLength(255),
                 Forms\Components\Select::make('channel')
                     ->options(function () {

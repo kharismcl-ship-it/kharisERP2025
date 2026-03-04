@@ -45,8 +45,8 @@ class ItTrainingSessionResource extends Resource
                         ->relationship('company', 'name')
                         ->searchable()
                         ->preload()
-                        ->required(),
-                    TextInput::make('title')->required()->maxLength(255),
+                        ,
+                    TextInput::make('title')->maxLength(255),
                 ]),
                 Textarea::make('description')->rows(3)->columnSpanFull(),
                 Grid::make(3)->schema([

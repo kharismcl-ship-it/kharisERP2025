@@ -44,7 +44,7 @@ class DisciplinaryCaseResource extends Resource
                     ->schema([
                         Forms\Components\Select::make('company_id')
                             ->relationship('company', 'name')
-                            ->searchable()->preload()->required(),
+                            ->searchable()->preload(),
                         Forms\Components\Select::make('employee_id')
                             ->label('Employee')
                             ->relationship('employee', 'first_name')

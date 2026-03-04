@@ -34,7 +34,7 @@ class GoodsReceiptResource extends Resource
                 ->schema([
                     Forms\Components\Select::make('company_id')
                         ->relationship('company', 'name')
-                        ->required()
+                        
                         ->searchable(),
 
                     Forms\Components\Select::make('purchase_order_id')

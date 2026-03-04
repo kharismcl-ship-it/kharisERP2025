@@ -30,7 +30,7 @@ class HostelWhatsAppGroupResource extends Resource
             ->components([
                 Forms\Components\Select::make('company_id')
                     ->relationship('company', 'name')
-                    ->required(),
+                    ,
                 Forms\Components\Select::make('hostel_id')
                     ->relationship('hostel', 'name')
                     ->required(),

@@ -41,7 +41,7 @@ class EmploymentContractResource extends Resource
                             ->required(),
                         Forms\Components\Select::make('company_id')
                             ->relationship('company', 'name')
-                            ->required(),
+                            ,
                         Forms\Components\TextInput::make('contract_number')
                             ->maxLength(255)
                             ->nullable(),

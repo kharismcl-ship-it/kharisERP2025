@@ -42,8 +42,8 @@ class KpiDefinitionResource extends Resource
                     ->schema([
                         Forms\Components\Select::make('company_id')
                             ->relationship('company', 'name')
-                            ->searchable()->preload()->required(),
-                        Forms\Components\TextInput::make('name')->required()->maxLength(200),
+                            ->searchable()->preload(),
+                        Forms\Components\TextInput::make('name')->maxLength(200),
                         Forms\Components\Select::make('department_id')
                             ->relationship('department', 'name')
                             ->searchable()->preload()->nullable(),

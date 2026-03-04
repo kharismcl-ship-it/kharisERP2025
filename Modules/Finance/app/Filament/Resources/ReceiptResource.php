@@ -36,10 +36,10 @@ class ReceiptResource extends Resource
                     ->schema([
                         Forms\Components\Select::make('company_id')
                             ->relationship('company', 'name')
-                            ->required()
+                            
                             ->columnSpanFull(),
                         Forms\Components\TextInput::make('customer_name')
-                            ->required()
+                            
                             ->maxLength(255),
                         Forms\Components\TextInput::make('customer_email')
                             ->email()

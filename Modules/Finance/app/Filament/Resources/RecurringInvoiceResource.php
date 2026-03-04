@@ -43,10 +43,10 @@ class RecurringInvoiceResource extends Resource
                         Forms\Components\Select::make('company_id')
                             ->relationship('company', 'name')
                             ->preload()
-                            ->required()
+                            
                             ->columnSpanFull(),
                         Forms\Components\TextInput::make('customer_name')
-                            ->required()
+                            
                             ->maxLength(255),
                         Forms\Components\TextInput::make('customer_email')
                             ->email()
@@ -61,7 +61,7 @@ class RecurringInvoiceResource extends Resource
                             ->columnSpanFull()
                             ->placeholder('Description that appears on each generated invoice'),
                         Forms\Components\TextInput::make('amount')
-                            ->required()
+                            
                             ->numeric()
                             ->prefix('GHS'),
                         Forms\Components\TextInput::make('tax_total')

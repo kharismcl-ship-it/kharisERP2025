@@ -44,12 +44,12 @@ class ShiftResource extends Resource
                     ->schema([
                         Forms\Components\Select::make('company_id')
                             ->relationship('company', 'name')
-                            ->searchable()->preload()->required(),
+                            ->searchable()->preload(),
                         Forms\Components\TextInput::make('name')
-                            ->required()->maxLength(100)
+                            ->maxLength(100)
                             ->placeholder('e.g. Morning Shift, Night Shift'),
-                        Forms\Components\TimePicker::make('start_time')->required()->seconds(false),
-                        Forms\Components\TimePicker::make('end_time')->required()->seconds(false),
+                        Forms\Components\TimePicker::make('start_time')->seconds(false),
+                        Forms\Components\TimePicker::make('end_time')->seconds(false),
                         Forms\Components\TextInput::make('break_duration_minutes')
                             ->label('Break Duration (minutes)')
                             ->numeric()->default(0),

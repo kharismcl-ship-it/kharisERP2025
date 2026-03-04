@@ -44,7 +44,7 @@ class GrievanceCaseResource extends Resource
                     ->schema([
                         Forms\Components\Select::make('company_id')
                             ->relationship('company', 'name')
-                            ->searchable()->preload()->required(),
+                            ->searchable()->preload(),
                         Forms\Components\Select::make('employee_id')
                             ->label('Employee Filing Grievance')
                             ->relationship('employee', 'first_name')

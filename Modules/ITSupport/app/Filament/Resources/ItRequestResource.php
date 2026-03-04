@@ -45,7 +45,7 @@ class ItRequestResource extends Resource
                         ->relationship('company', 'name')
                         ->searchable()
                         ->preload()
-                        ->required(),
+                        ,
                     Select::make('requester_employee_id')
                         ->label('Requester')
                         ->relationship('requesterEmployee', 'full_name')

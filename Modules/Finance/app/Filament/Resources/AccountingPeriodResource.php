@@ -42,15 +42,15 @@ class AccountingPeriodResource extends Resource
                         Forms\Components\Select::make('company_id')
                             ->relationship('company', 'name')
                             ->preload()
-                            ->required()
+                            
                             ->columnSpanFull(),
                         Forms\Components\TextInput::make('name')
-                            ->required()
+                            
                             ->maxLength(100)
                             ->placeholder('e.g. January 2026')
                             ->columnSpanFull(),
-                        Forms\Components\DatePicker::make('start_date')->required(),
-                        Forms\Components\DatePicker::make('end_date')->required(),
+                        Forms\Components\DatePicker::make('start_date'),
+                        Forms\Components\DatePicker::make('end_date'),
                         Forms\Components\Select::make('status')
                             ->options(AccountingPeriod::STATUSES)
                             ->default('open')

@@ -31,7 +31,7 @@ class ItemResource extends Resource
         return $schema->components([
             Forms\Components\Select::make('company_id')
                 ->relationship('company', 'name')
-                ->required()
+                
                 ->searchable(),
 
             Forms\Components\Select::make('item_category_id')

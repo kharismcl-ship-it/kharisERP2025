@@ -34,17 +34,17 @@ class VendorResource extends Resource
                 ->schema([
                     Forms\Components\Select::make('company_id')
                         ->relationship('company', 'name')
-                        ->required()
+                        
                         ->searchable(),
 
                     Forms\Components\TextInput::make('name')
-                        ->required()
+                        
                         ->maxLength(255)
                         ->live(onBlur: true)
                         ->afterStateUpdated(fn ($state, callable $set) => $set('slug', Str::slug($state))),
 
                     Forms\Components\TextInput::make('slug')
-                        ->required()
+                        
                         ->maxLength(255),
 
                     Forms\Components\Select::make('status')

@@ -44,7 +44,7 @@ class JobPositionResource extends Resource
                         Forms\Components\Select::make('company_id')
                             ->relationship('company', 'name')
                             ->live()
-                            ->required(),
+                            ,
                         Forms\Components\Select::make('department_id')
                             ->relationship('department', 'name')
                             ->options(fn (Get $get) => \Modules\HR\Models\Department::query()

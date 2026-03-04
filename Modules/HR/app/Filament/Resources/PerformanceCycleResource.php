@@ -37,14 +37,14 @@ class PerformanceCycleResource extends Resource
                     ->schema([
                         Forms\Components\Select::make('company_id')
                             ->relationship('company', 'name')
-                            ->required(),
+                            ,
                         Forms\Components\TextInput::make('name')
-                            ->required()
+                            
                             ->maxLength(255),
                         Forms\Components\DatePicker::make('start_date')
-                            ->required(),
+                            ,
                         Forms\Components\DatePicker::make('end_date')
-                            ->required(),
+                            ,
                     ]),
 
                 Section::make('Settings')

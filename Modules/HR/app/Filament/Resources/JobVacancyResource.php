@@ -46,8 +46,8 @@ class JobVacancyResource extends Resource
                     ->schema([
                         Forms\Components\Select::make('company_id')
                             ->relationship('company', 'name')
-                            ->searchable()->preload()->required(),
-                        Forms\Components\TextInput::make('title')->required()->maxLength(150),
+                            ->searchable()->preload(),
+                        Forms\Components\TextInput::make('title')->maxLength(150),
                         Forms\Components\Select::make('department_id')
                             ->relationship('department', 'name')
                             ->searchable()->preload()->nullable(),

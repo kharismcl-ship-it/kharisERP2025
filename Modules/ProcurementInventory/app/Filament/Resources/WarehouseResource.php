@@ -34,11 +34,11 @@ class WarehouseResource extends Resource
                 ->schema([
                     Forms\Components\Select::make('company_id')
                         ->relationship('company', 'name')
-                        ->required()
+                        
                         ->searchable(),
 
                     Forms\Components\TextInput::make('name')
-                        ->required()
+                        
                         ->maxLength(150)
                         ->live(onBlur: true)
                         ->afterStateUpdated(function ($state, callable $set, $get) {
@@ -48,7 +48,7 @@ class WarehouseResource extends Resource
                         }),
 
                     Forms\Components\TextInput::make('code')
-                        ->required()
+                        
                         ->maxLength(20)
                         ->helperText('Short identifier, e.g. WH-01')
                         ->afterStateUpdated(fn ($state, callable $set) => $set('code', strtoupper($state))),

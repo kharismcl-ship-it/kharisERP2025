@@ -38,14 +38,14 @@ class AccountResource extends Resource
                         Forms\Components\Select::make('company_id')
                             ->relationship('company', 'name')
                             ->preload()
-                            ->required()
+                            
                             ->columnSpanFull(),
                         Forms\Components\TextInput::make('code')
-                            ->required()
+                            
                             ->maxLength(50)
                             ->placeholder('e.g. 1100'),
                         Forms\Components\TextInput::make('name')
-                            ->required()
+                            
                             ->maxLength(255)
                             ->placeholder('e.g. Accounts Receivable'),
                         Forms\Components\Select::make('type')

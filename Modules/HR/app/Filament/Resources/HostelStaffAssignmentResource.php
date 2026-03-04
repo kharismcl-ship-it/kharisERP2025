@@ -43,7 +43,7 @@ class HostelStaffAssignmentResource extends Resource
                     ->schema([
                         Forms\Components\Select::make('company_id')
                             ->relationship('company', 'name')
-                            ->required(),
+                            ,
                         Forms\Components\Select::make('employee_id')
                             ->relationship('employee', 'full_name')
                             ->searchable()

@@ -38,10 +38,10 @@ class InvoiceResource extends Resource
                     ->schema([
                         Forms\Components\Select::make('company_id')
                             ->relationship('company', 'name')
-                            ->required()
+                            
                             ->columnSpanFull(),
                         Forms\Components\TextInput::make('customer_name')
-                            ->required()
+                            
                             ->maxLength(255),
                         Forms\Components\TextInput::make('customer_type')
                             ->maxLength(255)
@@ -56,7 +56,7 @@ class InvoiceResource extends Resource
                     ->columns(2)
                     ->schema([
                         Forms\Components\TextInput::make('invoice_number')
-                            ->required()
+                            
                             ->maxLength(255),
                         Forms\Components\Select::make('status')
                             ->options([

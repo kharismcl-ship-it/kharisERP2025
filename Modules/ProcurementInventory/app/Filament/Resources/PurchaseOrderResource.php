@@ -36,7 +36,7 @@ class PurchaseOrderResource extends Resource
                 ->schema([
                     Forms\Components\Select::make('company_id')
                         ->relationship('company', 'name')
-                        ->required()
+                        
                         ->searchable(),
 
                     Forms\Components\Select::make('vendor_id')

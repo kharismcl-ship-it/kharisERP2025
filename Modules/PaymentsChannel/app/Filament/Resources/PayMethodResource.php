@@ -39,7 +39,7 @@ class PayMethodResource extends Resource
                         Forms\Components\Select::make('company_id')
                             ->relationship('company', 'name')
                             ->live()
-                            ->required(),
+                            ,
 
                         Forms\Components\Select::make('provider')
                             ->options(function (callable $get) {

@@ -42,9 +42,9 @@ class PublicHolidayResource extends Resource
                     ->schema([
                         Forms\Components\Select::make('company_id')
                             ->relationship('company', 'name')
-                            ->searchable()->preload()->required(),
-                        Forms\Components\TextInput::make('name')->required()->maxLength(150),
-                        Forms\Components\DatePicker::make('date')->required()->native(false),
+                            ->searchable()->preload(),
+                        Forms\Components\TextInput::make('name')->maxLength(150),
+                        Forms\Components\DatePicker::make('date')->native(false),
                         Forms\Components\Toggle::make('is_recurring_annually')
                             ->label('Recurring Annually')
                             ->default(true)->inline(false),

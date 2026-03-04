@@ -37,14 +37,14 @@ class JournalEntryResource extends Resource
                     ->schema([
                         Forms\Components\Select::make('company_id')
                             ->relationship('company', 'name')
-                            ->required()
+                            
                             ->columnSpanFull(),
                         Forms\Components\TextInput::make('reference')
-                            ->required()
+                            
                             ->maxLength(255)
                             ->placeholder('e.g. JE-2026-0001'),
                         Forms\Components\DatePicker::make('date')
-                            ->required(),
+                            ,
                         Forms\Components\Textarea::make('description')
                             ->columnSpanFull()
                             ->rows(3),

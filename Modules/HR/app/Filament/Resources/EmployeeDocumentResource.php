@@ -43,7 +43,7 @@ class EmployeeDocumentResource extends Resource
                             ->required(),
                         Forms\Components\Select::make('company_id')
                             ->relationship('company', 'name')
-                            ->required(),
+                            ,
                         Forms\Components\Select::make('document_type')
                             ->options([
                                 'cv'          => 'CV',

@@ -38,7 +38,7 @@ class HostelTemplateResource extends Resource
                 Forms\Components\Select::make('company_id')
                     ->relationship('company', 'name')
                     ->live()
-                    ->required(),
+                    ,
 
                 Forms\Components\Select::make('code')
                     ->options(function () {

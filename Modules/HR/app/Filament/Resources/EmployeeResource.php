@@ -272,7 +272,7 @@ class EmployeeResource extends Resource
                                     ->all();
                             })
                             ->default(fn (): ?int => Filament::getTenant()?->getKey())
-                            ->required()
+                            
                             ->searchable()
                             ->live(),
 

@@ -37,7 +37,7 @@ class PerformanceReviewResource extends Resource
                     ->schema([
                         Forms\Components\Select::make('company_id')
                             ->relationship('company', 'name')
-                            ->required(),
+                            ,
                         Forms\Components\Select::make('performance_cycle_id')
                             ->relationship('performanceCycle', 'name')
                             ->required(),

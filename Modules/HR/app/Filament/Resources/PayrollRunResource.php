@@ -47,7 +47,7 @@ class PayrollRunResource extends Resource
                             ->relationship('company', 'name')
                             ->searchable()
                             ->preload()
-                            ->required(),
+                            ,
                         Forms\Components\Select::make('status')
                             ->options(PayrollRun::STATUSES)
                             ->required()

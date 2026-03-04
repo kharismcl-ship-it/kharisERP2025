@@ -30,10 +30,10 @@ class CommMessageResource extends Resource
                     ->relationship('company', 'name')
                     ->nullable(),
                 Forms\Components\TextInput::make('notifiable_type')
-                    ->required()
+                    
                     ->maxLength(255),
                 Forms\Components\TextInput::make('notifiable_id')
-                    ->required(),
+                    ,
                 Forms\Components\Select::make('channel')
                     ->options([
                         'email' => 'Email',

@@ -46,7 +46,7 @@ class EmployeeCompanyAssignmentResource extends Resource
                             ->relationship('company', 'name')
                             ->searchable()
                             ->preload()
-                            ->required(),
+                            ,
                         Forms\Components\TextInput::make('role')
                             ->maxLength(255),
                         Forms\Components\Toggle::make('is_active')
@@ -57,7 +57,7 @@ class EmployeeCompanyAssignmentResource extends Resource
                     ->columns(2)
                     ->schema([
                         Forms\Components\DatePicker::make('start_date')
-                            ->required(),
+                            ,
                         Forms\Components\DatePicker::make('end_date'),
                         Forms\Components\DateTimePicker::make('assigned_at'),
                         Forms\Components\DateTimePicker::make('expires_at'),

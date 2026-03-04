@@ -40,15 +40,15 @@ class FixedAssetResource extends Resource
                         Forms\Components\Select::make('company_id')
                             ->relationship('company', 'name')
                             ->preload()
-                            ->required()
+                            
                             ->columnSpanFull(),
                         Forms\Components\TextInput::make('asset_code')
-                            ->required()
+                            
                             ->maxLength(50)
                             ->placeholder('e.g. AST-0001')
                             ->unique(ignoreRecord: true),
                         Forms\Components\TextInput::make('name')
-                            ->required()
+                            
                             ->maxLength(255),
                         Forms\Components\Select::make('category_id')
                             ->relationship('category', 'name')

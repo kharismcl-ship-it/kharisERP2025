@@ -68,20 +68,20 @@ class HostelResource extends Resource
                             ->relationship('company', 'name')
                             ->searchable()
                             ->preload()
-                            ->required(),
+                            ,
 
                         TextInput::make('name')
-                            ->required()
+                            
                             ->reactive()
                             ->afterStateUpdated(fn ($state, callable $set) => $set('slug', Str::slug($state))),
 
                         TextInput::make('slug')
                             ->readOnly()
-                            ->required()
+                            
                             ->unique(Hostel::class, 'slug', ignoreRecord: true),
                         TextInput::make('code')
                             ->label('Hostel Code')
-                            ->required(),
+                            ,
 
                         FileUpload::make('photo')
                             ->image()
@@ -110,7 +110,7 @@ class HostelResource extends Resource
 
                         TextInput::make('capacity')
                             ->numeric()
-                            ->required(),
+                            ,
 
                         Select::make('gender_policy')
                             ->options([

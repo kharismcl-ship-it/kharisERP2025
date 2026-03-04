@@ -42,11 +42,11 @@ class AnnouncementResource extends Resource
                     ->schema([
                         Forms\Components\Select::make('company_id')
                             ->relationship('company', 'name')
-                            ->searchable()->preload()->required(),
+                            ->searchable()->preload(),
                         Forms\Components\TextInput::make('title')
-                            ->required()->maxLength(255)->columnSpanFull(),
+                            ->maxLength(255)->columnSpanFull(),
                         Forms\Components\RichEditor::make('content')
-                            ->required()->columnSpanFull(),
+                            ->columnSpanFull(),
                         Forms\Components\Select::make('priority')
                             ->options(Announcement::PRIORITIES)
                             ->required()->native(false),

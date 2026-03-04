@@ -39,16 +39,16 @@ class LeaveApprovalWorkflowResource extends Resource
                     ->schema([
                         Forms\Components\Select::make('company_id')
                             ->relationship('company', 'name')
-                            ->required(),
+                            ,
                         Forms\Components\TextInput::make('name')
-                            ->required()
+                            
                             ->maxLength(255),
                         Forms\Components\Textarea::make('description')
                             ->maxLength(65535)
                             ->columnSpanFull(),
                         Forms\Components\Toggle::make('is_active')
                             ->default(true)
-                            ->required(),
+                            ,
                         Forms\Components\Toggle::make('requires_all_approvals')
                             ->label('Require All Approvals')
                             ->helperText('If enabled, all approval levels must approve. If disabled, any approval can approve.')
@@ -71,7 +71,7 @@ class LeaveApprovalWorkflowResource extends Resource
                                 Forms\Components\TextInput::make('level_number')
                                     ->label('Level #')
                                     ->numeric()
-                                    ->required(),
+                                    ,
                                 Forms\Components\Select::make('approver_type')
                                     ->label('Approver Type')
                                     ->options([

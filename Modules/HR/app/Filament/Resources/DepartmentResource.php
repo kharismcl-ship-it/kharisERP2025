@@ -43,9 +43,9 @@ class DepartmentResource extends Resource
                     ->schema([
                         Forms\Components\Select::make('company_id')
                             ->relationship('company', 'name')
-                            ->required(),
+                            ,
                         Forms\Components\TextInput::make('name')
-                            ->required()
+                            
                             ->maxLength(255),
                         Forms\Components\TextInput::make('code')
                             ->maxLength(255)

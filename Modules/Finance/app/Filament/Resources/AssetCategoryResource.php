@@ -43,7 +43,7 @@ class AssetCategoryResource extends Resource
                             ->placeholder('System-wide')
                             ->columnSpanFull(),
                         Forms\Components\TextInput::make('name')
-                            ->required()
+                            
                             ->maxLength(255)
                             ->placeholder('e.g. Motor Vehicles'),
                         Forms\Components\Select::make('depreciation_method')

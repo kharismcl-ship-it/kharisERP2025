@@ -40,14 +40,14 @@ class CostCentreResource extends Resource
                         Forms\Components\Select::make('company_id')
                             ->relationship('company', 'name')
                             ->preload()
-                            ->required()
+                            
                             ->columnSpanFull(),
                         Forms\Components\TextInput::make('code')
-                            ->required()
+                            
                             ->maxLength(20)
                             ->placeholder('e.g. CC-HR'),
                         Forms\Components\TextInput::make('name')
-                            ->required()
+                            
                             ->maxLength(255)
                             ->placeholder('e.g. Human Resources'),
                         Forms\Components\Select::make('parent_id')

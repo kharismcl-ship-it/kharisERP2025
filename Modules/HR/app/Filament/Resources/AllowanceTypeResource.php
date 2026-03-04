@@ -43,9 +43,9 @@ class AllowanceTypeResource extends Resource
                     ->schema([
                         Forms\Components\Select::make('company_id')
                             ->relationship('company', 'name')
-                            ->searchable()->preload()->required(),
+                            ->searchable()->preload(),
                         Forms\Components\TextInput::make('name')
-                            ->required()->maxLength(100),
+                            ->maxLength(100),
                         Forms\Components\TextInput::make('code')
                             ->maxLength(30)
                             ->unique(ignoreRecord: true)

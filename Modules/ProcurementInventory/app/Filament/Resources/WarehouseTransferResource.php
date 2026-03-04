@@ -36,7 +36,7 @@ class WarehouseTransferResource extends Resource
                 ->schema([
                     Forms\Components\Select::make('company_id')
                         ->relationship('company', 'name')
-                        ->required()
+                        
                         ->searchable(),
 
                     Forms\Components\TextInput::make('reference')

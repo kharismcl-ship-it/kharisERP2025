@@ -40,18 +40,18 @@ class BankAccountResource extends Resource
                         Forms\Components\Select::make('company_id')
                             ->relationship('company', 'name')
                             ->preload()
-                            ->required()
+                            
                             ->columnSpanFull(),
                         Forms\Components\TextInput::make('name')
-                            ->required()
+                            
                             ->maxLength(255)
                             ->placeholder('e.g. Main Operating Account'),
                         Forms\Components\TextInput::make('bank_name')
-                            ->required()
+                            
                             ->maxLength(255)
                             ->placeholder('e.g. GCB Bank'),
                         Forms\Components\TextInput::make('account_number')
-                            ->required()
+                            
                             ->maxLength(50),
                         Forms\Components\TextInput::make('branch')
                             ->maxLength(255)

@@ -42,7 +42,7 @@ class BankReconciliationResource extends Resource
                         Forms\Components\Select::make('company_id')
                             ->relationship('company', 'name')
                             ->preload()
-                            ->required()
+                            
                             ->columnSpanFull(),
                         Forms\Components\Select::make('bank_account_id')
                             ->relationship('bankAccount', 'name')

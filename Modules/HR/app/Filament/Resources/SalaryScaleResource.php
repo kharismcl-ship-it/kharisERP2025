@@ -38,15 +38,15 @@ class SalaryScaleResource extends Resource
                     ->schema([
                         Forms\Components\Select::make('company_id')
                             ->relationship('company', 'name')
-                            ->required(),
+                            ,
                         Forms\Components\TextInput::make('name')
-                            ->required()
+                            
                             ->maxLength(255),
                         Forms\Components\TextInput::make('code')
                             ->maxLength(255)
                             ->nullable(),
                         Forms\Components\TextInput::make('currency')
-                            ->required()
+                            
                             ->maxLength(3)
                             ->default('GHS'),
                     ]),
@@ -55,10 +55,10 @@ class SalaryScaleResource extends Resource
                     ->columns(2)
                     ->schema([
                         Forms\Components\TextInput::make('min_basic')
-                            ->required()
+                            
                             ->numeric(),
                         Forms\Components\TextInput::make('max_basic')
-                            ->required()
+                            
                             ->numeric(),
                     ]),
 

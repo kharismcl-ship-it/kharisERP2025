@@ -36,7 +36,7 @@ class PayIntentResource extends Resource
             ->components([
                 Forms\Components\Select::make('company_id')
                     ->relationship('company', 'name')
-                    ->required(),
+                    ,
                 Forms\Components\Select::make('provider')
                     ->options([
                         'flutterwave' => 'Flutterwave',

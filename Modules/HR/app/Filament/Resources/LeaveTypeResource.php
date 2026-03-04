@@ -37,18 +37,18 @@ class LeaveTypeResource extends Resource
                     ->schema([
                         Forms\Components\Select::make('company_id')
                             ->relationship('company', 'name')
-                            ->required(),
+                            ,
                         Forms\Components\TextInput::make('name')
-                            ->required()
+                            
                             ->maxLength(255),
                         Forms\Components\TextInput::make('code')
                             ->label('Code')
-                            ->required()
+                            
                             ->maxLength(50)
                             ->unique(ignoreRecord: true),
                         Forms\Components\TextInput::make('max_days_per_year')
                             ->label('Max Days Per Year')
-                            ->required()
+                            
                             ->numeric()
                             ->minValue(0)
                             ->default(0),

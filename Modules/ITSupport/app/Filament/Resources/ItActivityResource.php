@@ -43,7 +43,7 @@ class ItActivityResource extends Resource
                         ->relationship('company', 'name')
                         ->searchable()
                         ->preload()
-                        ->required(),
+                        ,
                     Select::make('performed_by_employee_id')
                         ->label('Performed By')
                         ->relationship('performedByEmployee', 'full_name')

@@ -42,7 +42,7 @@ class EmployeeSalaryResource extends Resource
                             ->required(),
                         Forms\Components\Select::make('company_id')
                             ->relationship('company', 'name')
-                            ->required(),
+                            ,
                         Forms\Components\Select::make('salary_scale_id')
                             ->relationship('salaryScale', 'name')
                             ->nullable(),

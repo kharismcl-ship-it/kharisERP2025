@@ -36,7 +36,7 @@ class PaymentResource extends Resource
                     ->schema([
                         Forms\Components\Select::make('company_id')
                             ->relationship('company', 'name')
-                            ->required()
+                            
                             ->columnSpanFull(),
                         Forms\Components\Select::make('invoice_id')
                             ->relationship('invoice', 'invoice_number')
