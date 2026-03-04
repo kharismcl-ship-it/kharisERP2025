@@ -2,6 +2,7 @@
 
 namespace Modules\ClientService\Filament\Resources;
 
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -40,6 +41,13 @@ class CsVisitorResource extends Resource
     {
         return $schema->components([
             Section::make('Visitor Information')->schema([
+                Select::make('company_id')
+                    ->label('Company')
+                    ->relationship('company', 'name')
+                    ->searchable()
+                    ->preload()
+                    ->required()
+                    ->columnSpanFull(),
                 Grid::make(3)->schema([
                     TextInput::make('full_name')->required()->maxLength(255),
                     TextInput::make('phone')->tel()->nullable(),
@@ -60,8 +68,10 @@ class CsVisitorResource extends Resource
                     ->columnSpanFull(),
                 SignaturePad::make('check_in_signature')
                     ->label('Visitor Signature')
-                    ->nullable()
-                    ->columnSpanFull(),
+                    ->clearAction(fn (Action $action) => $action->button())
+                    ->downloadAction(fn (Action $action) => $action->color('primary'))
+                    ->undoAction(fn (Action $action) => $action->icon('heroicon-o-pencil'))
+                    ->doneAction(fn (Action $action) => $action->iconButton()->icon('heroicon-o-thumbs-up'))
             ]),
 
             Section::make('Visit Details')->schema([
