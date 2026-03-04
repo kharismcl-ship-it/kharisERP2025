@@ -32,6 +32,7 @@ class CsVisitor extends Model
         'badge_number',
         'items_brought',
         'photo_path',
+        'check_in_signature',
         'notes',
     ];
 

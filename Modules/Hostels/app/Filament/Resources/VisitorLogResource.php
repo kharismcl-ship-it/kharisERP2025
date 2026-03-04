@@ -11,6 +11,7 @@ use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Saade\FilamentAutograph\Forms\Components\SignaturePad;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -72,6 +73,10 @@ class VisitorLogResource extends Resource
                     ->relationship('recordedByUser', 'name')
                     ->searchable()
                     ->required(),
+                SignaturePad::make('visitor_signature')
+                    ->label('Visitor Signature')
+                    ->nullable()
+                    ->columnSpanFull(),
             ]);
     }
 

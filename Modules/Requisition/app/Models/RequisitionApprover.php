@@ -17,6 +17,7 @@ class RequisitionApprover extends Model
         'decision',
         'decided_at',
         'comment',
+        'signature',
     ];
 
     protected function casts(): array

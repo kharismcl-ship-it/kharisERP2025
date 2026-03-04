@@ -10,6 +10,7 @@ use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Resources\RelationManagers\RelationManager;
+use Saade\FilamentAutograph\Forms\Components\SignaturePad;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
@@ -43,6 +44,10 @@ class RequisitionApproversRelationManager extends RelationManager
                     ->default('pending'),
             ]),
             Textarea::make('comment')->rows(2)->columnSpanFull(),
+            SignaturePad::make('signature')
+                ->label('Approver Signature')
+                ->nullable()
+                ->columnSpanFull(),
         ]);
     }
 

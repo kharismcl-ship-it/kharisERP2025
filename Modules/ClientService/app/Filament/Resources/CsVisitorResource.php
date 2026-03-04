@@ -12,6 +12,7 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Saade\FilamentAutograph\Forms\Components\SignaturePad;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -55,6 +56,10 @@ class CsVisitorResource extends Resource
                     ->label('Photo')
                     ->directory('visitor-photos')
                     ->image()
+                    ->nullable()
+                    ->columnSpanFull(),
+                SignaturePad::make('check_in_signature')
+                    ->label('Visitor Signature')
                     ->nullable()
                     ->columnSpanFull(),
             ]),

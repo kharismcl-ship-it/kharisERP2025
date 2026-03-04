@@ -30,6 +30,7 @@ class VisitorLog extends Model
         'check_in_at',
         'check_out_at',
         'recorded_by_user_id',
+        'visitor_signature',
     ];
 
     protected static function newFactory(): VisitorLogFactory

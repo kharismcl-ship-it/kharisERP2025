@@ -38,6 +38,7 @@ use Modules\Hostels\Models\Hostel;
 use Modules\Hostels\Models\HostelCharge;
 use Modules\Hostels\Models\Room;
 use Modules\Hostels\Services\PricingService;
+use Saade\FilamentAutograph\Forms\Components\SignaturePad;
 
 class BookingResource extends Resource
 {
@@ -281,6 +282,11 @@ class BookingResource extends Resource
 
                         DateTimePicker::make('actual_check_out_at')
                             ->nullable(),
+
+                        SignaturePad::make('guest_check_in_signature')
+                            ->label('Guest Check-In Signature')
+                            ->nullable()
+                            ->columnSpanFull(),
 
                         TextInput::make('total_amount')
                             ->numeric()

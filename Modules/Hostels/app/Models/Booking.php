@@ -51,6 +51,7 @@ class Booking extends Model
         'check_out_date',
         'expected_check_out_date',
         'actual_check_in_at',
+        'guest_check_in_signature',
         'actual_check_out_at',
         'status',
         'total_amount',
