@@ -4,6 +4,7 @@ namespace Modules\ClientService\Models;
 
 use App\Models\Company;
 use App\Models\Concerns\BelongsToCompany;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Modules\ClientService\Events\VisitorCheckedOut;
@@ -34,6 +35,8 @@ class CsVisitor extends Model
         'photo_path',
         'check_in_signature',
         'notes',
+        'checked_in_by_user_id',
+        'checked_out_by_user_id',
     ];
 
     protected function casts(): array
@@ -97,5 +100,15 @@ class CsVisitor extends Model
     public function department()
     {
         return $this->belongsTo(Department::class);
+    }
+
+    public function checkedInBy()
+    {
+        return $this->belongsTo(User::class, 'checked_in_by_user_id');
+    }
+
+    public function checkedOutBy()
+    {
+        return $this->belongsTo(User::class, 'checked_out_by_user_id');
     }
 }

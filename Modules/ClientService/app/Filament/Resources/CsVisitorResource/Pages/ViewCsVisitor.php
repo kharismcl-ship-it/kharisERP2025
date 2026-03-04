@@ -77,6 +77,12 @@ class ViewCsVisitor extends ViewRecord
                         ->badge()
                         ->state(fn (CsVisitor $record) => $record->is_checked_out ? 'Out' : 'In')
                         ->color(fn ($state) => $state === 'Out' ? 'success' : 'warning'),
+                    TextEntry::make('checkedInBy.name')
+                        ->label('Checked In By')
+                        ->placeholder('—'),
+                    TextEntry::make('checkedOutBy.name')
+                        ->label('Checked Out By')
+                        ->placeholder('—'),
                 ])
                 ->columns(4),
 
