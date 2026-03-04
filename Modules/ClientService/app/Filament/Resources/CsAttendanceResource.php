@@ -44,8 +44,7 @@ class CsAttendanceResource extends Resource
                         ->label('Company')
                         ->relationship('company', 'name')
                         ->searchable()
-                        ->preload()
-                        ->required(),
+                        ->preload(),
                     Select::make('employee_id')
                         ->label('Employee')
                         ->relationship('employee', 'full_name')
