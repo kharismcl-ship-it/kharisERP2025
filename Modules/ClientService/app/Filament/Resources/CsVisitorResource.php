@@ -41,13 +41,7 @@ class CsVisitorResource extends Resource
     {
         return $schema->components([
             Section::make('Visitor Information')->schema([
-                Select::make('company_id')
-                    ->label('Company')
-                    ->relationship('company', 'name')
-                    ->searchable()
-                    ->preload()
-                    ->required()
-                    ->columnSpanFull(),
+
                 Grid::make(3)->schema([
                     TextInput::make('full_name')->required()->maxLength(255),
                     TextInput::make('phone')->tel()->nullable(),
@@ -76,6 +70,12 @@ class CsVisitorResource extends Resource
 
             Section::make('Visit Details')->schema([
                 Grid::make(2)->schema([
+                    Select::make('company_id')
+                        ->label('Hosting Company')
+                        ->relationship('company', 'name')
+                        ->searchable()
+                        ->preload()
+                        ->columnSpanFull(),
                     Select::make('host_employee_id')
                         ->label('Host Employee')
                         ->relationship('hostEmployee', 'full_name')
