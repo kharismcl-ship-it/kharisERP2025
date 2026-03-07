@@ -3,6 +3,7 @@
 namespace Modules\Farms\Filament\Resources\FarmResource\RelationManagers;
 
 use EduardoRibeiroDev\FilamentLeaflet\Fields\MapPicker;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -31,11 +32,24 @@ class FarmPlotsRelationManager extends RelationManager
             Select::make('status')->options(array_combine(FarmPlot::STATUSES, array_map('ucfirst', FarmPlot::STATUSES)))->default('active'),
             Textarea::make('description')->rows(2)->columnSpanFull(),
             Textarea::make('notes')->rows(2)->columnSpanFull(),
-            MapPicker::make('map_coordinates')
+            MapPicker::make('map')
+                ->label('Pin Location & Draw Boundary')
                 ->latitudeFieldName('latitude')
                 ->longitudeFieldName('longitude')
-                ->height(300)
+                ->center(5.6037, -0.1870)
+                ->height(400)
+                ->zoom(13)
+                ->fullscreenControl()
+                ->searchControl()
+                ->drawPolygonControl()
+                ->drawPolylineControl()
+                ->drawRectangleControl()
+                ->drawCircleControl()
+                ->editLayersControl()
+                ->dragLayersControl()
+                ->removeLayersControl()
                 ->columnSpanFull(),
+            Hidden::make('geometry'),
         ]);
     }
 

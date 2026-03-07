@@ -32,14 +32,22 @@ class TripLog extends Model
         'client_name',
         'client_phone',
         'client_email',
+        'origin_lat',
+        'origin_lng',
+        'destination_lat',
+        'destination_lng',
     ];
 
     protected $casts = [
-        'trip_date'    => 'date',
-        'start_mileage'=> 'decimal:2',
-        'end_mileage'  => 'decimal:2',
-        'distance_km'  => 'decimal:2',
-        'fare_amount'  => 'decimal:2',
+        'trip_date'       => 'date',
+        'start_mileage'   => 'decimal:2',
+        'end_mileage'     => 'decimal:2',
+        'distance_km'     => 'decimal:2',
+        'fare_amount'     => 'decimal:2',
+        'origin_lat'      => 'float',
+        'origin_lng'      => 'float',
+        'destination_lat' => 'float',
+        'destination_lng' => 'float',
     ];
 
     const STATUSES = ['planned', 'in_progress', 'completed', 'cancelled'];

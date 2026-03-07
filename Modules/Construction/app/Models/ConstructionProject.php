@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
 use App\Models\Company;
+use EduardoRibeiroDev\FilamentLeaflet\Concerns\HasGeoJsonFile;
 use Modules\Construction\Events\ProjectBudgetOverrun;
 use Modules\Construction\Events\ProjectCompleted;
 use Modules\PaymentsChannel\Traits\HasPayments;
@@ -14,7 +15,7 @@ use App\Models\Concerns\BelongsToCompany;
 
 class ConstructionProject extends Model
 {
-    use HasPayments, BelongsToCompany;
+    use HasPayments, BelongsToCompany, HasGeoJsonFile;
 
     protected $fillable = [
         'company_id',
@@ -40,6 +41,7 @@ class ConstructionProject extends Model
         'invoice_id',
         'status',
         'notes',
+        'geometry',
     ];
 
     protected $casts = [
@@ -49,8 +51,9 @@ class ConstructionProject extends Model
         'contract_value'    => 'decimal:2',
         'budget'            => 'decimal:2',
         'total_spent'       => 'decimal:2',
-        'latitude'          => 'decimal:7',
-        'longitude'         => 'decimal:7',
+        'latitude'          => 'float',
+        'longitude'         => 'float',
+        'geometry'          => 'array',
     ];
 
     const STATUSES = ['planning', 'active', 'on_hold', 'completed', 'cancelled'];
@@ -156,6 +159,15 @@ class ConstructionProject extends Model
     public function invoice(): BelongsTo
     {
         return $this->belongsTo(\Modules\Finance\Models\Invoice::class, 'invoice_id');
+    }
+
+    public function getGeoJsonFileAttributeName(): string { return 'geometry'; }
+
+    public function getGeoJsonUrl(): ?string
+    {
+        if (empty($this->geometry)) { return null; }
+        $json = is_array($this->geometry) ? json_encode($this->geometry) : $this->geometry;
+        return 'data:application/json;base64,' . base64_encode($json);
     }
 
     public function getBudgetVarianceAttribute(): float

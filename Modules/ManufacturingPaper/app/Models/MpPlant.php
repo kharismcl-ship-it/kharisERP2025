@@ -3,6 +3,7 @@
 namespace Modules\ManufacturingPaper\Models;
 
 use App\Models\Company;
+use EduardoRibeiroDev\FilamentLeaflet\Concerns\HasGeoJsonFile;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -11,7 +12,7 @@ use App\Models\Concerns\BelongsToCompany;
 
 class MpPlant extends Model
 {
-    use BelongsToCompany;
+    use BelongsToCompany, HasGeoJsonFile;
 
     protected $table = 'mp_plants';
 
@@ -25,7 +26,25 @@ class MpPlant extends Model
         'capacity_unit',
         'status',
         'description',
+        'latitude',
+        'longitude',
+        'geometry',
     ];
+
+    protected $casts = [
+        'latitude'  => 'float',
+        'longitude' => 'float',
+        'geometry'  => 'array',
+    ];
+
+    public function getGeoJsonFileAttributeName(): string { return 'geometry'; }
+
+    public function getGeoJsonUrl(): ?string
+    {
+        if (empty($this->geometry)) { return null; }
+        $json = is_array($this->geometry) ? json_encode($this->geometry) : $this->geometry;
+        return 'data:application/json;base64,' . base64_encode($json);
+    }
 
     const TYPES = ['integrated', 'pulp_only', 'paper_only', 'recycled'];
     const STATUSES = ['active', 'idle', 'maintenance', 'decommissioned'];

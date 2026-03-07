@@ -26,11 +26,15 @@ class Warehouse extends Model
         'is_default',
         'is_active',
         'notes',
+        'latitude',
+        'longitude',
     ];
 
     protected $casts = [
         'is_default' => 'boolean',
         'is_active'  => 'boolean',
+        'latitude'   => 'float',
+        'longitude'  => 'float',
     ];
 
     public function company(): BelongsTo

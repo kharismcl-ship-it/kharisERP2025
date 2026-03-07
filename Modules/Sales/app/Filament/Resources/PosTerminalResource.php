@@ -2,6 +2,8 @@
 
 namespace Modules\Sales\Filament\Resources;
 
+use EduardoRibeiroDev\FilamentLeaflet\Fields\MapPicker;
+use EduardoRibeiroDev\FilamentLeaflet\Tables\MapColumn;
 use Filament\Actions\EditAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\BulkActionGroup;
@@ -32,6 +34,23 @@ class PosTerminalResource extends Resource
                 TextInput::make('location')->maxLength(200),
                 Toggle::make('is_active')->default(true)->inline(false),
             ]),
+
+            Section::make('Map Location')
+                ->icon('heroicon-o-map-pin')
+                ->collapsible()
+                ->schema([
+                    MapPicker::make('map')
+                        ->label('Terminal Location')
+                        ->latitudeFieldName('latitude')
+                        ->longitudeFieldName('longitude')
+                        ->center(5.6037, -0.1870)
+                        ->height(350)
+                        ->zoom(14)
+                        ->fullscreenControl()
+                        ->searchControl()
+                        ->scaleControl()
+                        ->columnSpanFull(),
+                ]),
         ]);
     }
 
@@ -43,6 +62,14 @@ class PosTerminalResource extends Resource
                 TextColumn::make('location'),
                 ToggleColumn::make('is_active'),
                 TextColumn::make('created_at')->dateTime()->sortable()->toggleable(isToggledHiddenByDefault: true),
+                MapColumn::make('latitude')
+                    ->label('Map')
+                    ->latitudeFieldName('latitude')
+                    ->longitudeFieldName('longitude')
+                    ->height(80)
+                    ->zoom(14)
+                    ->circular()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->actions([EditAction::make()])
             ->bulkActions([BulkActionGroup::make([DeleteBulkAction::make()])]);

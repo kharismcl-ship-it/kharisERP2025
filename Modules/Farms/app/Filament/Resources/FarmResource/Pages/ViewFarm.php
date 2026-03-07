@@ -155,15 +155,28 @@ class ViewFarm extends ViewRecord
                     TextEntry::make('updated_at')->dateTime()->label('Last Updated'),
                 ]),
 
-            Section::make('Location on Map')
+            Section::make('Location & Map')
+                ->icon('heroicon-o-map-pin')
                 ->collapsible()
                 ->collapsed()
+                ->columns(2)
                 ->schema([
-                    MapEntry::make('map_coordinates')
+                    \Filament\Infolists\Components\TextEntry::make('location')->label('Address')->placeholder('—')->columnSpanFull(),
+
+                    MapEntry::make('map')
+                        ->label('Farm Location')
                         ->latitudeFieldName('latitude')
                         ->longitudeFieldName('longitude')
-                        ->height(300)
+                        ->center(5.6037, -0.1870)
+                        ->height(400)
+                        ->zoom(14)
+                        ->static()
+                        ->fullscreenControl()
+                        ->scaleControl()
                         ->columnSpanFull(),
+
+                    \Filament\Infolists\Components\TextEntry::make('latitude')->placeholder('—'),
+                    \Filament\Infolists\Components\TextEntry::make('longitude')->placeholder('—'),
                 ]),
         ]);
     }

@@ -4,6 +4,8 @@ namespace Modules\Finance\Providers;
 
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
+use Livewire\Livewire;
+use Modules\Finance\Filament\Widgets\FixedAssetsMapWidget;
 use Nwidart\Modules\Traits\PathNamespace;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -28,6 +30,8 @@ class FinanceServiceProvider extends ServiceProvider
                 return;
             }
         }
+
+        Livewire::component('finance-fixed-assets-map-widget', FixedAssetsMapWidget::class);
 
         $this->registerCommands();
         $this->registerCommandSchedules();

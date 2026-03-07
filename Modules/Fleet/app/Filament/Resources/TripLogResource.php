@@ -2,6 +2,8 @@
 
 namespace Modules\Fleet\Filament\Resources;
 
+use EduardoRibeiroDev\FilamentLeaflet\Fields\MapPicker;
+use EduardoRibeiroDev\FilamentLeaflet\Tables\MapColumn;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
@@ -82,6 +84,41 @@ class TripLogResource extends Resource
                         ->placeholder('e.g. Client meeting, goods delivery'),
                 ]),
 
+            Section::make('Route Map')
+                ->icon('heroicon-o-map')
+                ->description('Pin origin and destination on the map')
+                ->collapsible()
+                ->columns(2)
+                ->schema([
+                    MapPicker::make('origin_map')
+                        ->label('Origin Pin')
+                        ->latitudeFieldName('origin_lat')
+                        ->longitudeFieldName('origin_lng')
+                        ->center(5.6037, -0.1870)
+                        ->height(300)
+                        ->zoom(12)
+                        ->fullscreenControl()
+                        ->searchControl()
+                        ->scaleControl()
+                        ->columnSpanFull(),
+                    TextInput::make('origin_lat')->numeric()->readOnly()->label('Origin Latitude')->placeholder('Auto-filled'),
+                    TextInput::make('origin_lng')->numeric()->readOnly()->label('Origin Longitude')->placeholder('Auto-filled'),
+
+                    MapPicker::make('destination_map')
+                        ->label('Destination Pin')
+                        ->latitudeFieldName('destination_lat')
+                        ->longitudeFieldName('destination_lng')
+                        ->center(5.6037, -0.1870)
+                        ->height(300)
+                        ->zoom(12)
+                        ->fullscreenControl()
+                        ->searchControl()
+                        ->scaleControl()
+                        ->columnSpanFull(),
+                    TextInput::make('destination_lat')->numeric()->readOnly()->label('Destination Latitude')->placeholder('Auto-filled'),
+                    TextInput::make('destination_lng')->numeric()->readOnly()->label('Destination Longitude')->placeholder('Auto-filled'),
+                ]),
+
             Section::make('Mileage & Timing')
                 ->description('Odometer readings and departure / return times')
                 ->columns(3)
@@ -137,6 +174,22 @@ class TripLogResource extends Resource
                         default       => 'gray',
                     }),
                 TextColumn::make('driver.name')->label('Driver'),
+                MapColumn::make('origin_lat')
+                    ->label('Origin Map')
+                    ->latitudeFieldName('origin_lat')
+                    ->longitudeFieldName('origin_lng')
+                    ->height(80)
+                    ->zoom(13)
+                    ->circular()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                MapColumn::make('destination_lat')
+                    ->label('Destination Map')
+                    ->latitudeFieldName('destination_lat')
+                    ->longitudeFieldName('destination_lng')
+                    ->height(80)
+                    ->zoom(13)
+                    ->circular()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 SelectFilter::make('status')

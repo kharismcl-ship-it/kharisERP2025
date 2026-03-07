@@ -17,10 +17,14 @@ class PosTerminal extends Model
         'name',
         'location',
         'is_active',
+        'latitude',
+        'longitude',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
+        'latitude'  => 'float',
+        'longitude' => 'float',
     ];
 
     public function company(): BelongsTo

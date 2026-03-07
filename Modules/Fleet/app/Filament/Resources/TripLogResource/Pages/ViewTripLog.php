@@ -2,6 +2,7 @@
 
 namespace Modules\Fleet\Filament\Resources\TripLogResource\Pages;
 
+use EduardoRibeiroDev\FilamentLeaflet\Infolists\MapEntry;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Textarea;
@@ -154,6 +155,37 @@ class ViewTripLog extends ViewRecord
                         ->label('Trip Purpose')
                         ->columnSpanFull()
                         ->placeholder('—'),
+                ]),
+
+            Section::make('Route Map')
+                ->icon('heroicon-o-map')
+                ->collapsible()
+                ->collapsed()
+                ->columns(2)
+                ->schema([
+                    MapEntry::make('origin_map')
+                        ->label('Origin Location')
+                        ->latitudeFieldName('origin_lat')
+                        ->longitudeFieldName('origin_lng')
+                        ->center(5.6037, -0.1870)
+                        ->height(300)
+                        ->zoom(13)
+                        ->static()
+                        ->fullscreenControl()
+                        ->scaleControl()
+                        ->columnSpanFull(),
+
+                    MapEntry::make('destination_map')
+                        ->label('Destination Location')
+                        ->latitudeFieldName('destination_lat')
+                        ->longitudeFieldName('destination_lng')
+                        ->center(5.6037, -0.1870)
+                        ->height(300)
+                        ->zoom(13)
+                        ->static()
+                        ->fullscreenControl()
+                        ->scaleControl()
+                        ->columnSpanFull(),
                 ]),
 
             Section::make('Mileage & Timing')

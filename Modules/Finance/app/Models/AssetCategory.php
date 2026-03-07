@@ -14,6 +14,7 @@ class AssetCategory extends Model
     protected $fillable = [
         'company_id',
         'name',
+        'map_icon',
         'depreciation_method',
         'useful_life_years',
         'residual_rate',

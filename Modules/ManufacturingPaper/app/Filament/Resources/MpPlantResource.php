@@ -2,9 +2,13 @@
 
 namespace Modules\ManufacturingPaper\Filament\Resources;
 
+use EduardoRibeiroDev\FilamentLeaflet\Fields\MapPicker;
+use EduardoRibeiroDev\FilamentLeaflet\Infolists\MapEntry;
+use EduardoRibeiroDev\FilamentLeaflet\Tables\MapColumn;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -53,6 +57,92 @@ class MpPlantResource extends Resource
                 ]),
                 Textarea::make('description')->rows(3)->columnSpanFull(),
             ]),
+
+            Section::make('Location & Map')
+                ->icon('heroicon-o-map-pin')
+                ->collapsible()
+                ->columns(2)
+                ->schema([
+                    MapPicker::make('map')
+                        ->label('Pin Location & Draw Boundary')
+                        ->latitudeFieldName('latitude')
+                        ->longitudeFieldName('longitude')
+                        ->center(5.6037, -0.1870)
+                        ->height(450)
+                        ->zoom(12)
+                        ->fullscreenControl()
+                        ->searchControl()
+                        ->scaleControl()
+                        ->drawPolygonControl()
+                        ->drawPolylineControl()
+                        ->drawRectangleControl()
+                        ->drawCircleControl()
+                        ->editLayersControl()
+                        ->dragLayersControl()
+                        ->removeLayersControl()
+                        ->columnSpanFull(),
+
+                    Grid::make(2)
+                        ->schema([
+                            TextInput::make('latitude')->numeric()->readOnly()->placeholder('Auto-filled by map pin'),
+                            TextInput::make('longitude')->numeric()->readOnly()->placeholder('Auto-filled by map pin'),
+                        ])
+                        ->columnSpanFull(),
+
+                ]),
+        ]);
+    }
+
+    public static function infolist(Schema $schema): Schema
+    {
+        return $schema->components([
+            Section::make('Plant Details')
+                ->columns(3)
+                ->schema([
+                    TextEntry::make('name')->weight('bold'),
+                    TextEntry::make('type')->badge()
+                        ->color(fn (string $state): string => match ($state) {
+                            'integrated' => 'success',
+                            'pulp_only'  => 'info',
+                            'paper_only' => 'primary',
+                            default      => 'gray',
+                        }),
+                    TextEntry::make('status')->badge()
+                        ->color(fn (string $state): string => match ($state) {
+                            'active'         => 'success',
+                            'idle'           => 'warning',
+                            'maintenance'    => 'danger',
+                            'decommissioned' => 'gray',
+                            default          => 'gray',
+                        }),
+                    TextEntry::make('capacity')->formatStateUsing(fn ($state, $record) => $state ? $state . ' ' . $record->capacity_unit : '—'),
+                    TextEntry::make('location')->label('Location')->placeholder('—'),
+                    TextEntry::make('slug')->badge()->color('gray'),
+                    TextEntry::make('description')->columnSpanFull()->placeholder('—'),
+                ]),
+
+            Section::make('Location & Map')
+                ->icon('heroicon-o-map-pin')
+                ->collapsible()
+                ->columns(2)
+                ->schema([
+                    TextEntry::make('location')->label('Address')->placeholder('—')->columnSpanFull(),
+
+                    MapEntry::make('map')
+                        ->label('Plant Location')
+                        ->latitudeFieldName('latitude')
+                        ->longitudeFieldName('longitude')
+                        ->center(5.6037, -0.1870)
+                        ->height(400)
+                        ->zoom(14)
+                        ->static()
+                        ->fullscreenControl()
+                        ->scaleControl()
+                        ->columnSpanFull(),
+
+                    TextEntry::make('latitude')->placeholder('—'),
+                    TextEntry::make('longitude')->placeholder('—'),
+                ]),
         ]);
     }
 
@@ -79,6 +169,14 @@ class MpPlantResource extends Resource
                         'decommissioned' => 'gray',
                         default          => 'gray',
                     }),
+                MapColumn::make('latitude')
+                    ->label('Map Preview')
+                    ->latitudeFieldName('latitude')
+                    ->longitudeFieldName('longitude')
+                    ->height(80)
+                    ->zoom(13)
+                    ->circular()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('type')

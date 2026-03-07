@@ -2,6 +2,7 @@
 
 namespace Modules\Construction\Filament\Resources\ConstructionProjectResource\Pages;
 
+use EduardoRibeiroDev\FilamentLeaflet\Infolists\MapEntry;
 use Filament\Actions;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\Section;
@@ -54,6 +55,29 @@ class ViewConstructionProject extends ViewRecord
                     TextEntry::make('total_spent')->label('Total Spent')->money('GHS'),
                 ]),
             ]),
+
+            Section::make('Location & Map')
+                ->icon('heroicon-o-map-pin')
+                ->collapsible()
+                ->columns(2)
+                ->schema([
+                    TextEntry::make('location')->label('Address')->placeholder('—')->columnSpanFull(),
+
+                    MapEntry::make('map')
+                        ->label('Site Location')
+                        ->latitudeFieldName('latitude')
+                        ->longitudeFieldName('longitude')
+                        ->center(5.6037, -0.1870)
+                        ->height(400)
+                        ->zoom(14)
+                        ->static()
+                        ->fullscreenControl()
+                        ->scaleControl()
+                        ->columnSpanFull(),
+
+                    TextEntry::make('latitude')->placeholder('—'),
+                    TextEntry::make('longitude')->placeholder('—'),
+                ]),
         ]);
     }
 }

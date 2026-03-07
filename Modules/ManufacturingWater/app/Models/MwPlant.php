@@ -3,6 +3,7 @@
 namespace Modules\ManufacturingWater\Models;
 
 use App\Models\Company;
+use EduardoRibeiroDev\FilamentLeaflet\Concerns\HasGeoJsonFile;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -11,7 +12,7 @@ use App\Models\Concerns\BelongsToCompany;
 
 class MwPlant extends Model
 {
-    use BelongsToCompany;
+    use BelongsToCompany, HasGeoJsonFile;
 
     protected $table = 'mw_plants';
 
@@ -25,11 +26,26 @@ class MwPlant extends Model
         'capacity_liters_per_day',
         'status',
         'description',
+        'latitude',
+        'longitude',
+        'geometry',
     ];
 
     protected $casts = [
         'capacity_liters_per_day' => 'decimal:2',
+        'latitude'                => 'float',
+        'longitude'               => 'float',
+        'geometry'                => 'array',
     ];
+
+    public function getGeoJsonFileAttributeName(): string { return 'geometry'; }
+
+    public function getGeoJsonUrl(): ?string
+    {
+        if (empty($this->geometry)) { return null; }
+        $json = is_array($this->geometry) ? json_encode($this->geometry) : $this->geometry;
+        return 'data:application/json;base64,' . base64_encode($json);
+    }
 
     const TYPES        = ['treatment', 'bottling', 'distribution'];
     const SOURCE_TYPES = ['borehole', 'river', 'reservoir', 'municipal', 'spring'];

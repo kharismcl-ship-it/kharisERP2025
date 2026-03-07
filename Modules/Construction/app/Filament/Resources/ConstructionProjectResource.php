@@ -3,6 +3,7 @@
 namespace Modules\Construction\Filament\Resources;
 
 use EduardoRibeiroDev\FilamentLeaflet\Fields\MapPicker;
+use EduardoRibeiroDev\FilamentLeaflet\Tables\MapColumn;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -77,13 +78,35 @@ class ConstructionProjectResource extends Resource
                 ]),
             ]),
 
-            Section::make('Location on Map')
+            Section::make('Location & Map')
+                ->icon('heroicon-o-map-pin')
                 ->collapsible()
+                ->columns(2)
                 ->schema([
-                    MapPicker::make('map_coordinates')
+                    MapPicker::make('map')
+                        ->label('Pin Location & Draw Boundary')
                         ->latitudeFieldName('latitude')
                         ->longitudeFieldName('longitude')
-                        ->height(350)
+                        ->center(5.6037, -0.1870)
+                        ->height(450)
+                        ->zoom(12)
+                        ->fullscreenControl()
+                        ->searchControl()
+                        ->scaleControl()
+                        ->drawPolygonControl()
+                        ->drawPolylineControl()
+                        ->drawRectangleControl()
+                        ->drawCircleControl()
+                        ->editLayersControl()
+                        ->dragLayersControl()
+                        ->removeLayersControl()
+                        ->columnSpanFull(),
+
+                    Grid::make(2)
+                        ->schema([
+                            TextInput::make('latitude')->numeric()->readOnly()->placeholder('Auto-filled by map pin'),
+                            TextInput::make('longitude')->numeric()->readOnly()->placeholder('Auto-filled by map pin'),
+                        ])
                         ->columnSpanFull(),
                 ]),
         ]);
@@ -109,6 +132,14 @@ class ConstructionProjectResource extends Resource
                         'cancelled' => 'danger',
                         default     => 'gray',
                     }),
+                MapColumn::make('latitude')
+                    ->label('Map Preview')
+                    ->latitudeFieldName('latitude')
+                    ->longitudeFieldName('longitude')
+                    ->height(80)
+                    ->zoom(13)
+                    ->circular()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('status')

@@ -8,6 +8,8 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms;
+use Filament\Forms\Components\FileUpload;
+use Filament\Infolists\Components\ImageEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -43,9 +45,18 @@ class AssetCategoryResource extends Resource
                             ->placeholder('System-wide')
                             ->columnSpanFull(),
                         Forms\Components\TextInput::make('name')
-                            
                             ->maxLength(255)
                             ->placeholder('e.g. Motor Vehicles'),
+
+                        FileUpload::make('map_icon')
+                            ->label('Map Marker Icon')
+                            ->image()
+                            ->directory('asset-categories/icons')
+                            ->imageEditor()
+                            ->acceptedFileTypes(['image/png', 'image/jpeg', 'image/webp', 'image/svg+xml'])
+                            ->maxSize(512)
+                            ->helperText('PNG/SVG icon shown on the Fixed Assets map. Recommended: 48×48 px.')
+                            ->columnSpanFull(),
                         Forms\Components\Select::make('depreciation_method')
                             ->options(AssetCategory::DEPRECIATION_METHODS)
                             ->default('straight_line')
@@ -87,6 +98,13 @@ class AssetCategoryResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\ImageColumn::make('map_icon')
+                    ->label('Icon')
+                    ->disk('public')
+                    ->width(36)
+                    ->height(36)
+                    ->defaultImageUrl('https://img.icons8.com/color/48/image-not-available.png')
+                    ->placeholder('—'),
                 Tables\Columns\TextColumn::make('name')
                     ->searchable()
                     ->sortable()

@@ -5,13 +5,14 @@ namespace Modules\Farms\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use EduardoRibeiroDev\FilamentLeaflet\Concerns\HasGeoJsonFile;
 use Illuminate\Support\Str;
 use App\Models\Company;
 use App\Models\Concerns\BelongsToCompany;
 
 class Farm extends Model
 {
-    use BelongsToCompany;
+    use BelongsToCompany, HasGeoJsonFile;
 
     protected $fillable = [
         'company_id',
@@ -28,12 +29,14 @@ class Farm extends Model
         'owner_phone',
         'status',
         'notes',
+        'geometry',
     ];
 
     protected $casts = [
         'total_area' => 'decimal:4',
-        'latitude'   => 'decimal:7',
-        'longitude'  => 'decimal:7',
+        'latitude'   => 'float',
+        'longitude'  => 'float',
+        'geometry'   => 'array',
     ];
 
     const TYPES    = ['crop', 'livestock', 'mixed', 'aquaculture'];
@@ -46,6 +49,15 @@ class Farm extends Model
                 $farm->slug = Str::slug($farm->name);
             }
         });
+    }
+
+    public function getGeoJsonFileAttributeName(): string { return 'geometry'; }
+
+    public function getGeoJsonUrl(): ?string
+    {
+        if (empty($this->geometry)) { return null; }
+        $json = is_array($this->geometry) ? json_encode($this->geometry) : $this->geometry;
+        return 'data:application/json;base64,' . base64_encode($json);
     }
 
     public function company(): BelongsTo

@@ -2,6 +2,7 @@
 
 namespace Modules\Farms\Models;
 
+use EduardoRibeiroDev\FilamentLeaflet\Concerns\HasGeoJsonFile;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -10,7 +11,7 @@ use App\Models\Concerns\BelongsToCompany;
 
 class FarmPlot extends Model
 {
-    use BelongsToCompany;
+    use BelongsToCompany, HasGeoJsonFile;
 
     protected $fillable = [
         'farm_id',
@@ -25,16 +26,27 @@ class FarmPlot extends Model
         'longitude',
         'status',
         'notes',
+        'geometry',
     ];
 
     protected $casts = [
         'area'      => 'decimal:4',
-        'latitude'  => 'decimal:7',
-        'longitude' => 'decimal:7',
+        'latitude'  => 'float',
+        'longitude' => 'float',
+        'geometry'  => 'array',
     ];
 
     const SOIL_TYPES = ['clay', 'sandy', 'loam', 'silty', 'peaty', 'chalky'];
     const STATUSES   = ['active', 'fallow', 'preparing'];
+
+    public function getGeoJsonFileAttributeName(): string { return 'geometry'; }
+
+    public function getGeoJsonUrl(): ?string
+    {
+        if (empty($this->geometry)) { return null; }
+        $json = is_array($this->geometry) ? json_encode($this->geometry) : $this->geometry;
+        return 'data:application/json;base64,' . base64_encode($json);
+    }
 
     public function farm(): BelongsTo
     {

@@ -9,6 +9,7 @@ use Modules\Finance\Filament\Pages\ArAgingReport;
 use Modules\Finance\Filament\Pages\BalanceSheet;
 use Modules\Finance\Filament\Pages\CashFlowStatement;
 use Modules\Finance\Filament\Pages\FinanceDashboard;
+use Modules\Finance\Filament\Pages\FixedAssetMapPage;
 use Modules\Finance\Filament\Pages\GeneralLedger;
 use Modules\Finance\Filament\Pages\IncomeStatement;
 use Modules\Finance\Filament\Pages\TrialBalance;
@@ -80,6 +81,7 @@ class FinanceFilamentPlugin implements Plugin
             ApAgingReport::class,
             GeneralLedger::class,
             CashFlowStatement::class,
+            FixedAssetMapPage::class,
         ]);
     }
 
