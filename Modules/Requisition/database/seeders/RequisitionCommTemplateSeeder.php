@@ -24,6 +24,13 @@ class RequisitionCommTemplateSeeder extends Seeder
                 'subject' => 'You have been added as {{role}} on requisition {{reference}}',
                 'body'    => "Dear Team Member,\n\nYou have been added as a {{role}} on the following request:\n\nReference: {{reference}}\nTitle: {{title}}\nRaised by: {{requester}}\n\nPlease log in to review and take action.",
             ],
+            [
+                'code'    => 'requisition_party_notified',
+                'name'    => 'Requisition — Party Notification',
+                'channel' => 'email',
+                'subject' => 'You have been added {{reason}} on requisition {{reference}}',
+                'body'    => "Dear Team Member,\n\nYou have been included on the following request ({{reason}}):\n\nReference: {{reference}}\nTitle: {{title}}\nRaised by: {{requester}}\n\nThis notification is for your awareness. Please log in to the ERP system to view full details.",
+            ],
         ];
 
         foreach ($templates as $tpl) {

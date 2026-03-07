@@ -5,6 +5,8 @@ namespace Modules\ClientService\Filament;
 use Filament\Contracts\Plugin;
 use Filament\Panel;
 use Modules\ClientService\Filament\Resources\CsAttendanceResource;
+use Modules\ClientService\Filament\Resources\CsVisitorBadgeResource;
+use Modules\ClientService\Filament\Resources\CsVisitorProfileResource;
 use Modules\ClientService\Filament\Resources\CsVisitorResource;
 
 class ClientServiceFilamentPlugin implements Plugin
@@ -19,6 +21,8 @@ class ClientServiceFilamentPlugin implements Plugin
         $panel->resources([
             CsAttendanceResource::class,
             CsVisitorResource::class,
+            CsVisitorProfileResource::class,
+            CsVisitorBadgeResource::class,
         ]);
     }
 

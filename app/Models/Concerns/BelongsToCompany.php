@@ -23,6 +23,16 @@ trait BelongsToCompany
     public static function bootBelongsToCompany(): void
     {
         static::addGlobalScope(new TenantScope());
+
+        // Auto-stamp company_id on every new record when Filament has an active
+        // tenant. This covers the admin panel (where Filament's own
+        // observeTenancyModelCreation does not fire) as well as any edge case
+        // where the form's company Select was left blank.
+        static::creating(function ($model) {
+            if (empty($model->company_id) && app()->bound('filament')) {
+                $model->company_id = filament()->getTenant()?->getKey();
+            }
+        });
     }
 
     /**

@@ -15,30 +15,50 @@ class NotifyRequisitionStatusChanged
         $req      = $event->requisition;
         $employee = $req->requesterEmployee;
 
-        if (! $employee || ! $employee->getCommEmail()) {
+        if (! $employee) {
             return;
         }
 
+        $channels = $req->getNotificationChannels();
+
         $data = [
-            'reference'    => $req->reference,
-            'status'       => ucfirst(str_replace('_', ' ', $req->status)),
-            'title'        => $req->title,
-            'requester'    => $employee->getCommName(),
+            'reference' => $req->reference,
+            'status'    => ucfirst(str_replace('_', ' ', $req->status)),
+            'title'     => $req->title,
+            'requester' => $employee->getCommName(),
         ];
 
-        try {
-            $this->comms->sendFromTemplate(
-                'email',
-                'requisition_status_changed',
-                $employee->getCommEmail(),
-                $employee->getCommName(),
-                $data
-            );
-        } catch (\Throwable $e) {
-            Log::warning('NotifyRequisitionStatusChanged failed', [
-                'requisition_id' => $req->id,
-                'error'          => $e->getMessage(),
-            ]);
+        foreach ($channels as $channel) {
+            try {
+                // For database (in-app) channel, skip email check
+                if ($channel === 'database') {
+                    $this->comms->sendFromTemplate(
+                        'database',
+                        'requisition_status_changed',
+                        $employee->getCommEmail() ?? $employee->id,
+                        $employee->getCommName(),
+                        $data
+                    );
+                    continue;
+                }
+
+                if (! $employee->getCommEmail()) {
+                    continue;
+                }
+
+                $this->comms->sendFromTemplate(
+                    $channel,
+                    'requisition_status_changed',
+                    $employee->getCommEmail(),
+                    $employee->getCommName(),
+                    $data
+                );
+            } catch (\Throwable $e) {
+                Log::warning("NotifyRequisitionStatusChanged [{$channel}] failed", [
+                    'requisition_id' => $req->id,
+                    'error'          => $e->getMessage(),
+                ]);
+            }
         }
     }
 }

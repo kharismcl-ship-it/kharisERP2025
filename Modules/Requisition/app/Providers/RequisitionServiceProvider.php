@@ -39,9 +39,19 @@ class RequisitionServiceProvider extends ServiceProvider
         $this->app->register(RouteServiceProvider::class);
     }
 
-    protected function registerCommands(): void {}
+    protected function registerCommands(): void
+    {
+        $this->commands([
+            \Modules\Requisition\Console\Commands\EscalateOverdueRequisitionsCommand::class,
+        ]);
+    }
 
-    protected function registerCommandSchedules(): void {}
+    protected function registerCommandSchedules(): void
+    {
+        $this->callAfterResolving(\Illuminate\Console\Scheduling\Schedule::class, function (\Illuminate\Console\Scheduling\Schedule $schedule) {
+            $schedule->command('requisition:escalate-overdue')->dailyAt('06:00');
+        });
+    }
 
     public function registerTranslations(): void
     {

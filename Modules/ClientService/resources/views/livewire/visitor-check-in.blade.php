@@ -166,53 +166,85 @@
     @endif
 
     {{-- ══════════════════════════════════════════════════════
-         SCREEN: SUCCESS — check-in confirmation
+         SCREEN: SUCCESS — check-in confirmation + QR codes
     ══════════════════════════════════════════════════════ --}}
     @if ($screen === 'success')
         <main
-            class="flex-1 flex flex-col items-center justify-center px-6 py-12"
-            x-init="startAutoReset(30)"
-            x-on:click="startAutoReset(30)"
+            class="flex-1 flex flex-col items-center justify-center px-6 py-10"
+            x-init="startAutoReset(60)"
+            x-on:click="startAutoReset(60)"
         >
-            <div class="w-full max-w-lg text-center space-y-6">
+            <div class="w-full max-w-2xl space-y-6">
 
-                {{-- Green tick --}}
-                <div class="flex items-center justify-center">
-                    <div class="flex items-center justify-center w-28 h-28 rounded-full
-                                bg-success-100 dark:bg-success-900 text-success-600 dark:text-success-300
-                                ring-8 ring-success-50 dark:ring-success-950">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-14 h-14" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
+                {{-- Green tick + message --}}
+                <div class="text-center space-y-3">
+                    <div class="flex items-center justify-center">
+                        <div class="flex items-center justify-center w-20 h-20 rounded-full
+                                    bg-success-100 dark:bg-success-900 text-success-600 dark:text-success-300
+                                    ring-8 ring-success-50 dark:ring-success-950">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
                     </div>
-                </div>
 
-                {{-- Message --}}
-                <div>
-                    <h2 class="text-4xl font-extrabold text-gray-900 dark:text-white">
-                        You're checked in!
-                    </h2>
+                    <h2 class="text-3xl font-extrabold text-gray-900 dark:text-white">You're checked in!</h2>
                     @if ($checkedInName)
-                        <p class="mt-2 text-xl text-gray-600 dark:text-gray-300">
+                        <p class="text-lg text-gray-600 dark:text-gray-300">
                             Welcome, <span class="font-semibold text-gray-900 dark:text-white">{{ $checkedInName }}</span>
                         </p>
                     @endif
-                    @if ($badgeNumber)
-                        <p class="mt-3 inline-flex items-center gap-2 rounded-full bg-gray-100 dark:bg-gray-700 px-4 py-1.5 text-sm font-medium text-gray-700 dark:text-gray-200">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    @if ($badgeCode)
+                        <p class="inline-flex items-center gap-2 rounded-full
+                                   bg-primary-100 dark:bg-primary-900 px-4 py-1.5
+                                   text-sm font-bold text-primary-700 dark:text-primary-200 tracking-wide">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5zm6-10.125a1.875 1.875 0 11-3.75 0 1.875 1.875 0 013.75 0zm1.294 6.336a6.721 6.721 0 01-3.17.789 6.721 6.721 0 01-3.168-.789 3.376 3.376 0 016.338 0z" />
                             </svg>
-                            Badge {{ $badgeNumber }}
+                            Badge {{ $badgeCode }}
+                        </p>
+                    @else
+                        <p class="text-sm text-warning-600 dark:text-warning-400">
+                            No badge available. Please collect one from the reception desk.
                         </p>
                     @endif
                 </div>
 
-                <p class="text-sm text-gray-400 dark:text-gray-500">
-                    Please collect your visitor badge from the reception desk.
-                </p>
+                {{-- QR code cards --}}
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
 
-                {{-- Action buttons --}}
-                <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
+                    {{-- Badge / Check-out QR --}}
+                    @if ($badgeQrDataUri)
+                        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-5 flex flex-col items-center gap-3 text-center">
+                            <p class="text-xs font-semibold uppercase tracking-widest text-warning-600 dark:text-warning-400">
+                                Check-Out QR
+                            </p>
+                            <img src="{{ $badgeQrDataUri }}" alt="Check-Out QR Code" class="w-40 h-40 rounded-lg" />
+                            <div>
+                                <p class="text-sm font-medium text-gray-800 dark:text-gray-200">Staff will scan this when you leave</p>
+                                <p class="text-xs text-gray-400 mt-0.5">This code is valid for this visit only</p>
+                            </div>
+                        </div>
+                    @endif
+
+                    {{-- Profile / Returning-visitor QR --}}
+                    @if ($profileQrDataUri)
+                        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-5 flex flex-col items-center gap-3 text-center">
+                            <p class="text-xs font-semibold uppercase tracking-widest text-primary-600 dark:text-primary-400">
+                                Returning Visitor QR
+                            </p>
+                            <img src="{{ $profileQrDataUri }}" alt="Profile QR Code" class="w-40 h-40 rounded-lg" />
+                            <div>
+                                <p class="text-sm font-medium text-gray-800 dark:text-gray-200">Save this for faster check-in next time</p>
+                                <p class="text-xs text-gray-400 mt-0.5">Scan at the kiosk to skip re-typing your details</p>
+                            </div>
+                        </div>
+                    @endif
+
+                </div>
+
+                {{-- Action + countdown --}}
+                <div class="flex flex-col items-center gap-3">
                     <x-filament::button
                         wire:click="resetKiosk"
                         size="xl"
@@ -221,24 +253,24 @@
                     >
                         New Check-In
                     </x-filament::button>
+
+                    <p class="text-xs text-gray-400 dark:text-gray-600"
+                       x-data="{
+                           count: 60,
+                           init() {
+                               const t = setInterval(() => {
+                                   this.count--;
+                                   if (this.count <= 0) clearInterval(t);
+                               }, 1000);
+                               $watch('count', v => { if (v <= 0) clearInterval(t) });
+                           }
+                       }"
+                       x-on:click="count = 60; startAutoReset(60)"
+                    >
+                        Returning to welcome in <span x-text="count" class="font-medium text-gray-600 dark:text-gray-400"></span>s &mdash; tap anywhere to reset.
+                    </p>
                 </div>
 
-                {{-- Auto-reset countdown --}}
-                <p class="text-xs text-gray-400 dark:text-gray-600"
-                   x-data="{
-                       count: 30,
-                       init() {
-                           const t = setInterval(() => {
-                               this.count--;
-                               if (this.count <= 0) { clearInterval(t); }
-                           }, 1000);
-                           $watch('count', v => { if (v <= 0) clearInterval(t) });
-                       }
-                   }"
-                   x-on:click="count = 30; startAutoReset(30)"
-                >
-                    Returning to welcome in <span x-text="count" class="font-medium text-gray-600 dark:text-gray-400"></span>s &mdash; or tap anywhere to reset timer.
-                </p>
             </div>
         </main>
     @endif

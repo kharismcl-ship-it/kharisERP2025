@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasTenants;
+use Kirschbaum\Commentions\Contracts\Commenter;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -17,7 +18,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 use Modules\CommunicationCentre\Traits\HasNotificationPreferences;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable implements FilamentUser, HasTenants
+class User extends Authenticatable implements FilamentUser, HasTenants, Commenter
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, HasNotificationPreferences, HasRoles, Notifiable, TwoFactorAuthenticatable;

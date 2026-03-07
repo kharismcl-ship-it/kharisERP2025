@@ -1,13 +1,18 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="antialiased">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="fi antialiased">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="noindex,nofollow" />
     <title>{{ $title ?? ($companyName ?? 'Visitor Check-In') }}</title>
 
+    <style>
+        [x-cloak=''], [x-cloak='x-cloak'], [x-cloak='1'] { display: none !important; }
+    </style>
+
     @filamentStyles
-    @livewireStyles
+    {{ filament()->getTheme()->getHtml() }}
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
         /* -------------------------------------------------------
@@ -30,11 +35,10 @@
         }
     </style>
 </head>
-<body class="min-h-screen bg-slate-100 dark:bg-gray-900">
+<body class="fi-body min-h-screen bg-slate-100 dark:bg-gray-900">
 
     {{ $slot }}
 
-    @filamentScripts
-    @livewireScripts
+    @filamentScripts(withCore: true)
 </body>
 </html>

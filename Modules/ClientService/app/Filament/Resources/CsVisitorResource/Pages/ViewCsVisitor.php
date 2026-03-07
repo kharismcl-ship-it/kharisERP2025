@@ -2,6 +2,9 @@
 
 namespace Modules\ClientService\Filament\Resources\CsVisitorResource\Pages;
 
+use chillerlan\QRCode\Output\QROutputInterface;
+use chillerlan\QRCode\QRCode;
+use chillerlan\QRCode\QROptions;
 use Filament\Actions\EditAction;
 use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\TextEntry;
@@ -94,6 +97,57 @@ class ViewCsVisitor extends ViewRecord
                         ->columnSpanFull(),
                 ])
                 ->visible(fn (CsVisitor $record) => (bool) $record->photo_path),
+
+            Section::make('Visitor Pass')
+                ->description('QR codes for this visit. The check-out QR closes the visit; the returning QR is permanent for this visitor.')
+                ->schema([
+                    TextEntry::make('badge_number')
+                        ->label('Badge Code')
+                        ->badge()
+                        ->color('warning')
+                        ->placeholder('None assigned'),
+
+                    TextEntry::make('check_in_token')
+                        ->label('Check-Out QR')
+                        ->html()
+                        ->state(function (CsVisitor $record): string {
+                            if (! $record->check_in_token) {
+                                return '<p class="text-sm text-gray-400">—</p>';
+                            }
+                            $company = $record->company;
+                            if (! $company) {
+                                return '<p class="text-sm text-gray-400">—</p>';
+                            }
+                            $dataUri = (new QRCode(new QROptions([
+                                'outputType' => QROutputInterface::GDIMAGE_PNG,
+                                'scale'      => 5,
+                            ])))->render(route('clientservice.visitor-check-out', [
+                                'company'      => $company->slug,
+                                'checkInToken' => $record->check_in_token,
+                            ]));
+                            return '<img src="' . e($dataUri) . '" alt="Check-Out QR" class="w-32 h-32 rounded-lg" />';
+                        }),
+
+                    TextEntry::make('visitorProfile.profile_token')
+                        ->label('Returning Visitor QR')
+                        ->html()
+                        ->state(function (CsVisitor $record): string {
+                            $profile = $record->visitorProfile;
+                            $company = $record->company;
+                            if (! $profile || ! $company) {
+                                return '<p class="text-sm text-gray-400">—</p>';
+                            }
+                            $dataUri = (new QRCode(new QROptions([
+                                'outputType' => QROutputInterface::GDIMAGE_PNG,
+                                'scale'      => 5,
+                            ])))->render(route('clientservice.visitor-check-in.returning', [
+                                'company'      => $company->slug,
+                                'profileToken' => $profile->profile_token,
+                            ]));
+                            return '<img src="' . e($dataUri) . '" alt="Profile QR" class="w-32 h-32 rounded-lg" />';
+                        }),
+                ])
+                ->columns(3),
         ]);
     }
 }

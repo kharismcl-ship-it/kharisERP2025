@@ -14,6 +14,8 @@ class RequisitionApprover extends Model
         'requisition_id',
         'employee_id',
         'role',
+        'order',
+        'is_active',
         'decision',
         'decided_at',
         'comment',
@@ -24,7 +26,31 @@ class RequisitionApprover extends Model
     {
         return [
             'decided_at' => 'datetime',
+            'is_active'  => 'boolean',
         ];
+    }
+
+    protected static function boot(): void
+    {
+        parent::boot();
+
+        static::created(function (RequisitionApprover $approver) {
+            RequisitionActivity::log(
+                $approver->requisition,
+                'approver_added',
+                ($approver->role === 'approver' ? 'Approver' : 'Reviewer') . " added: {$approver->employee?->full_name}",
+            );
+        });
+
+        static::updated(function (RequisitionApprover $approver) {
+            if ($approver->isDirty('decision') && $approver->decision !== 'pending') {
+                RequisitionActivity::log(
+                    $approver->requisition,
+                    'approver_decision',
+                    "{$approver->employee?->full_name} marked as {$approver->decision}." . ($approver->comment ? " Comment: {$approver->comment}" : ''),
+                );
+            }
+        });
     }
 
     public function requisition()

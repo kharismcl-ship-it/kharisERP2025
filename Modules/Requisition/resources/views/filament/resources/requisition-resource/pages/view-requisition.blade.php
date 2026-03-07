@@ -1,11 +1,9 @@
 <x-filament-panels::page>
-    {{ $this->infolist }}
+    {{ $this->content }}
 
-    <div class="mt-6">
-        {{ $this->relationManagers }}
-    </div>
-
-    <div class="mt-6">
-        <x-commentions::comments :model="$this->record" />
-    </div>
+    @if ($this->record)
+        <div class="mt-6">
+            <livewire:commentions::comments :model="$this->record" />
+        </div>
+    @endif
 </x-filament-panels::page>
