@@ -17,13 +17,13 @@ class CompanyFactory extends Factory
      */
     public function definition(): array
     {
-        $name = fake()->company.' '.fake()->randomElement(['Inc', 'Ltd', 'Corp', 'Group', 'Enterprises']);
+        $name = $this->faker->company.' '.$this->faker->randomElement(['Inc', 'Ltd', 'Corp', 'Group', 'Enterprises']);
 
         return [
             'name' => $name,
             'slug' => Str::slug($name),
-            'type' => fake()->randomElement(['hostel', 'farm', 'construction', 'manufacturing', 'retail', 'services']),
-            'is_active' => fake()->boolean(90), // 90% chance of being active
+            'type' => $this->faker->randomElement(['hostel', 'farm', 'construction', 'manufacturing', 'retail', 'services']),
+            'is_active' => $this->faker->boolean(90), // 90% chance of being active
             'parent_company_id' => null, // Can be set to create hierarchical companies
         ];
     }
