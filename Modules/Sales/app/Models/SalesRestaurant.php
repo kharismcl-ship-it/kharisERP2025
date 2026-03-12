@@ -16,6 +16,7 @@ class SalesRestaurant extends Model
 
     protected $fillable = [
         'company_id',
+        'hostel_id',
         'name',
         'address',
         'default_vat_rate',
@@ -31,6 +32,11 @@ class SalesRestaurant extends Model
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
+    }
+
+    public function hostel(): BelongsTo
+    {
+        return $this->belongsTo(\Modules\Hostels\Models\Hostel::class);
     }
 
     public function tables(): HasMany

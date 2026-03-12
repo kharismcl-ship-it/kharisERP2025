@@ -90,6 +90,21 @@ class HostelOccupant extends Model
         return $this->hasOne(HostelOccupantUser::class);
     }
 
+    public function moviePurchases()
+    {
+        return $this->hasMany(HostelMoviePurchase::class);
+    }
+
+    public function movieRequests()
+    {
+        return $this->hasMany(HostelMovieRequest::class);
+    }
+
+    public function bookOrders()
+    {
+        return $this->hasMany(HostelBookOrder::class);
+    }
+
     /**
      * Check if hostel occupant has reached the maximum bookings for a semester
      *

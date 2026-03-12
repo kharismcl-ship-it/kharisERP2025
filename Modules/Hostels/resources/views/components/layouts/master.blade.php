@@ -17,14 +17,13 @@
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
-        {{-- Vite CSS --}}
-        {{-- {{ module_vite('build-hostels', 'resources/assets/sass/app.scss') }} --}}
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @livewireStyles
     </head>
 
     <body>
         {{ $slot }}
 
-        {{-- Vite JS --}}
-        {{-- {{ module_vite('build-hostels', 'resources/assets/js/app.js') }} --}}
+        @livewireScripts
     </body>
 </html>

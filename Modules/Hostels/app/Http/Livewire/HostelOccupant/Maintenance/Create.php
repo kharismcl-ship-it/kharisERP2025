@@ -3,22 +3,20 @@
 namespace Modules\Hostels\Http\Livewire\HostelOccupant\Maintenance;
 
 use Livewire\Component;
+use Modules\Hostels\Models\Booking;
 use Modules\Hostels\Models\Hostel;
 use Modules\Hostels\Models\MaintenanceRequest;
 use Modules\Hostels\Models\Room;
 
 class Create extends Component
 {
-    public function __invoke()
-    {
-        return $this->render();
-    }
-
-    public $hostels;
+    public $hostel = null;
 
     public $selectedHostel = null;
 
     public $selectedRoom = null;
+
+    public $rooms = [];
 
     public $title;
 
@@ -35,13 +33,22 @@ class Create extends Component
 
     public function mount()
     {
-        $this->hostels = Hostel::where('status', 'active')->get();
-    }
+        $occupant = auth('hostel_occupant')->user()->hostelOccupant;
 
-    public function updatedSelectedHostel($hostelId)
-    {
-        $this->rooms = Room::where('hostel_id', $hostelId)->get();
-        $this->selectedRoom = null;
+        $this->hostel = Hostel::find($occupant->hostel_id);
+        $this->selectedHostel = $occupant->hostel_id;
+
+        $this->rooms = Room::where('hostel_id', $occupant->hostel_id)->get();
+
+        // Pre-fill room from active booking if one exists
+        $activeBooking = Booking::where('hostel_occupant_id', $occupant->id)
+            ->whereIn('status', ['confirmed', 'checked_in'])
+            ->latest()
+            ->first();
+
+        if ($activeBooking) {
+            $this->selectedRoom = $activeBooking->room_id;
+        }
     }
 
     public function createRequest()
@@ -69,6 +76,6 @@ class Create extends Component
     public function render()
     {
         return view('hostels::livewire.hostel-occupant.maintenance.create')
-            ->layout('hostels::layouts.app');
+            ->layout('hostels::layouts.occupant');
     }
 }

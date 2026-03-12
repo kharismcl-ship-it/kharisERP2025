@@ -100,6 +100,29 @@ class FarmsServiceProvider extends ServiceProvider
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->name, 'database/migrations'));
         $this->registerPolicies();
+        $this->registerLivewireComponents();
+    }
+
+    protected function registerLivewireComponents(): void
+    {
+        \Livewire\Livewire::component('farms::farm-index', \Modules\Farms\Http\Livewire\FarmIndex::class);
+        \Livewire\Livewire::component('farms::farm-dashboard', \Modules\Farms\Http\Livewire\FarmDashboard::class);
+        \Livewire\Livewire::component('farms::navigation', \Modules\Farms\Http\Livewire\Navigation::class);
+        \Livewire\Livewire::component('farms::farm-map', \Modules\Farms\Http\Livewire\FarmMap::class);
+        \Livewire\Livewire::component('farms::tasks.index', \Modules\Farms\Http\Livewire\Tasks\Index::class);
+        \Livewire\Livewire::component('farms::daily-reports.index', \Modules\Farms\Http\Livewire\DailyReports\Index::class);
+        \Livewire\Livewire::component('farms::daily-reports.create', \Modules\Farms\Http\Livewire\DailyReports\Create::class);
+        \Livewire\Livewire::component('farms::daily-reports.show', \Modules\Farms\Http\Livewire\DailyReports\Show::class);
+        \Livewire\Livewire::component('farms::crops.index', \Modules\Farms\Http\Livewire\Crops\Index::class);
+        \Livewire\Livewire::component('farms::crops.show', \Modules\Farms\Http\Livewire\Crops\Show::class);
+        \Livewire\Livewire::component('farms::crops.record-harvest', \Modules\Farms\Http\Livewire\Crops\RecordHarvest::class);
+        \Livewire\Livewire::component('farms::livestock.index', \Modules\Farms\Http\Livewire\Livestock\Index::class);
+        \Livewire\Livewire::component('farms::livestock.show', \Modules\Farms\Http\Livewire\Livestock\Show::class);
+        \Livewire\Livewire::component('farms::requests.index', \Modules\Farms\Http\Livewire\Requests\Index::class);
+        \Livewire\Livewire::component('farms::requests.create', \Modules\Farms\Http\Livewire\Requests\Create::class);
+        \Livewire\Livewire::component('farms::requests.show', \Modules\Farms\Http\Livewire\Requests\Show::class);
+        \Livewire\Livewire::component('farms::attendance.index', \Modules\Farms\Http\Livewire\Attendance\Index::class);
+        \Livewire\Livewire::component('farms::reports.index', \Modules\Farms\Http\Livewire\Reports\Index::class);
     }
 
     /**

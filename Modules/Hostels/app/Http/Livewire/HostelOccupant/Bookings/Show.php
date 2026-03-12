@@ -4,29 +4,44 @@ namespace Modules\Hostels\Http\Livewire\HostelOccupant\Bookings;
 
 use Livewire\Component;
 use Modules\Hostels\Models\Booking;
+use Modules\Hostels\Models\Deposit;
 
 class Show extends Component
 {
-    public function __invoke()
-    {
-        return $this->render();
-    }
-
     public Booking $booking;
 
-    public function mount(Booking $booking)
-    {
-        $this->booking = $booking;
+    public string $activeTab = 'details';
 
-        // Ensure hostel occupant can only view their own bookings
+    public function mount(Booking $booking): void
+    {
         if ($booking->hostel_occupant_id !== auth('hostel_occupant')->user()->hostel_occupant_id) {
             abort(403);
         }
+
+        $this->booking = $booking->load(['hostel', 'room', 'bed']);
+    }
+
+    public function getDepositProperty(): ?Deposit
+    {
+        return Deposit::where('booking_id', $this->booking->id)->first();
+    }
+
+    public function getChargesProperty()
+    {
+        return $this->booking->charges()->with('feeType')->get();
+    }
+
+    public function getPaymentsProperty()
+    {
+        return $this->booking->payIntents()->latest()->get();
     }
 
     public function render()
     {
-        return view('hostels::livewire.hostel-occupant.bookings.show')
-            ->layout('hostels::layouts.app');
+        return view('hostels::livewire.hostel-occupant.bookings.show', [
+            'deposit'  => $this->deposit,
+            'charges'  => $this->charges,
+            'payments' => $this->payments,
+        ])->layout('hostels::layouts.occupant');
     }
 }

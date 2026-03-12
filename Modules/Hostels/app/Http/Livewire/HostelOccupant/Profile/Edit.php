@@ -44,11 +44,6 @@ class Edit extends Component
         'new_password' => 'nullable|string|min:8|confirmed',
     ];
 
-    public function __invoke()
-    {
-        return $this->render();
-    }
-
     public function mount()
     {
         $hostelOccupant = auth('hostel_occupant')->user()->hostelOccupant;
@@ -111,6 +106,6 @@ class Edit extends Component
     public function render()
     {
         return view('hostels::livewire.hostel-occupant.profile.edit')
-            ->layout('hostels::layouts.app');
+            ->layout('hostels::layouts.occupant');
     }
 }

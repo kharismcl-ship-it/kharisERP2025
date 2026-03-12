@@ -213,7 +213,7 @@ class HostelsServiceProvider extends ServiceProvider
             return;
         }
 
-        // Register public components
+        // ── Public ────────────────────────────────────────────────────────────
         \Livewire\Livewire::component('hostels.public.index', \Modules\Hostels\Http\Livewire\Public\Index::class);
         \Livewire\Livewire::component('hostels.public.show', \Modules\Hostels\Http\Livewire\Public\Show::class);
         \Livewire\Livewire::component('hostels.public.booking-wizard', \Modules\Hostels\Http\Livewire\Public\BookingWizard::class);
@@ -221,26 +221,70 @@ class HostelsServiceProvider extends ServiceProvider
         \Livewire\Livewire::component('hostels.public.booking-payment', \Modules\Hostels\Http\Livewire\Public\BookingPayment::class);
         \Livewire\Livewire::component('hostels.public.booking-payment-return', \Modules\Hostels\Http\Livewire\Public\BookingPaymentReturn::class);
         \Livewire\Livewire::component('hostels.public.booking-payment-failed', \Modules\Hostels\Http\Livewire\Public\BookingPaymentFailed::class);
+        \Livewire\Livewire::component('hostels.public.booking-change-request', \Modules\Hostels\Http\Livewire\Public\BookingChangeRequest::class);
 
-        // Register tenant components
-        \Livewire\Livewire::component('hostels.tenant.navigation', \Modules\Hostels\Http\Livewire\Tenant\Navigation::class);
+        // ── Admin — list/widget components ───────────────────────────────────
+        \Livewire\Livewire::component('hostels.admin.hostel-list', \Modules\Hostels\Http\Livewire\Admin\HostelList::class);
+        \Livewire\Livewire::component('hostels.admin.dashboard', \Modules\Hostels\Http\Livewire\Admin\Dashboard::class);
+        \Livewire\Livewire::component('hostels.admin.room-list', \Modules\Hostels\Http\Livewire\Admin\RoomList::class);
+        \Livewire\Livewire::component('hostels.admin.bed-list', \Modules\Hostels\Http\Livewire\Admin\BedList::class);
+        \Livewire\Livewire::component('hostels.admin.booking-list', \Modules\Hostels\Http\Livewire\Admin\BookingList::class);
+        \Livewire\Livewire::component('hostels.admin.hostel-charge-list', \Modules\Hostels\Http\Livewire\Admin\HostelChargeList::class);
+        \Livewire\Livewire::component('hostels.admin.hostel-occupant-list', \Modules\Hostels\Http\Livewire\Admin\HostelOccupantList::class);
+        \Livewire\Livewire::component('hostels.admin.hostel-whatsapp-group-list', \Modules\Hostels\Http\Livewire\Admin\HostelWhatsAppGroupList::class);
+        \Livewire\Livewire::component('hostels.admin.whatsapp-group-messages', \Modules\Hostels\Http\Livewire\Admin\WhatsAppGroupMessages::class);
+        \Livewire\Livewire::component('hostels.admin.booking-change-requests', \Modules\Hostels\Http\Livewire\Admin\BookingChangeRequests::class);
+        \Livewire\Livewire::component('hostels.admin.booking-approval', \Modules\Hostels\Http\Livewire\Admin\BookingApproval::class);
 
-        // Register other components
-        \Livewire\Livewire::component('hostels.bed-list', \Modules\Hostels\Http\Livewire\BedList::class);
-        \Livewire\Livewire::component('hostels.booking-list', \Modules\Hostels\Http\Livewire\BookingList::class);
-        \Livewire\Livewire::component('hostels.dashboard', \Modules\Hostels\Http\Livewire\Dashboard::class);
-        \Livewire\Livewire::component('hostels.hostel-charge-list', \Modules\Hostels\Http\Livewire\HostelChargeList::class);
-        \Livewire\Livewire::component('hostels.hostel-list', \Modules\Hostels\Http\Livewire\HostelList::class);
-        \Livewire\Livewire::component('hostels.room-list', \Modules\Hostels\Http\Livewire\RoomList::class);
-        \Livewire\Livewire::component('hostels.tenant-list', \Modules\Hostels\Http\Livewire\TenantList::class);
+        // ── Admin — nested components ─────────────────────────────────────────
+        \Livewire\Livewire::component('hostels.admin.bookings.create', \Modules\Hostels\Http\Livewire\Admin\Bookings\Create::class);
+        \Livewire\Livewire::component('hostels.admin.bookings.show', \Modules\Hostels\Http\Livewire\Admin\Bookings\Show::class);
+        \Livewire\Livewire::component('hostels.admin.incidents.index', \Modules\Hostels\Http\Livewire\Admin\Incidents\Index::class);
+        \Livewire\Livewire::component('hostels.admin.maintenance.index', \Modules\Hostels\Http\Livewire\Admin\Maintenance\Index::class);
+        \Livewire\Livewire::component('hostels.admin.reports.index', \Modules\Hostels\Http\Livewire\Admin\Reports\Index::class);
+        \Livewire\Livewire::component('hostels.admin.visitors.index', \Modules\Hostels\Http\Livewire\Admin\Visitors\Index::class);
 
-        // Register nested components
-        \Livewire\Livewire::component('hostels.bookings.create', \Modules\Hostels\Http\Livewire\Bookings\Create::class);
-        \Livewire\Livewire::component('hostels.bookings.show', \Modules\Hostels\Http\Livewire\Bookings\Show::class);
-        \Livewire\Livewire::component('hostels.incidents.index', \Modules\Hostels\Http\Livewire\Incidents\Index::class);
-        \Livewire\Livewire::component('hostels.maintenance.index', \Modules\Hostels\Http\Livewire\Maintenance\Index::class);
-        \Livewire\Livewire::component('hostels.reports.index', \Modules\Hostels\Http\Livewire\Reports\Index::class);
-        \Livewire\Livewire::component('hostels.visitors.index', \Modules\Hostels\Http\Livewire\Visitors\Index::class);
+        // ── Admin — operations ────────────────────────────────────────────────
+        \Livewire\Livewire::component('hostels.admin.check-in', \Modules\Hostels\Http\Livewire\Admin\CheckIn::class);
+        \Livewire\Livewire::component('hostels.admin.check-out', \Modules\Hostels\Http\Livewire\Admin\CheckOut::class);
+        \Livewire\Livewire::component('hostels.admin.deposit-collection', \Modules\Hostels\Http\Livewire\Admin\DepositCollection::class);
+
+        // ── HostelOccupant — auth ─────────────────────────────────────────────
+        \Livewire\Livewire::component('hostels.hostel-occupant.auth.login', \Modules\Hostels\Http\Livewire\HostelOccupant\Auth\Login::class);
+        \Livewire\Livewire::component('hostels.hostel-occupant.auth.register', \Modules\Hostels\Http\Livewire\HostelOccupant\Auth\Register::class);
+        \Livewire\Livewire::component('hostels.hostel-occupant.auth.forgot-password', \Modules\Hostels\Http\Livewire\HostelOccupant\Auth\ForgotPassword::class);
+        \Livewire\Livewire::component('hostels.hostel-occupant.auth.reset-password', \Modules\Hostels\Http\Livewire\HostelOccupant\Auth\ResetPassword::class);
+
+        // ── HostelOccupant — navigation ───────────────────────────────────────
+        \Livewire\Livewire::component('hostels.hostel-occupant.navigation', \Modules\Hostels\Http\Livewire\HostelOccupant\Navigation::class);
+
+        // ── HostelOccupant — portal pages ─────────────────────────────────────
+        \Livewire\Livewire::component('hostels.hostel-occupant.dashboard', \Modules\Hostels\Http\Livewire\HostelOccupant\Dashboard::class);
+        \Livewire\Livewire::component('hostels.hostel-occupant.bookings.index', \Modules\Hostels\Http\Livewire\HostelOccupant\Bookings\Index::class);
+        \Livewire\Livewire::component('hostels.hostel-occupant.bookings.show', \Modules\Hostels\Http\Livewire\HostelOccupant\Bookings\Show::class);
+        \Livewire\Livewire::component('hostels.hostel-occupant.bookings.create', \Modules\Hostels\Http\Livewire\HostelOccupant\Bookings\Create::class);
+        \Livewire\Livewire::component('hostels.hostel-occupant.bookings.cancel', \Modules\Hostels\Http\Livewire\HostelOccupant\Bookings\Cancel::class);
+        \Livewire\Livewire::component('hostels.hostel-occupant.bookings.receipt', \Modules\Hostels\Http\Livewire\HostelOccupant\Bookings\Receipt::class);
+        \Livewire\Livewire::component('hostels.hostel-occupant.maintenance.index', \Modules\Hostels\Http\Livewire\HostelOccupant\Maintenance\Index::class);
+        \Livewire\Livewire::component('hostels.hostel-occupant.maintenance.create', \Modules\Hostels\Http\Livewire\HostelOccupant\Maintenance\Create::class);
+        \Livewire\Livewire::component('hostels.hostel-occupant.incidents.index', \Modules\Hostels\Http\Livewire\HostelOccupant\Incidents\Index::class);
+        \Livewire\Livewire::component('hostels.hostel-occupant.incidents.create', \Modules\Hostels\Http\Livewire\HostelOccupant\Incidents\Create::class);
+        \Livewire\Livewire::component('hostels.hostel-occupant.visitors.index', \Modules\Hostels\Http\Livewire\HostelOccupant\Visitors\Index::class);
+        \Livewire\Livewire::component('hostels.hostel-occupant.visitors.create', \Modules\Hostels\Http\Livewire\HostelOccupant\Visitors\Create::class);
+        \Livewire\Livewire::component('hostels.hostel-occupant.profile.edit', \Modules\Hostels\Http\Livewire\HostelOccupant\Profile\Edit::class);
+
+        // ── HostelOccupant — new marketplace/entertainment ────────────────────
+        \Livewire\Livewire::component('hostels.hostel-occupant.whatsapp-groups.index', \Modules\Hostels\Http\Livewire\HostelOccupant\WhatsAppGroups\Index::class);
+        \Livewire\Livewire::component('hostels.hostel-occupant.restaurant.menu', \Modules\Hostels\Http\Livewire\HostelOccupant\Restaurant\Menu::class);
+        \Livewire\Livewire::component('hostels.hostel-occupant.shop.index', \Modules\Hostels\Http\Livewire\HostelOccupant\Shop\Index::class);
+        \Livewire\Livewire::component('hostels.hostel-occupant.shop.checkout', \Modules\Hostels\Http\Livewire\HostelOccupant\Shop\Checkout::class);
+        \Livewire\Livewire::component('hostels.hostel-occupant.shop.orders', \Modules\Hostels\Http\Livewire\HostelOccupant\Shop\Orders::class);
+        \Livewire\Livewire::component('hostels.hostel-occupant.movies.index', \Modules\Hostels\Http\Livewire\HostelOccupant\Movies\Index::class);
+        \Livewire\Livewire::component('hostels.hostel-occupant.movies.watch', \Modules\Hostels\Http\Livewire\HostelOccupant\Movies\Watch::class);
+        \Livewire\Livewire::component('hostels.hostel-occupant.movies.request', \Modules\Hostels\Http\Livewire\HostelOccupant\Movies\Request::class);
+        \Livewire\Livewire::component('hostels.hostel-occupant.books.index', \Modules\Hostels\Http\Livewire\HostelOccupant\Books\Index::class);
+        \Livewire\Livewire::component('hostels.hostel-occupant.books.checkout', \Modules\Hostels\Http\Livewire\HostelOccupant\Books\Checkout::class);
+        \Livewire\Livewire::component('hostels.hostel-occupant.books.orders', \Modules\Hostels\Http\Livewire\HostelOccupant\Books\Orders::class);
     }
 
     /**

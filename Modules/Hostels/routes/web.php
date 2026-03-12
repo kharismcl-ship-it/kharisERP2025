@@ -1,21 +1,28 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Modules\Hostels\Http\Livewire\Admin\BedList;
 use Modules\Hostels\Http\Livewire\Admin\BookingApproval;
-use Modules\Hostels\Http\Livewire\BedList;
-use Modules\Hostels\Http\Livewire\BookingChangeRequests;
-use Modules\Hostels\Http\Livewire\BookingList;
-use Modules\Hostels\Http\Livewire\Bookings\Create;
-use Modules\Hostels\Http\Livewire\Bookings\Show;
-use Modules\Hostels\Http\Livewire\Dashboard;
-use Modules\Hostels\Http\Livewire\HostelChargeList;
-use Modules\Hostels\Http\Livewire\HostelList;
-use Modules\Hostels\Http\Livewire\HostelOccupantList;
-use Modules\Hostels\Http\Livewire\HostelWhatsAppGroupList;
-use Modules\Hostels\Http\Livewire\Incidents\Index as IncidentsIndex;
-use Modules\Hostels\Http\Livewire\Maintenance\Index as MaintenanceIndex;
-use Modules\Hostels\Http\Livewire\Public\BookingChangeRequest;
+use Modules\Hostels\Http\Livewire\Admin\BookingChangeRequests;
+use Modules\Hostels\Http\Livewire\Admin\BookingList;
+use Modules\Hostels\Http\Livewire\Admin\Bookings\Create as AdminBookingsCreate;
+use Modules\Hostels\Http\Livewire\Admin\Bookings\Show as AdminBookingsShow;
+use Modules\Hostels\Http\Livewire\Admin\CheckIn;
+use Modules\Hostels\Http\Livewire\Admin\CheckOut;
+use Modules\Hostels\Http\Livewire\Admin\Dashboard;
+use Modules\Hostels\Http\Livewire\Admin\DepositCollection;
+use Modules\Hostels\Http\Livewire\Admin\HostelChargeList;
+use Modules\Hostels\Http\Livewire\Admin\HostelList;
+use Modules\Hostels\Http\Livewire\Admin\HostelOccupantList;
+use Modules\Hostels\Http\Livewire\Admin\HostelWhatsAppGroupList;
+use Modules\Hostels\Http\Livewire\Admin\Incidents\Index as AdminIncidentsIndex;
+use Modules\Hostels\Http\Livewire\Admin\Maintenance\Index as AdminMaintenanceIndex;
+use Modules\Hostels\Http\Livewire\Admin\Reports\Index as AdminReportsIndex;
+use Modules\Hostels\Http\Livewire\Admin\RoomList;
+use Modules\Hostels\Http\Livewire\Admin\Visitors\Index as AdminVisitorsIndex;
+use Modules\Hostels\Http\Livewire\Admin\WhatsAppGroupMessages;
 // Public routes
+use Modules\Hostels\Http\Livewire\Public\BookingChangeRequest;
 use Modules\Hostels\Http\Livewire\Public\BookingConfirmation;
 use Modules\Hostels\Http\Livewire\Public\BookingPayment;
 use Modules\Hostels\Http\Livewire\Public\BookingPaymentFailed;
@@ -23,11 +30,8 @@ use Modules\Hostels\Http\Livewire\Public\BookingPaymentReturn;
 use Modules\Hostels\Http\Livewire\Public\BookingWizard;
 use Modules\Hostels\Http\Livewire\Public\Index as PublicIndex;
 use Modules\Hostels\Http\Livewire\Public\Show as PublicShow;
-use Modules\Hostels\Http\Livewire\Reports\Index as ReportsIndex;
-use Modules\Hostels\Http\Livewire\RoomList;
-use Modules\Hostels\Http\Livewire\Visitors\Index as VisitorsIndex;
-use Modules\Hostels\Http\Livewire\WhatsAppGroupMessages;
 
+// ── Public ────────────────────────────────────────────────────────────────────
 Route::middleware(['web'])
     ->prefix('hostels')
     ->name('hostels.public.')
@@ -42,6 +46,7 @@ Route::middleware(['web'])
         Route::get('/bookings/{booking}/change-request', BookingChangeRequest::class)->name('booking.change-request');
     });
 
+// ── Admin ─────────────────────────────────────────────────────────────────────
 Route::middleware(['web', 'auth', 'set-company:hostels'])
     ->prefix('hostels/admin')
     ->name('hostels.')
@@ -54,13 +59,16 @@ Route::middleware(['web', 'auth', 'set-company:hostels'])
         Route::get('/{hostel:slug}/whatsapp-groups/{group}', WhatsAppGroupMessages::class)->name('whatsapp-groups.show');
         Route::get('/{hostel:slug}/hostel-occupants', HostelOccupantList::class)->name('hostel-occupants.index');
         Route::get('/{hostel:slug}/bookings', BookingList::class)->name('bookings.index');
-        Route::get('/{hostel:slug}/bookings/create', Create::class)->name('bookings.create');
-        Route::get('/{hostel:slug}/bookings/{booking}', Show::class)->name('bookings.show');
-        Route::get('/{hostel:slug}/maintenance', MaintenanceIndex::class)->name('maintenance.index');
-        Route::get('/{hostel:slug}/incidents', IncidentsIndex::class)->name('incidents.index');
-        Route::get('/{hostel:slug}/visitors', VisitorsIndex::class)->name('visitors.index');
-        Route::get('/{hostel:slug}/reports', ReportsIndex::class)->name('reports.index');
+        Route::get('/{hostel:slug}/bookings/create', AdminBookingsCreate::class)->name('bookings.create');
+        Route::get('/{hostel:slug}/bookings/{booking}', AdminBookingsShow::class)->name('bookings.show');
+        Route::get('/{hostel:slug}/maintenance', AdminMaintenanceIndex::class)->name('maintenance.index');
+        Route::get('/{hostel:slug}/incidents', AdminIncidentsIndex::class)->name('incidents.index');
+        Route::get('/{hostel:slug}/visitors', AdminVisitorsIndex::class)->name('visitors.index');
+        Route::get('/{hostel:slug}/reports', AdminReportsIndex::class)->name('reports.index');
         Route::get('/{hostel:slug}/hostel-charges', HostelChargeList::class)->name('hostel-charges.index');
         Route::get('/{hostel:slug}/change-requests', BookingChangeRequests::class)->name('change-requests.index');
         Route::get('/{hostel:slug}/booking-approvals', BookingApproval::class)->name('booking-approvals.index');
+        Route::get('/{hostel:slug}/check-in', CheckIn::class)->name('check-in');
+        Route::get('/{hostel:slug}/check-out', CheckOut::class)->name('check-out');
+        Route::get('/{hostel:slug}/deposit-collection', DepositCollection::class)->name('deposit-collection');
     });

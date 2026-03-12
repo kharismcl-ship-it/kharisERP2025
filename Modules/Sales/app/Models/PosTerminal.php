@@ -14,6 +14,7 @@ class PosTerminal extends Model
 
     protected $fillable = [
         'company_id',
+        'hostel_id',
         'name',
         'location',
         'is_active',
@@ -30,6 +31,11 @@ class PosTerminal extends Model
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
+    }
+
+    public function hostel(): BelongsTo
+    {
+        return $this->belongsTo(\Modules\Hostels\Models\Hostel::class);
     }
 
     public function sessions(): HasMany

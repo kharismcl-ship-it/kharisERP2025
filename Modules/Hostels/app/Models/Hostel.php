@@ -293,4 +293,24 @@ class Hostel extends Model
     {
         return $this->hasMany(PricingPolicy::class);
     }
+
+    public function movies()
+    {
+        return $this->hasMany(HostelMovie::class);
+    }
+
+    public function books()
+    {
+        return $this->hasMany(HostelBook::class);
+    }
+
+    public function bookOrders()
+    {
+        return $this->hasMany(HostelBookOrder::class);
+    }
+
+    public function movieRequests()
+    {
+        return $this->hasMany(HostelMovieRequest::class);
+    }
 }

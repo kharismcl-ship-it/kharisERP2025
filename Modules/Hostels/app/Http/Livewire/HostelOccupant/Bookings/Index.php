@@ -7,11 +7,6 @@ use Modules\Hostels\Models\Booking;
 
 class Index extends Component
 {
-    public function __invoke()
-    {
-        return $this->render();
-    }
-
     public function render()
     {
         $hostelOccupantId = auth('hostel_occupant')->user()->hostel_occupant_id;
@@ -23,6 +18,6 @@ class Index extends Component
 
         return view('hostels::livewire.hostel-occupant.bookings.index', [
             'bookings' => $bookings,
-        ])->layout('hostels::layouts.app');
+        ])->layout('hostels::layouts.occupant');
     }
 }

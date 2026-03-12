@@ -9,11 +9,6 @@ use Modules\Hostels\Models\HostelOccupantUser;
 
 class Register extends Component
 {
-    public function __invoke()
-    {
-        return $this->render();
-    }
-
     public $first_name;
 
     public $last_name;

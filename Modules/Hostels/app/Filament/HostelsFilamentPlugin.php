@@ -27,6 +27,11 @@ use Modules\Hostels\Filament\Resources\HostelStaffResource;
 use Modules\Hostels\Filament\Resources\HostelStaffRoleResource;
 use Modules\Hostels\Filament\Resources\HostelTemplateResource;
 use Modules\Hostels\Filament\Resources\HostelUtilityChargeResource;
+use Modules\Hostels\Filament\Resources\HostelBookOrderResource;
+use Modules\Hostels\Filament\Resources\HostelBookResource;
+use Modules\Hostels\Filament\Resources\HostelMoviePurchaseResource;
+use Modules\Hostels\Filament\Resources\HostelMovieRequestResource;
+use Modules\Hostels\Filament\Resources\HostelMovieResource;
 use Modules\Hostels\Filament\Resources\HostelWhatsAppGroupResource;
 use Modules\Hostels\Filament\Resources\IncidentResource;
 use Modules\Hostels\Filament\Resources\MaintenanceRecordResource;
@@ -77,6 +82,11 @@ class HostelsFilamentPlugin implements Plugin
                 HostelInventoryItemResource::class,
                 HostelUtilityChargeResource::class,
                 HostelWhatsAppGroupResource::class,
+                HostelMovieResource::class,
+                HostelMoviePurchaseResource::class,
+                HostelMovieRequestResource::class,
+                HostelBookResource::class,
+                HostelBookOrderResource::class,
                 HostelOccupantResource::class,
                 BookingResource::class,
                 DepositResource::class,
@@ -106,6 +116,11 @@ class HostelsFilamentPlugin implements Plugin
                 HostelStaffAttendanceResource::class,
                 RoomInventoryAssignmentResource::class,
                 VisitorLogResource::class,
+                HostelMovieResource::class,
+                HostelMoviePurchaseResource::class,
+                HostelMovieRequestResource::class,
+                HostelBookResource::class,
+                HostelBookOrderResource::class,
             ]);
         }
 

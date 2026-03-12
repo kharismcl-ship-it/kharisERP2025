@@ -1,112 +1,150 @@
-<div class="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-    <div class="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md">
-        <h2 class="text-2xl font-bold text-center text-gray-800">Hostel Occupant Registration</h2>
-        
-        @if (session()->has('message'))
-            <div class="px-4 py-3 text-green-700 bg-green-100 border border-green-400 rounded">
-                {{ session('message') }}
-            </div>
-        @endif
+<div class="flex flex-col gap-6">
 
-        <form wire:submit.prevent="register" class="space-y-4">
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label for="first_name" class="block text-sm font-medium text-gray-700">First Name</label>
-                    <input 
-                        type="text" 
-                        id="first_name" 
-                        wire:model="first_name"
-                        class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        required
-                    >
-                    @error('first_name') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                </div>
-
-                <div>
-                    <label for="last_name" class="block text-sm font-medium text-gray-700">Last Name</label>
-                    <input 
-                        type="text" 
-                        id="last_name" 
-                        wire:model="last_name"
-                        class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        required
-                    >
-                    @error('last_name') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-                </div>
-            </div>
-
-            <div>
-                <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-                <input 
-                    type="email" 
-                    id="email" 
-                    wire:model="email"
-                    class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
-                >
-                @error('email') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-            </div>
-
-            <div>
-                <label for="phone" class="block text-sm font-medium text-gray-700">Phone</label>
-                <input 
-                    type="text" 
-                    id="phone" 
-                    wire:model="phone"
-                    class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
-                >
-                @error('phone') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-            </div>
-
-            <div>
-                <label for="student_id" class="block text-sm font-medium text-gray-700">Student ID (Optional)</label>
-                <input 
-                    type="text" 
-                    id="student_id" 
-                    wire:model="student_id"
-                    class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                @error('student_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-            </div>
-
-            <div>
-                <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
-                <input 
-                    type="password" 
-                    id="password" 
-                    wire:model="password"
-                    class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
-                >
-                @error('password') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-            </div>
-
-            <div>
-                <label for="password_confirmation" class="block text-sm font-medium text-gray-700">Confirm Password</label>
-                <input 
-                    type="password" 
-                    id="password_confirmation" 
-                    wire:model="password_confirmation"
-                    class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
-                >
-                @error('password_confirmation') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
-            </div>
-
-            <button 
-                type="submit" 
-                class="w-full px-4 py-2 text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-            >
-                Register
-            </button>
-        </form>
-
-        <div class="text-center">
-            <p class="text-sm text-gray-600">
-                Already have an account? 
-                <a href="{{ route('hostel_occupant.login') }}" class="text-blue-600 hover:underline">Login here</a>
-            </p>
-        </div>
+    <div class="flex flex-col gap-1 text-center">
+        <h1 class="text-xl font-semibold text-gray-900">Create your account</h1>
+        <p class="text-sm text-gray-500">Fill in your details to register as a resident</p>
     </div>
+
+    <form wire:submit.prevent="register" class="flex flex-col gap-4">
+
+        <div class="grid grid-cols-2 gap-4">
+            <div class="flex flex-col gap-1.5">
+                <label for="first_name" class="text-sm font-medium text-gray-700">First name</label>
+                <input
+                    type="text"
+                    id="first_name"
+                    wire:model="first_name"
+                    autocomplete="given-name"
+                    placeholder="John"
+                    class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400
+                           focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500
+                           @error('first_name') border-red-400 @enderror"
+                >
+                @error('first_name')
+                    <p class="text-xs text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
+
+            <div class="flex flex-col gap-1.5">
+                <label for="last_name" class="text-sm font-medium text-gray-700">Last name</label>
+                <input
+                    type="text"
+                    id="last_name"
+                    wire:model="last_name"
+                    autocomplete="family-name"
+                    placeholder="Doe"
+                    class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400
+                           focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500
+                           @error('last_name') border-red-400 @enderror"
+                >
+                @error('last_name')
+                    <p class="text-xs text-red-600">{{ $message }}</p>
+                @enderror
+            </div>
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+            <label for="email" class="text-sm font-medium text-gray-700">Email address</label>
+            <input
+                type="email"
+                id="email"
+                wire:model="email"
+                autocomplete="email"
+                autofocus
+                placeholder="you@example.com"
+                class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400
+                       focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500
+                       @error('email') border-red-400 @enderror"
+            >
+            @error('email')
+                <p class="text-xs text-red-600">{{ $message }}</p>
+            @enderror
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+            <label for="phone" class="text-sm font-medium text-gray-700">Phone number</label>
+            <input
+                type="tel"
+                id="phone"
+                wire:model="phone"
+                autocomplete="tel"
+                placeholder="+234 800 000 0000"
+                class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400
+                       focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500
+                       @error('phone') border-red-400 @enderror"
+            >
+            @error('phone')
+                <p class="text-xs text-red-600">{{ $message }}</p>
+            @enderror
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+            <label for="student_id" class="text-sm font-medium text-gray-700">
+                Student ID
+                <span class="font-normal text-gray-400">(optional)</span>
+            </label>
+            <input
+                type="text"
+                id="student_id"
+                wire:model="student_id"
+                placeholder="e.g. STU/2024/001"
+                class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400
+                       focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500
+                       @error('student_id') border-red-400 @enderror"
+            >
+            @error('student_id')
+                <p class="text-xs text-red-600">{{ $message }}</p>
+            @enderror
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+            <label for="password" class="text-sm font-medium text-gray-700">Password</label>
+            <input
+                type="password"
+                id="password"
+                wire:model="password"
+                autocomplete="new-password"
+                placeholder="At least 8 characters"
+                class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400
+                       focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500
+                       @error('password') border-red-400 @enderror"
+            >
+            @error('password')
+                <p class="text-xs text-red-600">{{ $message }}</p>
+            @enderror
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+            <label for="password_confirmation" class="text-sm font-medium text-gray-700">Confirm password</label>
+            <input
+                type="password"
+                id="password_confirmation"
+                wire:model="password_confirmation"
+                autocomplete="new-password"
+                placeholder="Repeat your password"
+                class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400
+                       focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+            >
+        </div>
+
+        <button
+            type="submit"
+            wire:loading.attr="disabled"
+            class="mt-1 w-full rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white
+                   hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2
+                   disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
+        >
+            <span wire:loading.remove>Create account</span>
+            <span wire:loading>Creating account...</span>
+        </button>
+
+    </form>
+
+    <p class="text-center text-sm text-gray-500">
+        Already have an account?
+        <a href="{{ route('hostel_occupant.login') }}" class="font-medium text-indigo-600 hover:text-indigo-500">
+            Sign in
+        </a>
+    </p>
+
 </div>

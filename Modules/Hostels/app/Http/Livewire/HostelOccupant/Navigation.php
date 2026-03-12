@@ -8,6 +8,14 @@ class Navigation extends Component
 {
     public function render()
     {
-        return view('hostels::components.hostel-occupant.navigation');
+        $user     = auth('hostel_occupant')->user();
+        $occupant = $user?->hostelOccupant;
+        $hostel   = $occupant?->hostel;
+
+        return view('hostels::components.hostel-occupant.navigation', [
+            'hostel'   => $hostel,
+            'occupant' => $occupant,
+            'user'     => $user,
+        ]);
     }
 }

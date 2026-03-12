@@ -11,12 +11,7 @@ use Modules\Hostels\Models\Room;
 
 class Create extends Component
 {
-    public function __invoke()
-    {
-        return $this->render();
-    }
-
-    public $hostels;
+    public $hostel = null;
 
     public $selectedHostel = null;
 
@@ -50,22 +45,34 @@ class Create extends Component
 
     public function mount()
     {
-        $this->hostels = Hostel::where('status', 'active')->get();
+        $occupant = auth('hostel_occupant')->user()->hostelOccupant;
+
+        $this->hostel = Hostel::find($occupant->hostel_id);
+        $this->selectedHostel = $occupant->hostel_id;
+
+        $this->rooms = Room::where('hostel_id', $occupant->hostel_id)
+            ->where('status', 'available')
+            ->get();
+
+        // Pre-fill from active booking if one exists
+        $activeBooking = Booking::where('hostel_occupant_id', $occupant->id)
+            ->whereIn('status', ['confirmed', 'checked_in'])
+            ->latest()
+            ->first();
+
+        if ($activeBooking) {
+            $this->selectedRoom = $activeBooking->room_id;
+            if ($activeBooking->room_id) {
+                $this->beds = Bed::where('room_id', $activeBooking->room_id)
+                    ->where('status', 'available')
+                    ->get();
+            }
+        }
+
         $this->academicYear = date('Y').'/'.(date('Y') + 1);
         $this->semester = '1';
         $this->checkInDate = date('Y-m-d');
         $this->checkOutDate = date('Y-m-d', strtotime('+1 year'));
-    }
-
-    public function updatedSelectedHostel($hostelId)
-    {
-        $this->rooms = Room::where('hostel_id', $hostelId)
-            ->where('status', 'available')
-            ->get();
-
-        $this->selectedRoom = null;
-        $this->beds = [];
-        $this->selectedBed = null;
     }
 
     public function updatedSelectedRoom($roomId)
@@ -134,6 +141,6 @@ class Create extends Component
     public function render()
     {
         return view('hostels::livewire.hostel-occupant.bookings.create')
-            ->layout('hostels::layouts.app');
+            ->layout('hostels::layouts.occupant');
     }
 }

@@ -2,8 +2,8 @@
 
 namespace Modules\Farms\Http\Livewire;
 
-use Illuminate\Support\Facades\DB;
 use Livewire\Component;
+use Modules\Farms\Models\Farm;
 
 class FarmIndex extends Component
 {
@@ -13,14 +13,11 @@ class FarmIndex extends Component
 
         $farms = collect();
         if ($companyId) {
-            $farms = DB::table('farms')
-                ->where('company_id', $companyId)
-                ->orderBy('name')
-                ->get();
+            $farms = Farm::where('company_id', $companyId)->orderBy('name')->get();
         }
 
         return view('farms::livewire.farm-index', [
             'farms' => $farms,
-        ])->layout('layouts.app');
+        ])->layout('farms::layouts.app');
     }
 }
