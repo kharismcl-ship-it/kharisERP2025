@@ -90,7 +90,17 @@ class UserResource extends Resource
                             ->relationship('companies', 'name')
                             ->searchable()
                             ->preload()
-                            ->helperText('Which companies can this user access in the tenant switcher?'),
+                            ->helperText('Which companies can this user access in the tenant switcher?')
+                            ->saveRelationshipsUsing(function ($record, $state) {
+                                // Sync with is_active = true so canAccessPanel() passes
+                                $syncData = collect($state ?? [])
+                                    ->mapWithKeys(fn ($id) => [(int) $id => [
+                                        'is_active'   => true,
+                                        'assigned_at' => now(),
+                                    ]])
+                                    ->all();
+                                $record->companies()->sync($syncData);
+                            }),
 
                         Forms\Components\Toggle::make('is_global_super_admin')
                             ->label('Global Super Admin')
@@ -170,7 +180,12 @@ class UserResource extends Resource
                                             return [];
                                         }
                                         $teamKey = config('permission.column_names.team_foreign_key', 'company_id');
-                                        return Role::where($teamKey, $companyId)
+                                        // Include company-specific roles AND global (company_id = NULL) roles
+                                        return Role::where(function ($q) use ($teamKey, $companyId) {
+                                                $q->where($teamKey, $companyId)
+                                                  ->orWhereNull($teamKey);
+                                            })
+                                            ->where('name', '!=', 'super_admin')
                                             ->orderBy('name')
                                             ->pluck('name', 'id')
                                             ->mapWithKeys(fn ($name, $id) => [
@@ -225,18 +240,35 @@ class UserResource extends Resource
                                     if (empty($row['company_id']) || empty($row['role_id'])) {
                                         continue;
                                     }
+
+                                    $roleId  = (int) $row['role_id'];
+                                    $companyId = (int) $row['company_id'];
+
+                                    // If the selected role is global (company_id = NULL), ensure a
+                                    // company-scoped copy exists so Spatie's team-mode check passes
+                                    $role = Role::find($roleId);
+                                    if ($role && is_null($role->$teamKey)) {
+                                        $scopedRole = Role::firstOrCreate(
+                                            ['name' => $role->name, 'guard_name' => $role->guard_name, $teamKey => $companyId],
+                                            ['name' => $role->name, 'guard_name' => $role->guard_name, $teamKey => $companyId]
+                                        );
+                                        // Mirror permissions from the global role to the scoped copy
+                                        $scopedRole->syncPermissions($role->permissions);
+                                        $roleId = $scopedRole->id;
+                                    }
+
                                     DB::table($tables['model_has_roles'])->updateOrInsert(
                                         [
-                                            'role_id'    => $row['role_id'],
+                                            'role_id'    => $roleId,
                                             'model_type' => get_class($record),
                                             'model_id'   => $record->getKey(),
-                                            $teamKey     => $row['company_id'],
+                                            $teamKey     => $companyId,
                                         ],
                                         [
-                                            'role_id'    => $row['role_id'],
+                                            'role_id'    => $roleId,
                                             'model_type' => get_class($record),
                                             'model_id'   => $record->getKey(),
-                                            $teamKey     => $row['company_id'],
+                                            $teamKey     => $companyId,
                                         ]
                                     );
                                 }
