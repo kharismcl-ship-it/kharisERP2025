@@ -30,6 +30,16 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Ensure config/modules.php exists so Sushi's filemtime() check doesn't crash.
+        // alizharb/filament-module-manager's Module model uses config_path('modules.php')
+        // as its sushiCacheReferencePath(); if missing it throws a fatal error.
+        if (! file_exists(config_path('modules.php'))) {
+            $source = base_path('vendor/nwidart/laravel-modules/config/config.php');
+            if (file_exists($source)) {
+                copy($source, config_path('modules.php'));
+            }
+        }
+
         \Illuminate\Database\Eloquent\Factories\Factory::guessFactoryNamesUsing(function (string $modelName) {
             if (str_starts_with($modelName, 'Modules\\')) {
                 $parts = explode('\\', $modelName);
