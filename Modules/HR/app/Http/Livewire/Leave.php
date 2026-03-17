@@ -4,8 +4,10 @@ namespace Modules\HR\Http\Livewire;
 
 use Livewire\Component;
 use Modules\HR\Models\Employee;
+use Modules\HR\Models\LeaveApprovalRequest;
 use Modules\HR\Models\LeaveRequest;
 use Modules\HR\Models\LeaveType;
+use Modules\HR\Services\LeaveApprovalService;
 
 class Leave extends Component
 {
@@ -56,35 +58,57 @@ class Leave extends Component
 
         $companyId = app('current_company_id');
 
-        LeaveRequest::create([
-            'company_id' => $companyId,
-            'employee_id' => $this->employee_id,
+        $leaveRequest = LeaveRequest::create([
+            'company_id'    => $companyId,
+            'employee_id'   => $this->employee_id,
             'leave_type_id' => $this->leave_type_id,
-            'start_date' => $this->start_date,
-            'end_date' => $this->end_date,
-            'reason' => $this->reason,
-            'status' => 'pending',
+            'start_date'    => $this->start_date,
+            'end_date'      => $this->end_date,
+            'total_days'    => \Carbon\Carbon::parse($this->start_date)->diffInDays(\Carbon\Carbon::parse($this->end_date)) + 1,
+            'reason'        => $this->reason,
+            'status'        => 'pending',
         ]);
+
+        app(LeaveApprovalService::class)->initializeApprovalProcess($leaveRequest);
 
         $this->reset(['employee_id', 'leave_type_id', 'start_date', 'end_date', 'reason']);
         $this->loadLeaveRequests();
-        session()->flash('message', 'Leave request submitted successfully.');
+        session()->flash('message', 'Leave request submitted and sent for approval.');
     }
 
     public function approveLeaveRequest($id)
     {
-        $companyId = app('current_company_id');
-        $leaveRequest = LeaveRequest::where('company_id', $companyId)->findOrFail($id);
-        $leaveRequest->update(['status' => 'approved']);
+        $companyId      = app('current_company_id');
+        $leaveRequest   = LeaveRequest::where('company_id', $companyId)->findOrFail($id);
+        $approvalRequest = $leaveRequest->approvalRequests()->where('status', 'pending')->first();
+
+        if ($approvalRequest) {
+            app(LeaveApprovalService::class)->processApproval($approvalRequest, 'approved');
+        } else {
+            // No workflow configured — direct approval
+            $leaveRequest->update([
+                'status'                  => 'approved',
+                'approved_by_employee_id' => auth()->user()->employee->id ?? null,
+                'approved_at'             => now(),
+            ]);
+        }
+
         $this->loadLeaveRequests();
         session()->flash('message', 'Leave request approved.');
     }
 
     public function rejectLeaveRequest($id)
     {
-        $companyId = app('current_company_id');
-        $leaveRequest = LeaveRequest::where('company_id', $companyId)->findOrFail($id);
-        $leaveRequest->update(['status' => 'rejected']);
+        $companyId      = app('current_company_id');
+        $leaveRequest   = LeaveRequest::where('company_id', $companyId)->findOrFail($id);
+        $approvalRequest = $leaveRequest->approvalRequests()->where('status', 'pending')->first();
+
+        if ($approvalRequest) {
+            app(LeaveApprovalService::class)->processApproval($approvalRequest, 'rejected');
+        } else {
+            $leaveRequest->update(['status' => 'rejected']);
+        }
+
         $this->loadLeaveRequests();
         session()->flash('message', 'Leave request rejected.');
     }

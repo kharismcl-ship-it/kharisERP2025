@@ -3,7 +3,9 @@
 namespace Modules\Farms\Providers;
 
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
+use Modules\Farms\Events\FarmOrderPlaced;
 use Modules\Farms\Listeners\FarmSalePaymentListener;
+use Modules\Farms\Listeners\SendFarmOrderConfirmation;
 use Modules\PaymentsChannel\Events\PaymentSucceeded;
 
 class EventServiceProvider extends ServiceProvider
@@ -16,6 +18,10 @@ class EventServiceProvider extends ServiceProvider
     protected $listen = [
         PaymentSucceeded::class => [
             FarmSalePaymentListener::class,
+        ],
+        // Marketplace order placed — send confirmation email/SMS
+        FarmOrderPlaced::class => [
+            SendFarmOrderConfirmation::class,
         ],
         // Farm sale comms — CommunicationCentre integration
         \Modules\Farms\Events\FarmSaleCreated::class => [

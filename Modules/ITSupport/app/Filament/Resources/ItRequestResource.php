@@ -142,7 +142,7 @@ class ItRequestResource extends Resource
                     ->relationship('assignedToEmployee', 'full_name'),
             ])
             ->actions([
-                \Filament\Tables\Actions\Action::make('assign_to_me')
+                \Filament\Actions\Action::make('assign_to_me')
                     ->label('Assign to Me')
                     ->icon('heroicon-o-user-plus')
                     ->color('info')
@@ -153,7 +153,7 @@ class ItRequestResource extends Resource
                             $record->update(['assigned_to_employee_id' => $employee->id, 'status' => 'in_progress']);
                         }
                     }),
-                \Filament\Tables\Actions\Action::make('resolve')
+                \Filament\Actions\Action::make('resolve')
                     ->label('Mark Resolved')
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
@@ -166,7 +166,7 @@ class ItRequestResource extends Resource
                         'resolved_at'      => now(),
                         'resolution_notes' => $data['resolution_notes'],
                     ])),
-                \Filament\Tables\Actions\Action::make('close')
+                \Filament\Actions\Action::make('close')
                     ->label('Close')
                     ->icon('heroicon-o-x-circle')
                     ->color('gray')

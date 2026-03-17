@@ -2,6 +2,7 @@
 
 namespace Modules\Hostels\Filament\Pages;
 
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Carbon\Carbon;
 use Filament\Pages\Page;
 use Illuminate\Contracts\View\View;
@@ -17,6 +18,8 @@ class CheckInOutCalendar extends Page
     protected static string|\UnitEnum|null $navigationGroup = 'Hostels';
 
     protected static ?int $navigationSort = 6;
+
+    use HasPageShield;
 
     public ?string $selectedHostel = null;
 

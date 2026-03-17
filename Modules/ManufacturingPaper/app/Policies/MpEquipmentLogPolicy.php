@@ -1,16 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\ManufacturingPaper\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use Modules\ManufacturingPaper\Models\MpEquipmentLog;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class MpEquipmentLogPolicy
 {
-    public function viewAny(User $user): bool   { return $user->can('view_any_mp::equipment::log'); }
-    public function view(User $user, MpEquipmentLog $model): bool { return $user->can('view_mp::equipment::log'); }
-    public function create(User $user): bool    { return $user->can('create_mp::equipment::log'); }
-    public function update(User $user, MpEquipmentLog $model): bool { return $user->can('update_mp::equipment::log'); }
-    public function delete(User $user, MpEquipmentLog $model): bool { return $user->can('delete_mp::equipment::log'); }
-    public function deleteAny(User $user): bool { return $user->can('delete_any_mp::equipment::log'); }
+    use HandlesAuthorization;
+    
+    public function viewAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ViewAny:MpEquipmentLog');
+    }
+
+    public function view(AuthUser $authUser, MpEquipmentLog $mpEquipmentLog): bool
+    {
+        return $authUser->can('View:MpEquipmentLog');
+    }
+
+    public function create(AuthUser $authUser): bool
+    {
+        return $authUser->can('Create:MpEquipmentLog');
+    }
+
+    public function update(AuthUser $authUser, MpEquipmentLog $mpEquipmentLog): bool
+    {
+        return $authUser->can('Update:MpEquipmentLog');
+    }
+
+    public function delete(AuthUser $authUser, MpEquipmentLog $mpEquipmentLog): bool
+    {
+        return $authUser->can('Delete:MpEquipmentLog');
+    }
+
+    public function restore(AuthUser $authUser, MpEquipmentLog $mpEquipmentLog): bool
+    {
+        return $authUser->can('Restore:MpEquipmentLog');
+    }
+
+    public function forceDelete(AuthUser $authUser, MpEquipmentLog $mpEquipmentLog): bool
+    {
+        return $authUser->can('ForceDelete:MpEquipmentLog');
+    }
+
+    public function forceDeleteAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ForceDeleteAny:MpEquipmentLog');
+    }
+
+    public function restoreAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('RestoreAny:MpEquipmentLog');
+    }
+
+    public function replicate(AuthUser $authUser, MpEquipmentLog $mpEquipmentLog): bool
+    {
+        return $authUser->can('Replicate:MpEquipmentLog');
+    }
+
+    public function reorder(AuthUser $authUser): bool
+    {
+        return $authUser->can('Reorder:MpEquipmentLog');
+    }
+
 }

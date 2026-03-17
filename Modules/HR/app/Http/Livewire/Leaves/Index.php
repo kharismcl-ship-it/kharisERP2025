@@ -6,6 +6,7 @@ use Livewire\Component;
 use Modules\HR\Models\Department;
 use Modules\HR\Models\LeaveRequest;
 use Modules\HR\Models\LeaveType;
+use Modules\HR\Services\LeaveApprovalService;
 
 class Index extends Component
 {
@@ -69,22 +70,36 @@ class Index extends Component
 
     public function approveLeaveRequest($id)
     {
-        $companyId = app('current_company_id');
-        $leaveRequest = LeaveRequest::where('company_id', $companyId)->findOrFail($id);
-        $leaveRequest->update([
-            'status' => 'approved',
-            'approved_by_employee_id' => auth()->user()->employee->id ?? null,
-            'approved_at' => now(),
-        ]);
+        $companyId      = app('current_company_id');
+        $leaveRequest   = LeaveRequest::where('company_id', $companyId)->findOrFail($id);
+        $approvalRequest = $leaveRequest->approvalRequests()->where('status', 'pending')->first();
+
+        if ($approvalRequest) {
+            app(LeaveApprovalService::class)->processApproval($approvalRequest, 'approved');
+        } else {
+            $leaveRequest->update([
+                'status'                  => 'approved',
+                'approved_by_employee_id' => auth()->user()->employee->id ?? null,
+                'approved_at'             => now(),
+            ]);
+        }
+
         $this->loadLeaveRequests();
         session()->flash('message', 'Leave request approved.');
     }
 
     public function rejectLeaveRequest($id)
     {
-        $companyId = app('current_company_id');
-        $leaveRequest = LeaveRequest::where('company_id', $companyId)->findOrFail($id);
-        $leaveRequest->update(['status' => 'rejected']);
+        $companyId      = app('current_company_id');
+        $leaveRequest   = LeaveRequest::where('company_id', $companyId)->findOrFail($id);
+        $approvalRequest = $leaveRequest->approvalRequests()->where('status', 'pending')->first();
+
+        if ($approvalRequest) {
+            app(LeaveApprovalService::class)->processApproval($approvalRequest, 'rejected');
+        } else {
+            $leaveRequest->update(['status' => 'rejected']);
+        }
+
         $this->loadLeaveRequests();
         session()->flash('message', 'Leave request rejected.');
     }

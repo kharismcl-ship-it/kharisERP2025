@@ -5,6 +5,7 @@ namespace Modules\HR\Observers;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Modules\HR\Events\NewEmployeeOnboarded;
 use Modules\HR\Models\Employee;
 
 class EmployeeObserver
@@ -31,8 +32,10 @@ class EmployeeObserver
             ]);
         }
 
-        // Automatic user creation is now disabled by default
-        // Use the hybrid approach with request/approve workflow instead
+        // Fire onboarding event when user account is first linked (system access granted)
+        if ($employee->isDirty('user_id') && $employee->user_id && ! $employee->getOriginal('user_id')) {
+            event(new NewEmployeeOnboarded($employee));
+        }
     }
 
     /**

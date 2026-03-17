@@ -107,7 +107,13 @@ class CompanyAdminPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
-                // IMPORTANT: runs AFTER tenant is resolved by Filament's routing
+                SyncSpatiePermissionsWithFilamentTenants::class,
+                EnsureGlobalSuperAdminRole::class,
+            ])
+            // These two MUST also run for Livewire AJAX requests (POST /livewire/update).
+            // Without persistent registration, Livewire requests have no team context
+            // so setPermissionsTeamId() is never called → every Gate check returns false → 403.
+            ->persistentMiddleware([
                 SyncSpatiePermissionsWithFilamentTenants::class,
                 EnsureGlobalSuperAdminRole::class,
             ])
@@ -119,6 +125,7 @@ class CompanyAdminPanelProvider extends PanelProvider
             //                                      on App\Models\Role (→ Company).
             ->plugins([
                 FilamentShieldPlugin::make()
+                    ->navigationGroup('Core')
                     ->scopeToTenant(true)
                     ->tenantOwnershipRelationshipName('team'),
                 HRFilamentPlugin::make(),

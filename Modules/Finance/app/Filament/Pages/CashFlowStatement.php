@@ -2,6 +2,7 @@
 
 namespace Modules\Finance\Filament\Pages;
 
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Filament\Pages\Page;
 use Filament\Support\Icons\Heroicon;
 use Modules\Finance\Models\Account;
@@ -13,6 +14,8 @@ class CashFlowStatement extends Page
     protected static string|\UnitEnum|null $navigationGroup = 'Finance';
 
     protected static ?int $navigationSort = 56;
+
+    use HasPageShield;
 
     protected static ?string $navigationLabel = 'Cash Flow';
 

@@ -11,13 +11,13 @@ use Illuminate\Auth\Access\HandlesAuthorization;
 class FarmRequestPolicy
 {
     use HandlesAuthorization;
-
+    
     public function viewAny(AuthUser $authUser): bool
     {
         return $authUser->can('ViewAny:FarmRequest');
     }
 
-    public function view(AuthUser $authUser, FarmRequest $record): bool
+    public function view(AuthUser $authUser, FarmRequest $farmRequest): bool
     {
         return $authUser->can('View:FarmRequest');
     }
@@ -27,22 +27,22 @@ class FarmRequestPolicy
         return $authUser->can('Create:FarmRequest');
     }
 
-    public function update(AuthUser $authUser, FarmRequest $record): bool
+    public function update(AuthUser $authUser, FarmRequest $farmRequest): bool
     {
         return $authUser->can('Update:FarmRequest');
     }
 
-    public function delete(AuthUser $authUser, FarmRequest $record): bool
+    public function delete(AuthUser $authUser, FarmRequest $farmRequest): bool
     {
         return $authUser->can('Delete:FarmRequest');
     }
 
-    public function restore(AuthUser $authUser, FarmRequest $record): bool
+    public function restore(AuthUser $authUser, FarmRequest $farmRequest): bool
     {
         return $authUser->can('Restore:FarmRequest');
     }
 
-    public function forceDelete(AuthUser $authUser, FarmRequest $record): bool
+    public function forceDelete(AuthUser $authUser, FarmRequest $farmRequest): bool
     {
         return $authUser->can('ForceDelete:FarmRequest');
     }
@@ -57,7 +57,7 @@ class FarmRequestPolicy
         return $authUser->can('RestoreAny:FarmRequest');
     }
 
-    public function replicate(AuthUser $authUser, FarmRequest $record): bool
+    public function replicate(AuthUser $authUser, FarmRequest $farmRequest): bool
     {
         return $authUser->can('Replicate:FarmRequest');
     }
@@ -66,4 +66,5 @@ class FarmRequestPolicy
     {
         return $authUser->can('Reorder:FarmRequest');
     }
+
 }

@@ -20,6 +20,7 @@ use Modules\HR\Filament\Resources\CertificationResource;
 use Modules\HR\Filament\Resources\DeductionTypeResource;
 use Modules\HR\Filament\Resources\DepartmentResource;
 use Modules\HR\Filament\Resources\DisciplinaryCaseResource;
+use Modules\HR\Filament\Resources\EmployeeBenefitResource;
 use Modules\HR\Filament\Resources\EmployeeCompanyAssignmentResource;
 use Modules\HR\Filament\Resources\EmployeeDocumentResource;
 use Modules\HR\Filament\Resources\EmployeeGoalResource;
@@ -28,10 +29,12 @@ use Modules\HR\Filament\Resources\EmployeeResource;
 use Modules\HR\Filament\Resources\EmployeeSalaryResource;
 use Modules\HR\Filament\Resources\EmploymentContractResource;
 use Modules\HR\Filament\Resources\GrievanceCaseResource;
+use Modules\HR\Filament\Resources\InterviewResource;
 use Modules\HR\Filament\Resources\HostelStaffAssignmentResource;
 use Modules\HR\Filament\Resources\JobPositionResource;
 use Modules\HR\Filament\Resources\JobVacancyResource;
 use Modules\HR\Filament\Resources\KpiDefinitionResource;
+use Modules\HR\Filament\Resources\KpiScoreResource;
 use Modules\HR\Filament\Resources\LeaveApprovalWorkflowResource;
 use Modules\HR\Filament\Resources\LeaveBalanceResource;
 use Modules\HR\Filament\Resources\LeaveRequestResource;
@@ -42,6 +45,10 @@ use Modules\HR\Filament\Resources\PerformanceReviewResource;
 use Modules\HR\Filament\Resources\PublicHolidayResource;
 use Modules\HR\Filament\Resources\SalaryScaleResource;
 use Modules\HR\Filament\Resources\ShiftResource;
+use Modules\HR\Filament\Resources\OffboardingChecklistResource;
+use Modules\HR\Filament\Resources\PerformanceImprovementPlanResource;
+use Modules\HR\Filament\Resources\ProbationReviewResource;
+use Modules\HR\Filament\Resources\TrainingNominationResource;
 use Modules\HR\Filament\Resources\TrainingProgramResource;
 
 class HRFilamentPlugin implements Plugin
@@ -89,21 +96,28 @@ class HRFilamentPlugin implements Plugin
 
                 // Recruitment
                 JobVacancyResource::class,
+                InterviewResource::class,
 
                 // Learning & Development
                 TrainingProgramResource::class,
+                TrainingNominationResource::class,
                 CertificationResource::class,
 
                 // Employee Relations
                 DisciplinaryCaseResource::class,
                 GrievanceCaseResource::class,
+                OffboardingChecklistResource::class,
+                ProbationReviewResource::class,
 
                 // Performance
                 EmployeeGoalResource::class,
                 KpiDefinitionResource::class,
+                KpiScoreResource::class,
+                PerformanceImprovementPlanResource::class,
 
                 // Benefits & Loans
                 BenefitTypeResource::class,
+                EmployeeBenefitResource::class,
                 EmployeeLoanResource::class,
 
                 // HR Comms
@@ -140,22 +154,30 @@ class HRFilamentPlugin implements Plugin
 
                 // Recruitment
                 JobVacancyResource::class,
+                InterviewResource::class,
 
                 // Learning & Development
                 TrainingProgramResource::class,
+                TrainingNominationResource::class,
                 CertificationResource::class,
 
                 // Employee Relations
                 DisciplinaryCaseResource::class,
                 GrievanceCaseResource::class,
+                OffboardingChecklistResource::class,
+                ProbationReviewResource::class,
 
                 // Performance
                 PerformanceReviewResource::class,
                 AttendanceRecordResource::class,
                 EmployeeGoalResource::class,
                 KpiDefinitionResource::class,
+                KpiScoreResource::class,
+                PerformanceImprovementPlanResource::class,
 
                 // Benefits & Loans
+                BenefitTypeResource::class,
+                EmployeeBenefitResource::class,
                 EmployeeLoanResource::class,
 
                 // HR Comms

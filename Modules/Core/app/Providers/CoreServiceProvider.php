@@ -27,6 +27,23 @@ class CoreServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->name, 'database/migrations'));
+        $this->registerPolicies();
+    }
+
+    protected function registerPolicies(): void
+    {
+        $policiesPath = module_path($this->name, 'app/Policies');
+        if (! is_dir($policiesPath)) {
+            return;
+        }
+        foreach (glob($policiesPath . DIRECTORY_SEPARATOR . '*.php') as $file) {
+            $policyBaseName = basename($file, '.php');
+            $policyClass    = "Modules\\{$this->name}\\Policies\\{$policyBaseName}";
+            $modelClass     = "Modules\\{$this->name}\\Models\\" . str_replace('Policy', '', $policyBaseName);
+            if (class_exists($policyClass) && class_exists($modelClass)) {
+                \Illuminate\Support\Facades\Gate::policy($modelClass, $policyClass);
+            }
+        }
     }
 
     /**

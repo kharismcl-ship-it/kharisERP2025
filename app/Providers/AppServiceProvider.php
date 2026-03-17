@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Http\Responses\LoginResponse;
 use App\Models\Company;
 use App\Models\Permission;
 use App\Models\Role;
@@ -10,6 +11,7 @@ use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
+use Laravel\Fortify\Contracts\LoginResponse as LoginResponseContract;
 use Spatie\Permission\PermissionRegistrar;
 
 class AppServiceProvider extends ServiceProvider
@@ -19,7 +21,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Override Fortify's default login response with smart panel redirect
+        $this->app->singleton(LoginResponseContract::class, LoginResponse::class);
     }
 
     /**

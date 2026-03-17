@@ -12,6 +12,89 @@ use Modules\HR\Models\LeaveType;
 class LeaveAccrualService
 {
     /**
+     * Process monthly leave accrual for all active employees.
+     * Should be called once per month (e.g. first day of the month).
+     */
+    public function processMonthlyAccrual(?int $year = null, ?int $month = null): array
+    {
+        $year  = $year  ?? now()->year;
+        $month = $month ?? now()->month;
+
+        $results = [
+            'employees_processed' => 0,
+            'balances_updated'    => 0,
+            'errors'              => [],
+        ];
+
+        try {
+            DB::beginTransaction();
+
+            $employees = Employee::where('employment_status', 'active')->get();
+            $accrualDate = Carbon::create($year, $month, 1);
+
+            foreach ($employees as $employee) {
+                $leaveTypes = LeaveType::where('company_id', $employee->company_id)
+                    ->where('is_active', true)
+                    ->where('has_accrual', true)
+                    ->whereIn('accrual_frequency', ['monthly'])
+                    ->get();
+
+                foreach ($leaveTypes as $leaveType) {
+                    try {
+                        $accrualAmount = $this->calculateProRataAccrual($employee, $leaveType, $accrualDate);
+
+                        if ($accrualAmount <= 0) {
+                            continue;
+                        }
+
+                        $balance = LeaveBalance::firstOrCreate(
+                            [
+                                'employee_id'   => $employee->id,
+                                'leave_type_id' => $leaveType->id,
+                                'year'          => $year,
+                            ],
+                            [
+                                'company_id'      => $employee->company_id,
+                                'initial_balance' => $leaveType->max_days_per_year ?? 0,
+                                'current_balance' => $leaveType->max_days_per_year ?? 0,
+                                'carried_over'    => 0,
+                                'adjustments'     => 0,
+                                'used_balance'    => 0,
+                            ]
+                        );
+
+                        $balance->adjustments = round(($balance->adjustments ?? 0) + $accrualAmount, 2);
+                        $balance->calculateCurrentBalance();
+                        $balance->save();
+
+                        $results['balances_updated']++;
+
+                        Log::info('Monthly leave accrual processed', [
+                            'employee_id'   => $employee->id,
+                            'leave_type_id' => $leaveType->id,
+                            'year'          => $year,
+                            'month'         => $month,
+                            'accrual'       => $accrualAmount,
+                        ]);
+                    } catch (\Exception $e) {
+                        $results['errors'][] = "Employee {$employee->id} / LeaveType {$leaveType->id}: " . $e->getMessage();
+                    }
+                }
+
+                $results['employees_processed']++;
+            }
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            $results['errors'][] = 'Monthly accrual failed: ' . $e->getMessage();
+            Log::error('Monthly leave accrual failed', ['error' => $e->getMessage()]);
+        }
+
+        return $results;
+    }
+
+    /**
      * Process year-end carry-over for all employees
      */
     public function processYearEndCarryOver(int $fromYear, int $toYear): array

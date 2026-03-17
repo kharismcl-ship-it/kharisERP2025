@@ -19,6 +19,7 @@ use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use Modules\HR\Filament\Resources\DepartmentResource\Pages;
 use Modules\HR\Models\Department;
+use Modules\HR\Models\Employee;
 
 class DepartmentResource extends Resource
 {
@@ -53,6 +54,17 @@ class DepartmentResource extends Resource
                         Forms\Components\Select::make('parent_id')
                             ->relationship('parent', 'name')
                             ->nullable(),
+                        Forms\Components\Select::make('head_employee_id')
+                            ->label('Department Head')
+                            ->options(function (Forms\Get $get) {
+                                $companyId = $get('company_id');
+                                return Employee::when($companyId, fn ($q) => $q->where('company_id', $companyId))
+                                    ->where('employment_status', 'active')
+                                    ->get()
+                                    ->mapWithKeys(fn ($e) => [$e->id => $e->first_name . ' ' . $e->last_name]);
+                            })
+                            ->searchable()
+                            ->nullable(),
                     ]),
 
                 \Filament\Schemas\Components\Section::make('Settings')
@@ -86,6 +98,12 @@ class DepartmentResource extends Resource
                 Tables\Columns\TextColumn::make('parent.name')
                     ->label('Parent Department')
                     ->sortable(),
+                Tables\Columns\TextColumn::make('head.full_name')
+                    ->label('Head')
+                    ->getStateUsing(fn (Department $record) => $record->head
+                        ? $record->head->first_name . ' ' . $record->head->last_name
+                        : '—')
+                    ->toggleable(),
                 Tables\Columns\IconColumn::make('is_active')
                     ->boolean()
                     ->sortable(),

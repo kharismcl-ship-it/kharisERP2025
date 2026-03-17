@@ -2,9 +2,12 @@
 
 namespace Modules\ManufacturingWater\Providers;
 
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
+use Modules\ManufacturingWater\Console\Commands\MwDailyTestReminderCommand;
+use Modules\ManufacturingWater\Console\Commands\MwTankLevelAlertCommand;
 use Modules\ManufacturingWater\Models\MwChemicalUsage;
 use Modules\ManufacturingWater\Models\MwDistributionRecord;
 use Modules\ManufacturingWater\Models\MwPlant;
@@ -77,7 +80,10 @@ class ManufacturingWaterServiceProvider extends ServiceProvider
      */
     protected function registerCommands(): void
     {
-        // $this->commands([]);
+        $this->commands([
+            MwTankLevelAlertCommand::class,
+            MwDailyTestReminderCommand::class,
+        ]);
     }
 
     /**
@@ -85,10 +91,11 @@ class ManufacturingWaterServiceProvider extends ServiceProvider
      */
     protected function registerCommandSchedules(): void
     {
-        // $this->app->booted(function () {
-        //     $schedule = $this->app->make(Schedule::class);
-        //     $schedule->command('inspire')->hourly();
-        // });
+        $this->app->booted(function () {
+            $schedule = $this->app->make(Schedule::class);
+            $schedule->command('mw:tank-level-alert')->hourly();
+            $schedule->command('mw:daily-test-reminder')->dailyAt('07:30');
+        });
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace Modules\Hostels\Filament\Pages;
 
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Carbon\Carbon;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
@@ -21,6 +22,8 @@ class RoomAvailabilityCalendar extends Page
     protected static string|\UnitEnum|null $navigationGroup = 'Hostels';
 
     protected static ?int $navigationSort = 5;
+
+    use HasPageShield;
 
     public ?string $selectedHostel = null;
 

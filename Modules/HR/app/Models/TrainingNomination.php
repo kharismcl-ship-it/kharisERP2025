@@ -10,7 +10,7 @@ class TrainingNomination extends Model
     protected $table = 'hr_training_nominations';
 
     protected $fillable = [
-        'training_program_id', 'employee_id', 'status', 'completion_date', 'score', 'notes',
+        'training_program_id', 'employee_id', 'company_id', 'status', 'completion_date', 'score', 'notes',
     ];
 
     protected $casts = [
@@ -34,5 +34,10 @@ class TrainingNomination extends Model
     public function employee(): BelongsTo
     {
         return $this->belongsTo(Employee::class);
+    }
+
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Company::class);
     }
 }

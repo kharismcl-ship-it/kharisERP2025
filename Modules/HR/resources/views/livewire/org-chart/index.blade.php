@@ -1,50 +1,21 @@
-<div>
-    <h1>Organization Chart</h1>
-
-    <div class="row">
-        @foreach($departments as $department)
-            <div class="col-md-6 mb-4">
-                <div class="card">
-                    <div class="card-header">
-                        <h4>{{ $department->name }}</h4>
-                    </div>
-                    <div class="card-body">
-                        @if($department->employees->count() > 0)
-                            <div class="table-responsive">
-                                <table class="table table-striped">
-                                    <thead>
-                                        <tr>
-                                            <th>Employee</th>
-                                            <th>Position</th>
-                                            <th>Manager</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach($department->employees as $employee)
-                                            <tr>
-                                                <td>{{ $employee->full_name }}</td>
-                                                <td>{{ $employee->jobPosition->title ?? 'N/A' }}</td>
-                                                <td>{{ $employee->manager->full_name ?? 'N/A' }}</td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        @else
-                            <p>No employees in this department.</p>
-                        @endif
-
-                        @if($department->children->count() > 0)
-                            <h5>Sub-departments:</h5>
-                            <ul>
-                                @foreach($department->children as $child)
-                                    <li>{{ $child->name }}</li>
-                                @endforeach
-                            </ul>
-                        @endif
-                    </div>
-                </div>
-            </div>
-        @endforeach
+<div class="p-6">
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold text-gray-800">Organisation Chart</h1>
+        <p class="text-sm text-gray-500 mt-1">Reporting structure for your company</p>
     </div>
+
+    @if($roots->isEmpty())
+        <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-yellow-700 text-sm">
+            No employees with a reporting structure found. Set the "Reporting To" field on employee records to build the chart.
+        </div>
+    @else
+        {{-- Horizontal scroll wrapper for wide trees --}}
+        <div class="overflow-x-auto pb-4">
+            <ul class="flex flex-col gap-0">
+                @foreach($roots as $employee)
+                    @include('hr::livewire.org-chart._node', ['employee' => $employee, 'depth' => 0])
+                @endforeach
+            </ul>
+        </div>
+    @endif
 </div>

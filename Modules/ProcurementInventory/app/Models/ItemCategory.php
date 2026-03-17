@@ -25,7 +25,7 @@ class ItemCategory extends Model
      */
     public function company(): BelongsTo
     {
-        return $this->belongsTo(\Modules\Core\Models\Company::class, 'company_id');
+        return $this->belongsTo(\App\Models\Company::class, 'company_id');
     }
 
     /**

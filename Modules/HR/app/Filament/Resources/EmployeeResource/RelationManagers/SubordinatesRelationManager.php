@@ -2,129 +2,102 @@
 
 namespace Modules\HR\Filament\Resources\EmployeeResource\RelationManagers;
 
+use Filament\Actions\AssociateAction;
 use Filament\Actions\BulkActionGroup;
-use Filament\Actions\CreateAction;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Forms;
+use Filament\Actions\DissociateAction;
+use Filament\Actions\DissociateBulkAction;
 use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 
 class SubordinatesRelationManager extends RelationManager
 {
+    public static function canViewForRecord(Model $ownerRecord, string $pageClass): bool { return true; }
+
     protected static string $relationship = 'subordinates';
 
-    protected static ?string $label = 'Subordinates';
-
     protected static ?string $title = 'Direct Reports';
-
-    public function form(Schema $schema): Schema
-    {
-        return $schema
-            ->components([
-                Forms\Components\TextInput::make('first_name')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('last_name')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('employee_code')
-                    ->required()
-                    ->maxLength(255),
-                Forms\Components\TextInput::make('email')
-                    ->email()
-                    ->maxLength(255)
-                    ->nullable(),
-                Forms\Components\TextInput::make('phone')
-                    ->tel()
-                    ->maxLength(255)
-                    ->nullable(),
-                Forms\Components\Select::make('department_id')
-                    ->relationship('department', 'name')
-                    ->searchable()
-                    ->preload()
-                    ->nullable(),
-                Forms\Components\Select::make('job_position_id')
-                    ->relationship('jobPosition', 'title')
-                    ->searchable()
-                    ->preload()
-                    ->nullable(),
-                Forms\Components\Select::make('employment_type')
-                    ->options([
-                        'full_time' => 'Full Time',
-                        'part_time' => 'Part Time',
-                        'contract' => 'Contract',
-                    ])
-                    ->required(),
-                Forms\Components\Select::make('status')
-                    ->options([
-                        'active' => 'Active',
-                        'inactive' => 'Inactive',
-                        'terminated' => 'Terminated',
-                    ])
-                    ->required(),
-            ]);
-    }
 
     public function table(Table $table): Table
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('full_name')
-                    ->searchable(['first_name', 'last_name'])
-                    ->sortable(['first_name', 'last_name']),
+                Tables\Columns\ImageColumn::make('employee_photo')
+                    ->label('')
+                    ->circular()
+                    ->defaultImageUrl(fn ($record) => 'https://ui-avatars.com/api/?name=' . urlencode($record->full_name) . '&background=random')
+                    ->size(36),
                 Tables\Columns\TextColumn::make('employee_code')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('email')
-                    ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('phone')
-                    ->searchable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('department.name')
+                    ->label('Code')
                     ->searchable()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('full_name')
+                    ->label('Name')
+                    ->searchable(['first_name', 'last_name'])
+                    ->sortable(['first_name', 'last_name']),
                 Tables\Columns\TextColumn::make('jobPosition.title')
+                    ->label('Position')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('department.name')
+                    ->label('Department')
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('employment_type')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('status')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-            ])
-            ->filters([
-                Tables\Filters\SelectFilter::make('department')
-                    ->relationship('department', 'name'),
-                Tables\Filters\SelectFilter::make('status')
-                    ->options([
-                        'active' => 'Active',
-                        'inactive' => 'Inactive',
-                        'terminated' => 'Terminated',
-                    ]),
-                Tables\Filters\SelectFilter::make('employment_type')
-                    ->options([
+                    ->label('Type')
+                    ->badge()
+                    ->color(fn ($state) => match ($state) {
+                        'full_time' => 'primary',
+                        'part_time' => 'success',
+                        'contract'  => 'warning',
+                        default     => 'gray',
+                    })
+                    ->formatStateUsing(fn ($state) => match ($state) {
                         'full_time' => 'Full Time',
                         'part_time' => 'Part Time',
-                        'contract' => 'Contract',
+                        'contract'  => 'Contract',
+                        'intern'    => 'Intern',
+                        default     => $state,
+                    }),
+                Tables\Columns\TextColumn::make('employment_status')
+                    ->label('Status')
+                    ->badge()
+                    ->color(fn ($state) => match ($state) {
+                        'active'    => 'success',
+                        'probation' => 'warning',
+                        default     => 'danger',
+                    })
+                    ->formatStateUsing(fn ($state) => ucfirst($state)),
+            ])
+            ->filters([
+                Tables\Filters\SelectFilter::make('employment_status')
+                    ->options([
+                        'active'     => 'Active',
+                        'probation'  => 'Probation',
+                        'suspended'  => 'Suspended',
+                        'terminated' => 'Terminated',
+                        'resigned'   => 'Resigned',
                     ]),
             ])
             ->headerActions([
-                CreateAction::make(),
+                AssociateAction::make()
+                    ->label('Add Direct Report')
+                    ->recordSelectSearchColumns(['first_name', 'last_name', 'employee_code', 'email'])
+                    ->recordTitle(fn (Model $record): string => "{$record->employee_code} — {$record->full_name}")
+                    ->preloadRecordSelect()
+                    ->associateAnother(false),
             ])
             ->actions([
-                EditAction::make(),
-                DeleteAction::make(),
+                DissociateAction::make()
+                    ->label('Remove')
+                    ->modalHeading('Remove Direct Report')
+                    ->modalDescription(fn (Model $record): string => "Remove {$record->full_name} from this manager's direct reports? The employee record will not be deleted."),
             ])
             ->bulkActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DissociateBulkAction::make()
+                        ->label('Remove Selected'),
                 ]),
             ]);
     }

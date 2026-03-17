@@ -112,12 +112,14 @@ class UserResource extends Resource
                                 }
                                 $teamKey  = config('permission.column_names.team_foreign_key', 'company_id');
                                 $tables   = config('permission.table_names');
+                                // Check roles.company_id IS NULL (the role's own column), NOT the pivot column
+                                // because model_has_roles.company_id is NOT NULL (part of PRIMARY KEY).
                                 $isGlobal = DB::table($tables['model_has_roles'])
                                     ->join($tables['roles'], $tables['roles'] . '.id', '=', $tables['model_has_roles'] . '.role_id')
                                     ->where($tables['model_has_roles'] . '.model_type', get_class($record))
                                     ->where($tables['model_has_roles'] . '.model_id', $record->getKey())
                                     ->where($tables['roles'] . '.name', 'super_admin')
-                                    ->whereNull($tables['model_has_roles'] . '.' . $teamKey)
+                                    ->whereNull($tables['roles'] . '.' . $teamKey)
                                     ->exists();
                                 $set('is_global_super_admin', $isGlobal);
                             })
@@ -144,20 +146,34 @@ class UserResource extends Resource
                                         $globalRoleId = $globalRole->id;
                                     }
 
-                                    DB::table($tables['model_has_roles'])->updateOrInsert(
-                                        ['role_id' => $globalRoleId, 'model_type' => get_class($record), 'model_id' => $record->getKey(), $teamKey => null],
-                                        ['role_id' => $globalRoleId, 'model_type' => get_class($record), 'model_id' => $record->getKey(), $teamKey => null]
-                                    );
+                                    // model_has_roles.company_id is NOT NULL (part of PRIMARY KEY),
+                                    // so we cannot insert with NULL. Assign the global role for every
+                                    // existing company. isGlobalSuperAdmin() detects this by checking
+                                    // roles.company_id IS NULL (the role's own column).
+                                    $companyIds = DB::table('companies')->pluck('id');
+                                    foreach ($companyIds as $companyId) {
+                                        DB::table($tables['model_has_roles'])->updateOrInsert(
+                                            ['role_id' => $globalRoleId, 'model_type' => get_class($record), 'model_id' => $record->getKey(), $teamKey => $companyId],
+                                            ['role_id' => $globalRoleId, 'model_type' => get_class($record), 'model_id' => $record->getKey(), $teamKey => $companyId]
+                                        );
+                                    }
 
                                     // Invalidate cache so EnsureGlobalSuperAdminRole propagates immediately
                                     \Illuminate\Support\Facades\Cache::forget("super_admin_synced_{$record->getKey()}");
-                                } elseif ($globalRole) {
+                                } else {
+                                    // Remove ALL super_admin role assignments (global + company-scoped) for this user.
+                                    // model_has_roles.company_id is NOT NULL so ->whereNull() would match nothing.
+                                    $superAdminRoleIds = DB::table($tables['roles'])
+                                        ->where('name', 'super_admin')
+                                        ->pluck('id');
+
                                     DB::table($tables['model_has_roles'])
-                                        ->where('role_id', $globalRole->id)
                                         ->where('model_type', get_class($record))
                                         ->where('model_id', $record->getKey())
-                                        ->whereNull($teamKey)
+                                        ->whereIn('role_id', $superAdminRoleIds)
                                         ->delete();
+
+                                    \Illuminate\Support\Facades\Cache::forget("super_admin_synced_{$record->getKey()}");
                                 }
                             }),
 

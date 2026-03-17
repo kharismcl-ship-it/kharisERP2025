@@ -6,6 +6,7 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -51,6 +52,23 @@ class MwDistributionRecordResource extends Resource
         ]);
     }
 
+    public static function infolist(Schema $schema): Schema
+    {
+        return $schema->components([
+            Section::make()->columns(3)->schema([
+                TextEntry::make('distribution_reference')->label('Reference'),
+                TextEntry::make('plant.name')->label('Plant'),
+                TextEntry::make('distribution_date')->date(),
+                TextEntry::make('destination')->columnSpanFull(),
+                TextEntry::make('volume_liters')->label('Volume (L)'),
+                TextEntry::make('unit_price')->label('Unit Price')->money('GHS')->placeholder('—'),
+                TextEntry::make('total_amount')->label('Total Amount')->money('GHS'),
+                TextEntry::make('vehicle_info')->label('Vehicle Info')->placeholder('—'),
+                TextEntry::make('notes')->columnSpanFull()->placeholder('—'),
+            ]),
+        ]);
+    }
+
     public static function table(Table $table): Table
     {
         return $table
@@ -69,6 +87,7 @@ class MwDistributionRecordResource extends Resource
                     ->relationship('plant', 'name'),
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
@@ -83,6 +102,7 @@ class MwDistributionRecordResource extends Resource
         return [
             'index'  => Pages\ListMwDistributionRecords::route('/'),
             'create' => Pages\CreateMwDistributionRecord::route('/create'),
+            'view'   => Pages\ViewMwDistributionRecord::route('/{record}'),
             'edit'   => Pages\EditMwDistributionRecord::route('/{record}/edit'),
         ];
     }

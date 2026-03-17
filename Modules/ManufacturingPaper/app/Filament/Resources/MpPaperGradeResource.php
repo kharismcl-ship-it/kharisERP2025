@@ -6,6 +6,8 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Infolists\Components\IconEntry;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -48,6 +50,29 @@ class MpPaperGradeResource extends Resource
         ]);
     }
 
+    public static function infolist(Schema $schema): Schema
+    {
+        return $schema->components([
+            Section::make()->columns(3)->schema([
+                TextEntry::make('name')->weight('bold'),
+                TextEntry::make('category')
+                    ->badge()
+                    ->color(fn ($state) => match ($state) {
+                        'printing'  => 'primary',
+                        'packaging' => 'warning',
+                        'tissue'    => 'info',
+                        'specialty' => 'success',
+                        default     => 'gray',
+                    }),
+                IconEntry::make('is_active')->label('Active')->boolean(),
+                TextEntry::make('gsm')->label('GSM (g/m²)')->placeholder('—'),
+                TextEntry::make('width_mm')->label('Width (mm)')->placeholder('—'),
+                TextEntry::make('color')->placeholder('—'),
+                TextEntry::make('description')->columnSpanFull()->placeholder('—'),
+            ]),
+        ]);
+    }
+
     public static function table(Table $table): Table
     {
         return $table
@@ -72,6 +97,7 @@ class MpPaperGradeResource extends Resource
                 Tables\Filters\TernaryFilter::make('is_active')->label('Active'),
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
@@ -85,6 +111,7 @@ class MpPaperGradeResource extends Resource
         return [
             'index'  => Pages\ListMpPaperGrades::route('/'),
             'create' => Pages\CreateMpPaperGrade::route('/create'),
+            'view'   => Pages\ViewMpPaperGrade::route('/{record}'),
             'edit'   => Pages\EditMpPaperGrade::route('/{record}/edit'),
         ];
     }

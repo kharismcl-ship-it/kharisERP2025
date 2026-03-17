@@ -2,6 +2,7 @@
 
 namespace Modules\Finance\Filament\Pages;
 
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Filament\Forms\Components\DatePicker;
 use Filament\Pages\Page;
 use Filament\Support\Icons\Heroicon;
@@ -15,6 +16,8 @@ class TrialBalance extends Page
     protected static string|\UnitEnum|null $navigationGroup = 'Finance';
 
     protected static ?int $navigationSort = 50;
+
+    use HasPageShield;
 
     protected static ?string $navigationLabel = 'Trial Balance';
 

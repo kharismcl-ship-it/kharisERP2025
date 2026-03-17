@@ -11,13 +11,13 @@ use Illuminate\Auth\Access\HandlesAuthorization;
 class MpProductionLinePolicy
 {
     use HandlesAuthorization;
-
+    
     public function viewAny(AuthUser $authUser): bool
     {
         return $authUser->can('ViewAny:MpProductionLine');
     }
 
-    public function view(AuthUser $authUser, MpProductionLine $record): bool
+    public function view(AuthUser $authUser, MpProductionLine $mpProductionLine): bool
     {
         return $authUser->can('View:MpProductionLine');
     }
@@ -27,22 +27,22 @@ class MpProductionLinePolicy
         return $authUser->can('Create:MpProductionLine');
     }
 
-    public function update(AuthUser $authUser, MpProductionLine $record): bool
+    public function update(AuthUser $authUser, MpProductionLine $mpProductionLine): bool
     {
         return $authUser->can('Update:MpProductionLine');
     }
 
-    public function delete(AuthUser $authUser, MpProductionLine $record): bool
+    public function delete(AuthUser $authUser, MpProductionLine $mpProductionLine): bool
     {
         return $authUser->can('Delete:MpProductionLine');
     }
 
-    public function restore(AuthUser $authUser, MpProductionLine $record): bool
+    public function restore(AuthUser $authUser, MpProductionLine $mpProductionLine): bool
     {
         return $authUser->can('Restore:MpProductionLine');
     }
 
-    public function forceDelete(AuthUser $authUser, MpProductionLine $record): bool
+    public function forceDelete(AuthUser $authUser, MpProductionLine $mpProductionLine): bool
     {
         return $authUser->can('ForceDelete:MpProductionLine');
     }
@@ -57,7 +57,7 @@ class MpProductionLinePolicy
         return $authUser->can('RestoreAny:MpProductionLine');
     }
 
-    public function replicate(AuthUser $authUser, MpProductionLine $record): bool
+    public function replicate(AuthUser $authUser, MpProductionLine $mpProductionLine): bool
     {
         return $authUser->can('Replicate:MpProductionLine');
     }
@@ -66,4 +66,5 @@ class MpProductionLinePolicy
     {
         return $authUser->can('Reorder:MpProductionLine');
     }
+
 }

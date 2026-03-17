@@ -139,12 +139,17 @@ class ViewLeaveRequest extends ViewRecord
                             ->label('Status')
                             ->badge()
                             ->color(fn ($state) => match ($state) {
-                                'approved' => 'success',
-                                'rejected' => 'danger',
-                                'pending' => 'warning',
-                                'cancelled' => 'gray',
-                                'draft' => 'secondary',
-                                default => 'gray',
+                                'approved'         => 'success',
+                                'rejected'         => 'danger',
+                                'pending'          => 'warning',
+                                'pending_approval' => 'info',
+                                'cancelled'        => 'gray',
+                                'draft'            => 'gray',
+                                default            => 'gray',
+                            })
+                            ->formatStateUsing(fn ($state) => match ($state) {
+                                'pending_approval' => 'In Review',
+                                default            => ucfirst(str_replace('_', ' ', $state)),
                             }),
                         TextEntry::make('approved_by_employee.full_name')
                             ->label('Approved By')

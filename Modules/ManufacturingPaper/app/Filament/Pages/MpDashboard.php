@@ -2,6 +2,7 @@
 
 namespace Modules\ManufacturingPaper\Filament\Pages;
 
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Filament\Pages\Page;
 use Modules\ManufacturingPaper\Models\MpEquipmentLog;
 use Modules\ManufacturingPaper\Models\MpPlant;
@@ -15,6 +16,8 @@ class MpDashboard extends Page
     protected static string|\UnitEnum|null $navigationGroup = 'Manufacturing Paper';
 
     protected static ?int $navigationSort = 0;
+
+    use HasPageShield;
 
     protected static ?string $navigationLabel = 'Dashboard';
 

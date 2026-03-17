@@ -2,6 +2,7 @@
 
 namespace Modules\Fleet\Filament\Pages;
 
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Filament\Pages\Page;
 use Filament\Support\Icons\Heroicon;
 use Modules\Fleet\Services\FleetService;
@@ -13,6 +14,8 @@ class FleetCostReport extends Page
     protected static string|\UnitEnum|null $navigationGroup = 'Fleet';
 
     protected static ?int $navigationSort = 8;
+
+    use HasPageShield;
 
     protected static ?string $navigationLabel = 'Cost Report';
 

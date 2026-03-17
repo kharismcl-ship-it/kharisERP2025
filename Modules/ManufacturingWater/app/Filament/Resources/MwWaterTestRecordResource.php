@@ -7,6 +7,8 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Infolists\Components\IconEntry;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -70,6 +72,40 @@ class MwWaterTestRecordResource extends Resource
         ]);
     }
 
+    public static function infolist(Schema $schema): Schema
+    {
+        return $schema->components([
+            Section::make('Test Info')->columns(3)->schema([
+                TextEntry::make('plant.name')->label('Plant'),
+                TextEntry::make('test_date')->date(),
+                TextEntry::make('test_type')
+                    ->label('Type')
+                    ->badge()
+                    ->color(fn ($state) => match ($state) {
+                        'final'        => 'success',
+                        'treated'      => 'info',
+                        'raw'          => 'warning',
+                        'distribution' => 'primary',
+                        default        => 'gray',
+                    }),
+                TextEntry::make('tested_by')->placeholder('—'),
+            ]),
+            Section::make('Parameters')->columns(4)->schema([
+                TextEntry::make('ph')->label('pH')->placeholder('—'),
+                TextEntry::make('turbidity_ntu')->label('Turbidity (NTU)')->placeholder('—'),
+                TextEntry::make('tds_ppm')->label('TDS (ppm)')->placeholder('—'),
+                TextEntry::make('temperature_c')->label('Temp (°C)')->placeholder('—'),
+                TextEntry::make('coliform_count')->label('Coliform (CFU/100ml)')->placeholder('—'),
+                TextEntry::make('chlorine_residual')->label('Chlorine (mg/L)')->placeholder('—'),
+                TextEntry::make('dissolved_oxygen')->label('DO (mg/L)')->placeholder('—'),
+            ]),
+            Section::make('Result')->columns(2)->schema([
+                IconEntry::make('passed')->label('Quality Passed')->boolean(),
+                TextEntry::make('notes')->placeholder('—'),
+            ]),
+        ]);
+    }
+
     public static function table(Table $table): Table
     {
         return $table
@@ -100,6 +136,7 @@ class MwWaterTestRecordResource extends Resource
                 Tables\Filters\TernaryFilter::make('passed'),
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
@@ -114,6 +151,7 @@ class MwWaterTestRecordResource extends Resource
         return [
             'index'  => Pages\ListMwWaterTestRecords::route('/'),
             'create' => Pages\CreateMwWaterTestRecord::route('/create'),
+            'view'   => Pages\ViewMwWaterTestRecord::route('/{record}'),
             'edit'   => Pages\EditMwWaterTestRecord::route('/{record}/edit'),
         ];
     }

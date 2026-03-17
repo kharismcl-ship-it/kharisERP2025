@@ -11,13 +11,13 @@ use Illuminate\Auth\Access\HandlesAuthorization;
 class FarmWorkerAttendancePolicy
 {
     use HandlesAuthorization;
-
+    
     public function viewAny(AuthUser $authUser): bool
     {
         return $authUser->can('ViewAny:FarmWorkerAttendance');
     }
 
-    public function view(AuthUser $authUser, FarmWorkerAttendance $record): bool
+    public function view(AuthUser $authUser, FarmWorkerAttendance $farmWorkerAttendance): bool
     {
         return $authUser->can('View:FarmWorkerAttendance');
     }
@@ -27,22 +27,22 @@ class FarmWorkerAttendancePolicy
         return $authUser->can('Create:FarmWorkerAttendance');
     }
 
-    public function update(AuthUser $authUser, FarmWorkerAttendance $record): bool
+    public function update(AuthUser $authUser, FarmWorkerAttendance $farmWorkerAttendance): bool
     {
         return $authUser->can('Update:FarmWorkerAttendance');
     }
 
-    public function delete(AuthUser $authUser, FarmWorkerAttendance $record): bool
+    public function delete(AuthUser $authUser, FarmWorkerAttendance $farmWorkerAttendance): bool
     {
         return $authUser->can('Delete:FarmWorkerAttendance');
     }
 
-    public function restore(AuthUser $authUser, FarmWorkerAttendance $record): bool
+    public function restore(AuthUser $authUser, FarmWorkerAttendance $farmWorkerAttendance): bool
     {
         return $authUser->can('Restore:FarmWorkerAttendance');
     }
 
-    public function forceDelete(AuthUser $authUser, FarmWorkerAttendance $record): bool
+    public function forceDelete(AuthUser $authUser, FarmWorkerAttendance $farmWorkerAttendance): bool
     {
         return $authUser->can('ForceDelete:FarmWorkerAttendance');
     }
@@ -57,7 +57,7 @@ class FarmWorkerAttendancePolicy
         return $authUser->can('RestoreAny:FarmWorkerAttendance');
     }
 
-    public function replicate(AuthUser $authUser, FarmWorkerAttendance $record): bool
+    public function replicate(AuthUser $authUser, FarmWorkerAttendance $farmWorkerAttendance): bool
     {
         return $authUser->can('Replicate:FarmWorkerAttendance');
     }
@@ -66,4 +66,5 @@ class FarmWorkerAttendancePolicy
     {
         return $authUser->can('Reorder:FarmWorkerAttendance');
     }
+
 }

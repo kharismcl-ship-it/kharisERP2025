@@ -37,6 +37,11 @@ class Announcement extends Model
         return $this->is_published && (! $this->expires_at || $this->expires_at->isFuture());
     }
 
+    public function getPriorityLabelAttribute(): string
+    {
+        return self::PRIORITIES[$this->priority] ?? ucfirst($this->priority ?? 'Normal');
+    }
+
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);

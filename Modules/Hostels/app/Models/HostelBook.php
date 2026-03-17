@@ -39,7 +39,7 @@ class HostelBook extends Model
 
     public function company()
     {
-        return $this->belongsTo(\Modules\Core\Models\Company::class);
+        return $this->belongsTo(\App\Models\Company::class);
     }
 
     public function orderItems()

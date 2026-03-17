@@ -65,11 +65,18 @@ class FleetServiceProvider extends ServiceProvider
 
     protected function registerPolicies(): void
     {
-        Gate::policy(Vehicle::class, VehiclePolicy::class);
-        Gate::policy(MaintenanceRecord::class, MaintenanceRecordPolicy::class);
-        Gate::policy(FuelLog::class, FuelLogPolicy::class);
-        Gate::policy(DriverAssignment::class, DriverAssignmentPolicy::class);
-        Gate::policy(TripLog::class, TripLogPolicy::class);
+        $policiesPath = module_path($this->name, 'app/Policies');
+        if (! is_dir($policiesPath)) {
+            return;
+        }
+        foreach (glob($policiesPath . DIRECTORY_SEPARATOR . '*.php') as $file) {
+            $policyBaseName = basename($file, '.php');
+            $policyClass    = "Modules\\{$this->name}\\Policies\\{$policyBaseName}";
+            $modelClass     = "Modules\\{$this->name}\\Models\\" . str_replace('Policy', '', $policyBaseName);
+            if (class_exists($policyClass) && class_exists($modelClass)) {
+                Gate::policy($modelClass, $policyClass);
+            }
+        }
     }
 
     /**

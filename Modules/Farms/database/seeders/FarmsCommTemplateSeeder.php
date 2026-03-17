@@ -289,6 +289,50 @@ EOD,
             'description' => 'Sent to buyer when a farm sale record is created.',
         ];
 
+        // Marketplace — Order Confirmed (Email)
+        $templates[] = [
+            'code'        => 'farms_order_confirmed',
+            'channel'     => 'email',
+            'name'        => 'Farms: Marketplace Order Confirmed (Email)',
+            'subject'     => 'Order Confirmed — {{order_ref}} | Alpha Farms',
+            'body'        => <<<'EOD'
+Dear {{customer_name}},
+
+Thank you for your order from Alpha Farms! We have received your order and it is being processed.
+
+Order Reference: {{order_ref}}
+Order Date:      {{order_date}}
+
+Items Ordered:
+{{item_lines}}
+
+Subtotal:       {{currency}} {{subtotal}}
+Delivery Fee:   {{currency}} {{delivery_fee}}
+Total:          {{currency}} {{total}}
+
+Delivery Method: {{delivery_type}}
+{{delivery_address}}
+
+Track your order at: {{track_url}}
+
+We will notify you when your order is ready. Thank you for supporting local farming!
+
+Best regards,
+Alpha Farms Team
+EOD,
+            'description' => 'Sent to customer when a marketplace order is placed.',
+        ];
+
+        // Marketplace — Order Confirmed (SMS)
+        $templates[] = [
+            'code'        => 'farms_order_confirmed_sms',
+            'channel'     => 'sms',
+            'name'        => 'Farms: Marketplace Order Confirmed (SMS)',
+            'subject'     => null,
+            'body'        => 'Alpha Farms: Order {{order_ref}} received! Total: GHS {{total}}. Track at {{track_url}}. Thank you!',
+            'description' => 'SMS sent to customer when a marketplace order is placed.',
+        ];
+
         foreach ($templates as $data) {
             CommTemplate::updateOrCreate(['code' => $data['code']], $data);
         }

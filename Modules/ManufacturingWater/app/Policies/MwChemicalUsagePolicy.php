@@ -1,16 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\ManufacturingWater\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use Modules\ManufacturingWater\Models\MwChemicalUsage;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class MwChemicalUsagePolicy
 {
-    public function viewAny(User $user): bool   { return $user->can('view_any_mw::chemical::usage'); }
-    public function view(User $user, MwChemicalUsage $model): bool { return $user->can('view_mw::chemical::usage'); }
-    public function create(User $user): bool    { return $user->can('create_mw::chemical::usage'); }
-    public function update(User $user, MwChemicalUsage $model): bool { return $user->can('update_mw::chemical::usage'); }
-    public function delete(User $user, MwChemicalUsage $model): bool { return $user->can('delete_mw::chemical::usage'); }
-    public function deleteAny(User $user): bool { return $user->can('delete_any_mw::chemical::usage'); }
+    use HandlesAuthorization;
+    
+    public function viewAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ViewAny:MwChemicalUsage');
+    }
+
+    public function view(AuthUser $authUser, MwChemicalUsage $mwChemicalUsage): bool
+    {
+        return $authUser->can('View:MwChemicalUsage');
+    }
+
+    public function create(AuthUser $authUser): bool
+    {
+        return $authUser->can('Create:MwChemicalUsage');
+    }
+
+    public function update(AuthUser $authUser, MwChemicalUsage $mwChemicalUsage): bool
+    {
+        return $authUser->can('Update:MwChemicalUsage');
+    }
+
+    public function delete(AuthUser $authUser, MwChemicalUsage $mwChemicalUsage): bool
+    {
+        return $authUser->can('Delete:MwChemicalUsage');
+    }
+
+    public function restore(AuthUser $authUser, MwChemicalUsage $mwChemicalUsage): bool
+    {
+        return $authUser->can('Restore:MwChemicalUsage');
+    }
+
+    public function forceDelete(AuthUser $authUser, MwChemicalUsage $mwChemicalUsage): bool
+    {
+        return $authUser->can('ForceDelete:MwChemicalUsage');
+    }
+
+    public function forceDeleteAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ForceDeleteAny:MwChemicalUsage');
+    }
+
+    public function restoreAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('RestoreAny:MwChemicalUsage');
+    }
+
+    public function replicate(AuthUser $authUser, MwChemicalUsage $mwChemicalUsage): bool
+    {
+        return $authUser->can('Replicate:MwChemicalUsage');
+    }
+
+    public function reorder(AuthUser $authUser): bool
+    {
+        return $authUser->can('Reorder:MwChemicalUsage');
+    }
+
 }

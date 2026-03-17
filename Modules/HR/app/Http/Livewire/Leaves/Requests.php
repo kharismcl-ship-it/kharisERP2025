@@ -5,6 +5,7 @@ namespace Modules\HR\Http\Livewire\Leaves;
 use Livewire\Component;
 use Modules\HR\Models\LeaveRequest;
 use Modules\HR\Models\LeaveType;
+use Modules\HR\Services\LeaveApprovalService;
 
 class Requests extends Component
 {
@@ -54,20 +55,22 @@ class Requests extends Component
         if ($employeeId) {
             $companyId = app('current_company_id');
 
-            LeaveRequest::create([
-                'company_id' => $companyId,
-                'employee_id' => $employeeId,
+            $leaveRequest = LeaveRequest::create([
+                'company_id'    => $companyId,
+                'employee_id'   => $employeeId,
                 'leave_type_id' => $this->leaveTypeId,
-                'start_date' => $this->startDate,
-                'end_date' => $this->endDate,
-                'total_days' => \Carbon\Carbon::parse($this->startDate)->diffInDays(\Carbon\Carbon::parse($this->endDate)) + 1,
-                'reason' => $this->reason,
-                'status' => 'pending',
+                'start_date'    => $this->startDate,
+                'end_date'      => $this->endDate,
+                'total_days'    => \Carbon\Carbon::parse($this->startDate)->diffInDays(\Carbon\Carbon::parse($this->endDate)) + 1,
+                'reason'        => $this->reason,
+                'status'        => 'pending',
             ]);
+
+            app(LeaveApprovalService::class)->initializeApprovalProcess($leaveRequest);
 
             $this->reset(['leaveTypeId', 'startDate', 'endDate', 'reason']);
             $this->loadLeaveRequests();
-            session()->flash('message', 'Leave request submitted successfully.');
+            session()->flash('message', 'Leave request submitted and sent for approval.');
         }
     }
 

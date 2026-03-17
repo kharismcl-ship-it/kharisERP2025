@@ -11,7 +11,7 @@ class Certification extends Model
     protected $table = 'hr_certifications';
 
     protected $fillable = [
-        'employee_id', 'name', 'issuing_authority', 'certificate_number',
+        'employee_id', 'company_id', 'name', 'issuing_authority', 'certificate_number',
         'issue_date', 'expiry_date', 'certificate_path', 'notes',
     ];
 
@@ -36,5 +36,10 @@ class Certification extends Model
     public function employee(): BelongsTo
     {
         return $this->belongsTo(Employee::class);
+    }
+
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Company::class);
     }
 }

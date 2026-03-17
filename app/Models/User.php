@@ -77,10 +77,19 @@ class User extends Authenticatable implements FilamentUser, HasTenants, Commente
     }
 
     /**
+     * The employee profile linked to this user account (if any).
+     */
+    public function employee()
+    {
+        return $this->hasOne(\Modules\HR\Models\Employee::class, 'user_id');
+    }
+
+    /**
      * Filament panel access control.
      *
      * - admin panel      → only global super_admin users
      * - company-admin    → any user with at least one active company assignment
+     * - staff            → any user with at least one active company assignment
      */
     public function canAccessPanel(Panel $panel): bool
     {
@@ -88,8 +97,11 @@ class User extends Authenticatable implements FilamentUser, HasTenants, Commente
             return $this->isGlobalSuperAdmin();
         }
 
-        // company-admin panel: user must belong to at least one company
-        return $this->activeCompanies()->exists();
+        if (in_array($panel->getId(), ['company-admin', 'staff'])) {
+            return $this->activeCompanies()->exists();
+        }
+
+        return false;
     }
 
     /**
@@ -154,12 +166,16 @@ class User extends Authenticatable implements FilamentUser, HasTenants, Commente
     {
         $teamKey = config('permission.column_names.team_foreign_key', 'team_id');
 
+        // Check if the user holds the global super_admin ROLE (role.company_id IS NULL).
+        // We check the role's company_id, NOT model_has_roles.company_id, because
+        // the model_has_roles.company_id column is NOT NULL (part of the PK) and
+        // cannot store NULL values in this schema.
         return DB::table('model_has_roles')
             ->join('roles', 'roles.id', '=', 'model_has_roles.role_id')
             ->where('model_has_roles.model_type', get_class($this))
             ->where('model_has_roles.model_id', $this->getKey())
             ->where('roles.name', 'super_admin')
-            ->whereNull("model_has_roles.{$teamKey}")
+            ->whereNull("roles.{$teamKey}")
             ->exists();
     }
 

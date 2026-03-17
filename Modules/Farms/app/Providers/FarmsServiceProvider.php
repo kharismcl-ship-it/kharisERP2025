@@ -93,6 +93,7 @@ class FarmsServiceProvider extends ServiceProvider
             }
         }
 
+        $this->registerTripLogObserver();
         $this->registerCommands();
         $this->registerCommandSchedules();
         $this->registerTranslations();
@@ -103,8 +104,30 @@ class FarmsServiceProvider extends ServiceProvider
         $this->registerLivewireComponents();
     }
 
+    protected function registerTripLogObserver(): void
+    {
+        // When a Fleet TripLog is marked completed, auto-mark the linked FarmOrder as delivered
+        try {
+            \Modules\Fleet\Models\TripLog::saved(function (\Modules\Fleet\Models\TripLog $trip) {
+                if ($trip->status === 'completed' && $trip->isDirty('status')) {
+                    $delivery = \Modules\Farms\Models\FarmOrderDelivery::where('trip_log_id', $trip->id)->first();
+                    if ($delivery) {
+                        $delivery->update(['status' => 'delivered', 'delivered_at' => now()]);
+                        $delivery->farmOrder?->update(['status' => 'delivered']);
+                    }
+                }
+            });
+        } catch (\Throwable) {
+            // Fleet module may not be loaded — silently skip
+        }
+    }
+
     protected function registerLivewireComponents(): void
     {
+        // Filament widgets
+        \Livewire\Livewire::component('modules.farms.filament.widgets.farm-dashboard-stats-widget', \Modules\Farms\Filament\Widgets\FarmDashboardStatsWidget::class);
+        \Livewire\Livewire::component('modules.farms.filament.widgets.farm-financial-report-stats-widget', \Modules\Farms\Filament\Widgets\FarmFinancialReportStatsWidget::class);
+
         \Livewire\Livewire::component('farms::farm-index', \Modules\Farms\Http\Livewire\FarmIndex::class);
         \Livewire\Livewire::component('farms::farm-dashboard', \Modules\Farms\Http\Livewire\FarmDashboard::class);
         \Livewire\Livewire::component('farms::navigation', \Modules\Farms\Http\Livewire\Navigation::class);
@@ -123,6 +146,33 @@ class FarmsServiceProvider extends ServiceProvider
         \Livewire\Livewire::component('farms::requests.show', \Modules\Farms\Http\Livewire\Requests\Show::class);
         \Livewire\Livewire::component('farms::attendance.index', \Modules\Farms\Http\Livewire\Attendance\Index::class);
         \Livewire\Livewire::component('farms::reports.index', \Modules\Farms\Http\Livewire\Reports\Index::class);
+
+        // Public Farm Shop
+        \Livewire\Livewire::component('farms::shop.index', \Modules\Farms\Http\Livewire\Shop\Index::class);
+        \Livewire\Livewire::component('farms::shop.show', \Modules\Farms\Http\Livewire\Shop\Show::class);
+        \Livewire\Livewire::component('farms::shop.cart', \Modules\Farms\Http\Livewire\Shop\Cart::class);
+        \Livewire\Livewire::component('farms::shop.checkout', \Modules\Farms\Http\Livewire\Shop\Checkout::class);
+        \Livewire\Livewire::component('farms::shop.order-payment', \Modules\Farms\Http\Livewire\Shop\OrderPayment::class);
+        \Livewire\Livewire::component('farms::shop.order-payment-return', \Modules\Farms\Http\Livewire\Shop\OrderPaymentReturn::class);
+        \Livewire\Livewire::component('farms::shop.order-confirmation', \Modules\Farms\Http\Livewire\Shop\OrderConfirmation::class);
+        \Livewire\Livewire::component('farms::shop.order-tracking', \Modules\Farms\Http\Livewire\Shop\OrderTracking::class);
+        \Livewire\Livewire::component('farms::shop.my-orders', \Modules\Farms\Http\Livewire\Shop\MyOrders::class);
+        \Livewire\Livewire::component('farms::shop.auth.login', \Modules\Farms\Http\Livewire\Shop\Auth\Login::class);
+        \Livewire\Livewire::component('farms::shop.auth.register', \Modules\Farms\Http\Livewire\Shop\Auth\Register::class);
+        \Livewire\Livewire::component('farms::shop.auth.forgot-password', \Modules\Farms\Http\Livewire\Shop\Auth\ForgotPassword::class);
+        \Livewire\Livewire::component('farms::shop.auth.reset-password', \Modules\Farms\Http\Livewire\Shop\Auth\ResetPassword::class);
+        \Livewire\Livewire::component('farms::shop.my-profile', \Modules\Farms\Http\Livewire\Shop\MyProfile::class);
+        \Livewire\Livewire::component('farms::shop.my-wishlist', \Modules\Farms\Http\Livewire\Shop\MyWishlist::class);
+        \Livewire\Livewire::component('farms::shop.order-receipt', \Modules\Farms\Http\Livewire\Shop\OrderReceipt::class);
+        \Livewire\Livewire::component('farms::shop.request-refund', \Modules\Farms\Http\Livewire\Shop\RequestRefund::class);
+        \Livewire\Livewire::component('farms::shop.harvest-calendar', \Modules\Farms\Http\Livewire\Shop\HarvestCalendar::class);
+        \Livewire\Livewire::component('farms::shop.my-subscriptions', \Modules\Farms\Http\Livewire\Shop\MySubscriptions::class);
+        \Livewire\Livewire::component('farms::shop.bundle-show', \Modules\Farms\Http\Livewire\Shop\BundleShow::class);
+        \Livewire\Livewire::component('farms::shop.farm-shop-page', \Modules\Farms\Http\Livewire\Shop\FarmShopPage::class);
+        \Livewire\Livewire::component('farms::shop.blog-index', \Modules\Farms\Http\Livewire\Shop\BlogIndex::class);
+        \Livewire\Livewire::component('farms::shop.blog-show', \Modules\Farms\Http\Livewire\Shop\BlogShow::class);
+        \Livewire\Livewire::component('farms::shop.farm-profile', \Modules\Farms\Http\Livewire\Shop\FarmProfile::class);
+        \Livewire\Livewire::component('farms::shop.b2b-register', \Modules\Farms\Http\Livewire\Shop\B2bRegister::class);
     }
 
     /**
@@ -133,6 +183,7 @@ class FarmsServiceProvider extends ServiceProvider
         $this->app->register(EventServiceProvider::class);
         $this->app->register(RouteServiceProvider::class);
         $this->app->singleton(FarmService::class);
+        $this->app->singleton(\Modules\Farms\Services\ShopSettingsService::class);
     }
 
     protected function registerPolicies(): void
@@ -184,6 +235,9 @@ class FarmsServiceProvider extends ServiceProvider
             \Modules\Farms\Console\Commands\FarmsHarvestDueAlertCommand::class,
             \Modules\Farms\Console\Commands\FarmsLivestockHealthReminderCommand::class,
             \Modules\Farms\Console\Commands\FarmsTaskOverdueAlertCommand::class,
+            \Modules\Farms\Console\Commands\FarmsNotifyRestockCommand::class,
+            \Modules\Farms\Console\Commands\FarmsAbandonedCartRecoveryCommand::class,
+            \Modules\Farms\Console\Commands\FarmsProcessSubscriptionsCommand::class,
         ]);
     }
 
@@ -200,6 +254,12 @@ class FarmsServiceProvider extends ServiceProvider
             $schedule->command('farms:livestock-health-reminders')->dailyAt('07:30');
             // Run task overdue alerts daily at 8:00am
             $schedule->command('farms:task-overdue-alerts')->dailyAt('08:00');
+            // Restock notifications — check every hour
+            $schedule->command('farms:notify-restock')->hourly();
+            // Abandoned cart recovery — check every 30 minutes
+            $schedule->command('farms:abandoned-cart-recovery')->everyThirtyMinutes();
+            // Subscription order generation — daily at 6am
+            $schedule->command('farms:process-subscriptions')->dailyAt('06:00');
         });
     }
 

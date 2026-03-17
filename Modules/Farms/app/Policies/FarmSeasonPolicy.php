@@ -11,13 +11,13 @@ use Illuminate\Auth\Access\HandlesAuthorization;
 class FarmSeasonPolicy
 {
     use HandlesAuthorization;
-
+    
     public function viewAny(AuthUser $authUser): bool
     {
         return $authUser->can('ViewAny:FarmSeason');
     }
 
-    public function view(AuthUser $authUser, FarmSeason $record): bool
+    public function view(AuthUser $authUser, FarmSeason $farmSeason): bool
     {
         return $authUser->can('View:FarmSeason');
     }
@@ -27,22 +27,22 @@ class FarmSeasonPolicy
         return $authUser->can('Create:FarmSeason');
     }
 
-    public function update(AuthUser $authUser, FarmSeason $record): bool
+    public function update(AuthUser $authUser, FarmSeason $farmSeason): bool
     {
         return $authUser->can('Update:FarmSeason');
     }
 
-    public function delete(AuthUser $authUser, FarmSeason $record): bool
+    public function delete(AuthUser $authUser, FarmSeason $farmSeason): bool
     {
         return $authUser->can('Delete:FarmSeason');
     }
 
-    public function restore(AuthUser $authUser, FarmSeason $record): bool
+    public function restore(AuthUser $authUser, FarmSeason $farmSeason): bool
     {
         return $authUser->can('Restore:FarmSeason');
     }
 
-    public function forceDelete(AuthUser $authUser, FarmSeason $record): bool
+    public function forceDelete(AuthUser $authUser, FarmSeason $farmSeason): bool
     {
         return $authUser->can('ForceDelete:FarmSeason');
     }
@@ -57,7 +57,7 @@ class FarmSeasonPolicy
         return $authUser->can('RestoreAny:FarmSeason');
     }
 
-    public function replicate(AuthUser $authUser, FarmSeason $record): bool
+    public function replicate(AuthUser $authUser, FarmSeason $farmSeason): bool
     {
         return $authUser->can('Replicate:FarmSeason');
     }
@@ -66,4 +66,5 @@ class FarmSeasonPolicy
     {
         return $authUser->can('Reorder:FarmSeason');
     }
+
 }

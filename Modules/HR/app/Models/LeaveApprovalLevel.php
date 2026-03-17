@@ -58,7 +58,7 @@ class LeaveApprovalLevel extends Model
             case 'specific_employee':
                 return $this->approverEmployee;
             case 'department_head':
-                return $this->approverDepartment->head;
+                return $this->approverDepartment?->head;
             case 'hr':
                 return Employee::whereHas('jobPosition', function ($query) {
                     $query->where('title', 'like', '%HR%')

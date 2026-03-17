@@ -8,9 +8,12 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -18,7 +21,7 @@ use Filament\Tables\Columns\BadgeColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Modules\Farms\Filament\Clusters\FarmFinanceCluster;
+use Modules\Farms\Filament\Clusters\FarmMarketplaceCluster;
 use Filament\Resources\Resource;
 use Modules\Farms\Filament\Resources\FarmProduceInventoryResource\Pages;
 use Modules\Farms\Models\FarmProduceInventory;
@@ -27,15 +30,15 @@ class FarmProduceInventoryResource extends Resource
 {
     protected static ?string $model = FarmProduceInventory::class;
 
-    protected static ?string $cluster = FarmFinanceCluster::class;
+    protected static ?string $cluster = FarmMarketplaceCluster::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-archive-box';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Farms';
 
-    protected static ?int $navigationSort = 11;
+    protected static ?int $navigationSort = 1;
 
-    protected static ?string $navigationLabel = 'Produce Inventory';
+    protected static ?string $navigationLabel = 'Produce & Listings';
 
     public static function form(Schema $schema): Schema
     {
@@ -77,6 +80,7 @@ class FarmProduceInventoryResource extends Resource
                 ->schema([
                     TextInput::make('total_quantity')->label('Total Harvested')->numeric()->step(0.001)->default(0),
                     TextInput::make('current_stock')->label('Current Stock')->numeric()->step(0.001)->default(0),
+                    TextInput::make('min_order_quantity')->label('Min Order Qty')->numeric()->step(0.001)->default(0)->helperText('0 = no minimum'),
                     TextInput::make('reserved_stock')->label('Reserved')->numeric()->step(0.001)->default(0),
                     TextInput::make('sold_stock')->label('Sold')->numeric()->step(0.001)->default(0),
                     TextInput::make('unit_cost')->label('Avg Unit Cost (GHS)')->numeric()->step(0.0001)->prefix('GHS'),
@@ -87,6 +91,62 @@ class FarmProduceInventoryResource extends Resource
                 ->schema([
                     DatePicker::make('harvest_date'),
                     DatePicker::make('expiry_date')->label('Expiry Date (perishables)'),
+                ]),
+
+            Section::make('Marketplace')
+                ->description('Configure this item for the public farm shop (alphafarms.org)')
+                ->columns(3)
+                ->schema([
+                    Toggle::make('marketplace_listed')
+                        ->label('List on Public Shop')
+                        ->helperText('Customers will be able to order this item online')
+                        ->columnSpanFull(),
+                    TextInput::make('unit_price')
+                        ->label('Selling Price (GHS)')
+                        ->numeric()
+                        ->step(0.01)
+                        ->prefix('GHS')
+                        ->helperText('Price shown to customers (leave blank to hide from shop)'),
+                    TextInput::make('market_price')
+                        ->label('Market Reference Price (GHS)')
+                        ->numeric()
+                        ->step(0.01)
+                        ->prefix('GHS')
+                        ->helperText('Prevailing market rate (e.g. Makola) — shown for comparison'),
+                    Textarea::make('description')
+                        ->label('Product Description')
+                        ->rows(2)
+                        ->columnSpanFull()
+                        ->placeholder('Brief description for customers'),
+                    FileUpload::make('images')
+                        ->label('Product Images')
+                        ->multiple()
+                        ->image()
+                        ->directory('produce-images')
+                        ->columnSpanFull()
+                        ->helperText('Upload up to 5 images shown on the shop product page'),
+                ]),
+
+            Section::make('Flash Sale')
+                ->description('Offer a limited-time sale price on this product')
+                ->columns(3)
+                ->collapsible()
+                ->collapsed()
+                ->schema([
+                    TextInput::make('sale_price')
+                        ->label('Sale Price (GHS)')
+                        ->numeric()
+                        ->step(0.01)
+                        ->prefix('GHS')
+                        ->helperText('Leave blank to disable sale'),
+                    DateTimePicker::make('sale_starts_at')
+                        ->label('Sale Starts At')
+                        ->nullable()
+                        ->placeholder('Immediately when saved'),
+                    DateTimePicker::make('sale_ends_at')
+                        ->label('Sale Ends At')
+                        ->nullable()
+                        ->placeholder('No end date'),
                 ]),
 
             Section::make('Notes')
@@ -108,6 +168,14 @@ class FarmProduceInventoryResource extends Resource
                 TextColumn::make('sold_stock')->label('Sold')->numeric(3),
 
                 TextColumn::make('unit_cost')->money('GHS')->label('Unit Cost'),
+                TextColumn::make('unit_price')->money('GHS')->label('Selling Price')->toggleable(),
+
+                TextColumn::make('marketplace_listed')
+                    ->label('In Shop')
+                    ->badge()
+                    ->formatStateUsing(fn ($state) => $state ? 'Listed' : 'Unlisted')
+                    ->color(fn ($state) => $state ? 'success' : 'gray')
+                    ->toggleable(),
 
                 TextColumn::make('status')
                     ->badge()
@@ -132,6 +200,13 @@ class FarmProduceInventoryResource extends Resource
             ->actions([ViewAction::make(), EditAction::make(), DeleteAction::make()])
             ->bulkActions([BulkActionGroup::make([DeleteBulkAction::make()])])
             ->defaultSort('harvest_date', 'desc');
+    }
+
+    public static function getRelationManagers(): array
+    {
+        return [
+            \Modules\Farms\Filament\Resources\FarmProduceInventoryResource\RelationManagers\PriceTiersRelationManager::class,
+        ];
     }
 
     public static function getPages(): array

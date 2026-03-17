@@ -7,6 +7,8 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Select;
+use Filament\Infolists\Components\IconEntry;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
@@ -69,6 +71,31 @@ class MpQualityRecordResource extends Resource
         ]);
     }
 
+    public static function infolist(Schema $schema): Schema
+    {
+        return $schema->components([
+            Section::make('Test Details')->columns(3)->schema([
+                TextEntry::make('batch.batch_number')->label('Batch No.'),
+                TextEntry::make('test_date')->date(),
+                TextEntry::make('tested_by')->placeholder('—'),
+            ]),
+            Section::make('Mechanical Properties')->columns(3)->schema([
+                TextEntry::make('tensile_cd')->label('Tensile CD (N/m)')->placeholder('—'),
+                TextEntry::make('tensile_md')->label('Tensile MD (N/m)')->placeholder('—'),
+                TextEntry::make('burst_strength')->label('Burst Strength (kPa)')->placeholder('—'),
+            ]),
+            Section::make('Physical Properties')->columns(3)->schema([
+                TextEntry::make('moisture_percent')->label('Moisture (%)')->placeholder('—'),
+                TextEntry::make('brightness')->label('Brightness (%)')->placeholder('—'),
+                TextEntry::make('opacity')->label('Opacity (%)')->placeholder('—'),
+                TextEntry::make('roughness')->label('Roughness (ml/min)')->placeholder('—'),
+                TextEntry::make('basis_weight')->label('Basis Weight (GSM)')->placeholder('—'),
+                IconEntry::make('passed')->label('Test Passed')->boolean(),
+                TextEntry::make('notes')->columnSpanFull()->placeholder('—'),
+            ]),
+        ]);
+    }
+
     public static function table(Table $table): Table
     {
         return $table
@@ -89,6 +116,7 @@ class MpQualityRecordResource extends Resource
                 Tables\Filters\TernaryFilter::make('passed')->label('Result'),
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
@@ -103,6 +131,7 @@ class MpQualityRecordResource extends Resource
         return [
             'index'  => Pages\ListMpQualityRecords::route('/'),
             'create' => Pages\CreateMpQualityRecord::route('/create'),
+            'view'   => Pages\ViewMpQualityRecord::route('/{record}'),
             'edit'   => Pages\EditMpQualityRecord::route('/{record}/edit'),
         ];
     }

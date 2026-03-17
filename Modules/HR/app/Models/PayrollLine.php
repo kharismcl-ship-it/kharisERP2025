@@ -10,7 +10,7 @@ class PayrollLine extends Model
     protected $table = 'hr_payroll_lines';
 
     protected $fillable = [
-        'payroll_run_id', 'employee_id', 'basic_salary', 'allowances',
+        'payroll_run_id', 'employee_id', 'company_id', 'basic_salary', 'allowances',
         'deductions', 'gross_salary', 'total_allowances', 'total_deductions',
         'paye_tax', 'ssnit_employee', 'ssnit_employer', 'net_salary', 'notes',
     ];
@@ -36,5 +36,10 @@ class PayrollLine extends Model
     public function employee(): BelongsTo
     {
         return $this->belongsTo(Employee::class);
+    }
+
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Company::class);
     }
 }

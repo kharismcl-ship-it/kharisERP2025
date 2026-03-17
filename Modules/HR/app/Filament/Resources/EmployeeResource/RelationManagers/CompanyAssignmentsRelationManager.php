@@ -18,6 +18,8 @@ class CompanyAssignmentsRelationManager extends RelationManager
 {
     protected static string $relationship = 'companyAssignments';
 
+    public static function canViewForRecord(Model $ownerRecord, string $pageClass): bool { return true; }
+
     public static function getTitle(Model $ownerRecord, string $pageClass): string
     {
         return 'Company Assignments';

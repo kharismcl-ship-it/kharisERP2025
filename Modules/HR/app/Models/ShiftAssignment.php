@@ -10,7 +10,7 @@ class ShiftAssignment extends Model
     protected $table = 'hr_shift_assignments';
 
     protected $fillable = [
-        'shift_id', 'employee_id', 'effective_from', 'effective_to', 'notes',
+        'shift_id', 'employee_id', 'company_id', 'effective_from', 'effective_to', 'notes',
     ];
 
     protected $casts = [
@@ -26,5 +26,10 @@ class ShiftAssignment extends Model
     public function employee(): BelongsTo
     {
         return $this->belongsTo(Employee::class);
+    }
+
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Company::class);
     }
 }

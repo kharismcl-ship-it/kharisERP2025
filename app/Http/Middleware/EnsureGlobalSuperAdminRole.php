@@ -45,13 +45,16 @@ class EnsureGlobalSuperAdminRole
         $tableNames = config('permission.table_names');
         $teamKey    = config('permission.column_names.team_foreign_key', 'team_id');
 
-        // Is this user a GLOBAL super_admin (company_id = null)?
+        // Is this user a GLOBAL super_admin?
+        // Check that the user holds the global super_admin ROLE (role.company_id IS NULL).
+        // We cannot check model_has_roles.company_id IS NULL because that column is NOT NULL
+        // in this schema (it was added as part of the PRIMARY KEY by the original migration).
         $isGlobalSuperAdmin = DB::table($tableNames['model_has_roles'])
             ->join($tableNames['roles'], $tableNames['roles'].'.id', '=', $tableNames['model_has_roles'].'.role_id')
             ->where($tableNames['model_has_roles'].'.model_type', get_class($user))
             ->where($tableNames['model_has_roles'].'.model_id', $user->getKey())
             ->where($tableNames['roles'].'.name', 'super_admin')
-            ->whereNull($tableNames['model_has_roles'].'.'.$teamKey)
+            ->whereNull($tableNames['roles'].'.'.$teamKey)
             ->exists();
 
         if (! $isGlobalSuperAdmin) {
@@ -114,20 +117,9 @@ class EnsureGlobalSuperAdminRole
             );
         }
 
-        // Also make sure the user has the global (unscoped) assignment
-        DB::table($tableNames['model_has_roles'])->updateOrInsert(
-            [
-                'role_id'    => $globalRoleId,
-                'model_id'   => $user->getKey(),
-                'model_type' => get_class($user),
-                $teamKey     => null,
-            ],
-            [
-                'role_id'    => $globalRoleId,
-                'model_id'   => $user->getKey(),
-                'model_type' => get_class($user),
-                $teamKey     => null,
-            ]
-        );
+        // NOTE: We intentionally skip a NULL company_id entry here because the
+        // model_has_roles.company_id column is NOT NULL (part of the PRIMARY KEY).
+        // The global super_admin role (role.company_id=NULL) is detected via the
+        // isGlobalSuperAdmin() check above which inspects roles.company_id instead.
     }
 }

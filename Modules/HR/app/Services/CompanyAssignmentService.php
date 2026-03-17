@@ -51,7 +51,7 @@ class CompanyAssignmentService
     }
 
     /**
-     * End an employee's assignment to a company.
+     * End an employee's assignment to a company and revoke their scoped roles.
      *
      * @param  string|null  $endDate
      * @return bool
@@ -59,8 +59,27 @@ class CompanyAssignmentService
     public function endAssignment(EmployeeCompanyAssignment $assignment, $endDate = null)
     {
         $assignment->is_active = false;
-        $assignment->end_date = $endDate ?? now();
+        $assignment->end_date  = $endDate ?? now();
+        $saved = $assignment->save();
 
-        return $assignment->save();
+        // Revoke Spatie roles scoped to the company being ended
+        $employee = $assignment->employee()->with('user')->first();
+        if ($employee && $employee->user) {
+            $companyId = $assignment->company_id;
+            // Remove all roles the user holds for this company (team context)
+            $rolesForCompany = $employee->user->roles()
+                ->where('company_id', $companyId)
+                ->get();
+
+            foreach ($rolesForCompany as $role) {
+                try {
+                    $employee->user->removeRole($role);
+                } catch (\Throwable) {
+                    // Role may already be removed or not exist — safe to skip
+                }
+            }
+        }
+
+        return $saved;
     }
 }

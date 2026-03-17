@@ -2,6 +2,7 @@
 
 namespace Modules\ManufacturingWater\Filament\Pages;
 
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Filament\Pages\Page;
 use Modules\ManufacturingWater\Models\MwDistributionRecord;
 use Modules\ManufacturingWater\Models\MwPlant;
@@ -15,6 +16,8 @@ class MwDashboard extends Page
     protected static string|\UnitEnum|null $navigationGroup = 'Manufacturing Water';
 
     protected static ?int $navigationSort = 0;
+
+    use HasPageShield;
 
     protected static ?string $navigationLabel = 'Dashboard';
 

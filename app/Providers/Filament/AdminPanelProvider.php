@@ -70,7 +70,9 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->plugins([
                 // centralApp(true) → Shield uses global unscoped roles for this panel
-                FilamentShieldPlugin::make()->centralApp(true),
+                FilamentShieldPlugin::make()
+                    ->navigationGroup('Core')
+                    ->centralApp(true),
                 CoreFilamentPlugin::make(),
                 HRFilamentPlugin::make(),
                 HostelsFilamentPlugin::make(),

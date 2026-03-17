@@ -11,13 +11,13 @@ use Illuminate\Auth\Access\HandlesAuthorization;
 class MwTreatmentStagePolicy
 {
     use HandlesAuthorization;
-
+    
     public function viewAny(AuthUser $authUser): bool
     {
         return $authUser->can('ViewAny:MwTreatmentStage');
     }
 
-    public function view(AuthUser $authUser, MwTreatmentStage $record): bool
+    public function view(AuthUser $authUser, MwTreatmentStage $mwTreatmentStage): bool
     {
         return $authUser->can('View:MwTreatmentStage');
     }
@@ -27,22 +27,22 @@ class MwTreatmentStagePolicy
         return $authUser->can('Create:MwTreatmentStage');
     }
 
-    public function update(AuthUser $authUser, MwTreatmentStage $record): bool
+    public function update(AuthUser $authUser, MwTreatmentStage $mwTreatmentStage): bool
     {
         return $authUser->can('Update:MwTreatmentStage');
     }
 
-    public function delete(AuthUser $authUser, MwTreatmentStage $record): bool
+    public function delete(AuthUser $authUser, MwTreatmentStage $mwTreatmentStage): bool
     {
         return $authUser->can('Delete:MwTreatmentStage');
     }
 
-    public function restore(AuthUser $authUser, MwTreatmentStage $record): bool
+    public function restore(AuthUser $authUser, MwTreatmentStage $mwTreatmentStage): bool
     {
         return $authUser->can('Restore:MwTreatmentStage');
     }
 
-    public function forceDelete(AuthUser $authUser, MwTreatmentStage $record): bool
+    public function forceDelete(AuthUser $authUser, MwTreatmentStage $mwTreatmentStage): bool
     {
         return $authUser->can('ForceDelete:MwTreatmentStage');
     }
@@ -57,7 +57,7 @@ class MwTreatmentStagePolicy
         return $authUser->can('RestoreAny:MwTreatmentStage');
     }
 
-    public function replicate(AuthUser $authUser, MwTreatmentStage $record): bool
+    public function replicate(AuthUser $authUser, MwTreatmentStage $mwTreatmentStage): bool
     {
         return $authUser->can('Replicate:MwTreatmentStage');
     }
@@ -66,4 +66,5 @@ class MwTreatmentStagePolicy
     {
         return $authUser->can('Reorder:MwTreatmentStage');
     }
+
 }

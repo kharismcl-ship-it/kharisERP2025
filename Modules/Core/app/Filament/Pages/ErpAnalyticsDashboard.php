@@ -122,7 +122,11 @@ class ErpAnalyticsDashboard extends Page
         $totalItems = \Modules\ProcurementInventory\Models\Item::count();
 
         $lowStockItems = class_exists(\Modules\ProcurementInventory\Models\StockLevel::class)
-            ? \Modules\ProcurementInventory\Models\StockLevel::whereColumn('quantity_on_hand', '<=', 'reorder_level')->count()
+            ? \Illuminate\Support\Facades\DB::table('stock_levels')
+                ->join('items', 'items.id', '=', 'stock_levels.item_id')
+                ->whereColumn('stock_levels.quantity_on_hand', '<=', 'items.reorder_level')
+                ->where('items.reorder_level', '>', 0)
+                ->count()
             : 0;
 
         $pendingPurchaseOrders = class_exists(\Modules\ProcurementInventory\Models\PurchaseOrder::class)

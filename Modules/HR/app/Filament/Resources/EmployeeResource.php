@@ -35,6 +35,7 @@ use Modules\HR\Filament\Resources\EmployeeResource\RelationManagers\EmploymentCo
 use Modules\HR\Filament\Resources\EmployeeResource\RelationManagers\LeaveRequestsRelationManager;
 use Modules\HR\Filament\Resources\EmployeeResource\RelationManagers\PerformanceReviewsRelationManager;
 use Modules\HR\Filament\Resources\EmployeeResource\RelationManagers\SalariesRelationManager;
+use Modules\HR\Filament\Resources\EmployeeResource\RelationManagers\ShiftAssignmentsRelationManager;
 use Modules\HR\Filament\Resources\EmployeeResource\RelationManagers\SubordinatesRelationManager;
 use Modules\HR\Models\Employee;
 use Ysfkaya\FilamentPhoneInput\Forms\PhoneInput;
@@ -61,7 +62,9 @@ class EmployeeResource extends Resource
 
                         Forms\Components\TextInput::make('employee_code')
                             ->label('Employee Code')
-                            ->readOnly()
+                            ->placeholder('Auto-generated on save (e.g. #EMP000001)')
+                            ->helperText('Leave blank to auto-generate, or enter a custom code.')
+                            ->maxLength(50)
                             ->columnSpanFull(),
                         FileUpload::make('employee_photo')
                             ->label('Employee Photo')
@@ -244,10 +247,10 @@ class EmployeeResource extends Resource
                             ->columnSpanFull(),
                         Forms\Components\TextInput::make('bank_branch')
                             ->label('Bank Branch')
-                            ->required(),
+                            ->placeholder('Eg. Accra Main Branch'),
                         Forms\Components\TextInput::make('bank_sort_code')
                             ->label('Bank Sort Code')
-                            ->required(),
+                            ->placeholder('Eg. 010070'),
 
                     ])
                     ->columns(2),
@@ -558,6 +561,7 @@ class EmployeeResource extends Resource
             SalariesRelationManager::class,
             SubordinatesRelationManager::class,
             CompanyAssignmentsRelationManager::class,
+            ShiftAssignmentsRelationManager::class,
         ];
     }
 

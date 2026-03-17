@@ -6,6 +6,7 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
@@ -61,6 +62,24 @@ class MwChemicalUsageResource extends Resource
         ]);
     }
 
+    public static function infolist(Schema $schema): Schema
+    {
+        return $schema->components([
+            Section::make('Usage Details')->columns(3)->schema([
+                TextEntry::make('plant.name')->label('Plant'),
+                TextEntry::make('treatmentStage.name')->label('Treatment Stage')->placeholder('—'),
+                TextEntry::make('chemical_name')->label('Chemical'),
+                TextEntry::make('usage_date')->date(),
+                TextEntry::make('batch_number')->label('Batch No.')->placeholder('—'),
+                TextEntry::make('purpose')->placeholder('—'),
+                TextEntry::make('quantity'),
+                TextEntry::make('unit'),
+                TextEntry::make('total_cost')->label('Total Cost')->money('GHS'),
+                TextEntry::make('notes')->columnSpanFull()->placeholder('—'),
+            ]),
+        ]);
+    }
+
     public static function table(Table $table): Table
     {
         return $table
@@ -80,6 +99,7 @@ class MwChemicalUsageResource extends Resource
                     ->relationship('plant', 'name'),
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
@@ -94,6 +114,7 @@ class MwChemicalUsageResource extends Resource
         return [
             'index'  => Pages\ListMwChemicalUsages::route('/'),
             'create' => Pages\CreateMwChemicalUsage::route('/create'),
+            'view'   => Pages\ViewMwChemicalUsage::route('/{record}'),
             'edit'   => Pages\EditMwChemicalUsage::route('/{record}/edit'),
         ];
     }
