@@ -127,6 +127,13 @@ class UserResource extends Resource
                                 $set('is_global_super_admin', $isGlobal);
                             })
                             ->saveRelationshipsUsing(function ($record, bool $state) {
+                                // Never touch your own super_admin status — the toggle is disabled
+                                // in the UI, but saveRelationshipsUsing still fires with a stale
+                                // state (false) for disabled fields, which would wipe the rows.
+                                if ($record->getKey() === auth()->id()) {
+                                    return;
+                                }
+
                                 $teamKey = config('permission.column_names.team_foreign_key', 'company_id');
                                 $tables  = config('permission.table_names');
 
