@@ -45,28 +45,37 @@ class AssignSuperAdmin extends Command
             $this->info("Global super_admin role already exists (id={$globalRoleId}).");
         }
 
-        // 2. Assign the global role to the user (team_id = NULL)
-        DB::table($tableNames['model_has_roles'])->updateOrInsert(
-            [
+        // 2. Assign the global role to the user for every company.
+        //    model_has_roles.company_id is NOT NULL (part of the PRIMARY KEY), so we cannot
+        //    insert with NULL. The "global" nature is detected by checking roles.company_id IS NULL
+        //    (the role's own column), not the pivot column. EnsureGlobalSuperAdminRole will keep
+        //    new companies in sync automatically on the user's next login.
+        $companyIds = DB::table('companies')->pluck('id');
+
+        if ($companyIds->isEmpty()) {
+            $this->error('No companies found. Create at least one company first, then re-run this command.');
+            return;
+        }
+
+        foreach ($companyIds as $companyId) {
+            DB::table($tableNames['model_has_roles'])->insertOrIgnore([
                 'role_id'    => $globalRoleId,
                 'model_id'   => $user->id,
                 'model_type' => get_class($user),
-                $teamKey     => null,
-            ],
-            [
-                'role_id'    => $globalRoleId,
-                'model_id'   => $user->id,
-                'model_type' => get_class($user),
-                $teamKey     => null,
-            ]
-        );
+                $teamKey     => $companyId,
+            ]);
+        }
+
+        // Invalidate the per-user sync cache so EnsureGlobalSuperAdminRole re-runs on next request
+        \Illuminate\Support\Facades\Cache::forget("super_admin_synced_{$user->id}");
 
         // 3. Verify
         $ok = DB::table($tableNames['model_has_roles'])
-            ->where('role_id', $globalRoleId)
-            ->where('model_id', $user->id)
-            ->where('model_type', get_class($user))
-            ->whereNull($teamKey)
+            ->join($tableNames['roles'], $tableNames['roles'] . '.id', '=', $tableNames['model_has_roles'] . '.role_id')
+            ->where($tableNames['model_has_roles'] . '.model_id', $user->id)
+            ->where($tableNames['model_has_roles'] . '.model_type', get_class($user))
+            ->where($tableNames['roles'] . '.name', 'super_admin')
+            ->whereNull($tableNames['roles'] . '.' . $teamKey)
             ->exists();
 
         if ($ok) {
