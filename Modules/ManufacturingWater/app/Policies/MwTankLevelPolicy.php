@@ -1,16 +1,70 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\ManufacturingWater\Policies;
 
-use App\Models\User;
+use Illuminate\Foundation\Auth\User as AuthUser;
 use Modules\ManufacturingWater\Models\MwTankLevel;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class MwTankLevelPolicy
 {
-    public function viewAny(User $user): bool   { return $user->can('view_any_mw::tank::level'); }
-    public function view(User $user, MwTankLevel $model): bool { return $user->can('view_mw::tank::level'); }
-    public function create(User $user): bool    { return $user->can('create_mw::tank::level'); }
-    public function update(User $user, MwTankLevel $model): bool { return $user->can('update_mw::tank::level'); }
-    public function delete(User $user, MwTankLevel $model): bool { return $user->can('delete_mw::tank::level'); }
-    public function deleteAny(User $user): bool { return $user->can('delete_any_mw::tank::level'); }
+    use HandlesAuthorization;
+    
+    public function viewAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ViewAny:MwTankLevel');
+    }
+
+    public function view(AuthUser $authUser, MwTankLevel $mwTankLevel): bool
+    {
+        return $authUser->can('View:MwTankLevel');
+    }
+
+    public function create(AuthUser $authUser): bool
+    {
+        return $authUser->can('Create:MwTankLevel');
+    }
+
+    public function update(AuthUser $authUser, MwTankLevel $mwTankLevel): bool
+    {
+        return $authUser->can('Update:MwTankLevel');
+    }
+
+    public function delete(AuthUser $authUser, MwTankLevel $mwTankLevel): bool
+    {
+        return $authUser->can('Delete:MwTankLevel');
+    }
+
+    public function restore(AuthUser $authUser, MwTankLevel $mwTankLevel): bool
+    {
+        return $authUser->can('Restore:MwTankLevel');
+    }
+
+    public function forceDelete(AuthUser $authUser, MwTankLevel $mwTankLevel): bool
+    {
+        return $authUser->can('ForceDelete:MwTankLevel');
+    }
+
+    public function forceDeleteAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('ForceDeleteAny:MwTankLevel');
+    }
+
+    public function restoreAny(AuthUser $authUser): bool
+    {
+        return $authUser->can('RestoreAny:MwTankLevel');
+    }
+
+    public function replicate(AuthUser $authUser, MwTankLevel $mwTankLevel): bool
+    {
+        return $authUser->can('Replicate:MwTankLevel');
+    }
+
+    public function reorder(AuthUser $authUser): bool
+    {
+        return $authUser->can('Reorder:MwTankLevel');
+    }
+
 }

@@ -35,6 +35,11 @@ class Incident extends Model
         'resolved_at',
     ];
 
+    protected $casts = [
+        'reported_at' => 'datetime',
+        'resolved_at' => 'datetime',
+    ];
+
     protected static function newFactory(): IncidentFactory
     {
         return IncidentFactory::new();

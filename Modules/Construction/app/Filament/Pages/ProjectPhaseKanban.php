@@ -2,15 +2,14 @@
 
 namespace Modules\Construction\Filament\Pages;
 
-use Filament\Pages\Page;
-use Livewire\Attributes\On;
+use App\Filament\Pages\KanbanPage;
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
+use Illuminate\Database\Eloquent\Collection;
 use Modules\Construction\Models\ConstructionProject;
 use Modules\Construction\Models\ProjectPhase;
 
-class ProjectPhaseKanban extends Page
+class ProjectPhaseKanban extends KanbanPage
 {
-    protected string $view = 'construction::filament.pages.project-phase-kanban';
-
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-squares-2x2';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Construction';
@@ -19,40 +18,55 @@ class ProjectPhaseKanban extends Page
 
     protected static ?string $navigationLabel = 'Phase Board';
 
+    use HasPageShield;
+
     public ?int $selectedProjectId = null;
 
-    public function getColumns(): array
+    public function getKanbanStatuses(): array
     {
         return [
-            ['key' => 'pending',     'label' => 'Pending'],
-            ['key' => 'in_progress', 'label' => 'In Progress'],
-            ['key' => 'on_hold',     'label' => 'On Hold'],
-            ['key' => 'completed',   'label' => 'Completed'],
+            ['key' => 'pending',     'label' => 'Pending',     'border_class' => 'border-gray-400',   'dot_color' => 'bg-gray-400'],
+            ['key' => 'in_progress', 'label' => 'In Progress', 'border_class' => 'border-yellow-400', 'dot_color' => 'bg-yellow-400'],
+            ['key' => 'on_hold',     'label' => 'On Hold',     'border_class' => 'border-orange-400', 'dot_color' => 'bg-orange-400'],
+            ['key' => 'completed',   'label' => 'Completed',   'border_class' => 'border-green-500',  'dot_color' => 'bg-green-500'],
         ];
     }
 
-    public function getPhasesByStatus(string $status): \Illuminate\Database\Eloquent\Collection
+    public function getKanbanRecords(string $status): Collection
     {
-        $query = ProjectPhase::query()
+        return ProjectPhase::query()
             ->with('project')
             ->where('status', $status)
-            ->orderBy('order');
+            ->when($this->selectedProjectId, fn ($q) =>
+                $q->where('construction_project_id', $this->selectedProjectId)
+            )
+            ->when($this->search, fn ($q) =>
+                $q->where('name', 'like', "%{$this->search}%")
+            )
+            ->orderBy('order')
+            ->get();
+    }
 
-        if ($this->selectedProjectId) {
-            $query->where('construction_project_id', $this->selectedProjectId);
+    protected function onCardMoved(int|string $recordId, string $newStatus): void
+    {
+        $validKeys = array_column($this->getKanbanStatuses(), 'key');
+        if (! in_array($newStatus, $validKeys, true)) {
+            return;
         }
 
-        return $query->get();
+        ProjectPhase::findOrFail($recordId)->update(['status' => $newStatus]);
     }
 
-    public function getProjects(): array
+    public function getCardView(): string
     {
-        return ConstructionProject::pluck('name', 'id')->toArray();
+        return 'construction::filament.kanban.phase-card';
     }
 
-    #[On('phase-status-changed')]
-    public function handleStatusChanged(int $phaseId, string $newStatus): void
+    public function getKanbanFilterBarView(): ?array
     {
-        ProjectPhase::findOrFail($phaseId)->update(['status' => $newStatus]);
+        return [
+            'view'  => 'construction::filament.kanban.project-filter-bar',
+            'props' => ['projects' => ConstructionProject::pluck('name', 'id')->toArray()],
+        ];
     }
 }

@@ -11,6 +11,7 @@ use Modules\ProcurementInventory\Filament\Resources\ItemResource;
 use Modules\ProcurementInventory\Filament\Resources\PurchaseOrderResource;
 use Modules\ProcurementInventory\Filament\Resources\StockLevelResource;
 use Modules\ProcurementInventory\Filament\Resources\StockMovementResource;
+use Modules\ProcurementInventory\Filament\Resources\VendorContactResource;
 use Modules\ProcurementInventory\Filament\Resources\VendorResource;
 
 class ProcurementInventoryFilamentPlugin implements Plugin
@@ -35,6 +36,7 @@ class ProcurementInventoryFilamentPlugin implements Plugin
             ItemCategoryResource::class,
             ItemResource::class,
             VendorResource::class,
+            VendorContactResource::class,
             PurchaseOrderResource::class,
             GoodsReceiptResource::class,
             StockLevelResource::class,

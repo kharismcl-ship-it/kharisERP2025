@@ -6,6 +6,7 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
+use Modules\HR\Console\Commands\ProcessLeaveAccrualCommand;
 use Modules\HR\Console\Commands\ProcessLeaveCarryOverCommand;
 use Modules\HR\Console\Commands\SyncEmployeeUsers;
 use Modules\HR\Console\Commands\TestCompanyAssignment;
@@ -61,6 +62,7 @@ class HRServiceProvider extends ServiceProvider
         $this->registerConfig();
         $this->registerViews();
         $this->loadMigrationsFrom(module_path($this->name, 'database/migrations'));
+        $this->registerPolicies();
         $this->registerNavigation();
     }
 
@@ -102,11 +104,19 @@ class HRServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton(\Modules\HR\Services\LeaveNotificationService::class, function ($app) {
-            return new \Modules\HR\Services\LeaveNotificationService;
+            return new \Modules\HR\Services\LeaveNotificationService(
+                $app->make(\Modules\CommunicationCentre\Services\CommunicationService::class)
+            );
         });
 
         $this->app->singleton(\Modules\HR\Services\LeaveReportingService::class, function ($app) {
             return new \Modules\HR\Services\LeaveReportingService;
+        });
+
+        $this->app->singleton(\Modules\HR\Services\WorkplaceRelationsService::class, function ($app) {
+            return new \Modules\HR\Services\WorkplaceRelationsService(
+                $app->make(\Modules\CommunicationCentre\Services\CommunicationService::class)
+            );
         });
     }
 
@@ -119,6 +129,7 @@ class HRServiceProvider extends ServiceProvider
             TestCompanyAssignment::class,
             SyncEmployeeUsers::class,
             ProcessLeaveCarryOverCommand::class,
+            ProcessLeaveAccrualCommand::class,
         ]);
     }
 
@@ -133,6 +144,12 @@ class HRServiceProvider extends ServiceProvider
             // Run leave carry-over every year on Jan 1 at 00:30 (non-interactively)
             $schedule->command('hr:leave:carry-over', ['--from-year' => now()->subYear()->year, '--to-year' => now()->year])
                 ->yearlyOn(1, 1, '00:30')
+                ->withoutOverlapping()
+                ->runInBackground();
+
+            // Run monthly leave accrual on the 1st of every month at 01:00
+            $schedule->command('hr:leave:accrue')
+                ->monthlyOn(1, '01:00')
                 ->withoutOverlapping()
                 ->runInBackground();
         });
@@ -211,6 +228,25 @@ class HRServiceProvider extends ServiceProvider
         $this->loadViewsFrom(array_merge($this->getPublishableViewPaths(), [$sourcePath]), $this->nameLower);
 
         Blade::componentNamespace(config('modules.namespace').'\\'.$this->name.'\\View\\Components', $this->nameLower);
+    }
+
+    /**
+     * Register module policies with Gate so Filament can authorise module models.
+     */
+    protected function registerPolicies(): void
+    {
+        $policiesPath = module_path($this->name, 'app/Policies');
+        if (! is_dir($policiesPath)) {
+            return;
+        }
+        foreach (glob($policiesPath . DIRECTORY_SEPARATOR . '*.php') as $file) {
+            $policyBaseName = basename($file, '.php');
+            $policyClass    = "Modules\\{$this->name}\\Policies\\{$policyBaseName}";
+            $modelClass     = "Modules\\{$this->name}\\Models\\" . str_replace('Policy', '', $policyBaseName);
+            if (class_exists($policyClass) && class_exists($modelClass)) {
+                \Illuminate\Support\Facades\Gate::policy($modelClass, $policyClass);
+            }
+        }
     }
 
     /**

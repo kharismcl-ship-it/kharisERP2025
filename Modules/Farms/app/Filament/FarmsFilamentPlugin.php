@@ -6,9 +6,14 @@ use Filament\Contracts\Plugin;
 use Filament\Panel;
 use Modules\Farms\Filament\Clusters\CropsCluster;
 use Modules\Farms\Filament\Clusters\FarmFinanceCluster;
+use Modules\Farms\Filament\Clusters\FarmMarketplaceCluster;
 use Modules\Farms\Filament\Clusters\FarmOperationsCluster;
 use Modules\Farms\Filament\Clusters\LivestockCluster;
+use Modules\Farms\Filament\Pages\CropYieldReport;
 use Modules\Farms\Filament\Pages\FarmDashboard;
+use Modules\Farms\Filament\Pages\FarmFinancialReport;
+use Modules\Farms\Filament\Pages\FarmShopSettingsPage;
+use Modules\Farms\Filament\Pages\LivestockReport;
 use Modules\Farms\Filament\Resources\CropActivityResource;
 use Modules\Farms\Filament\Resources\CropCycleResource;
 use Modules\Farms\Filament\Resources\CropScoutingResource;
@@ -18,6 +23,16 @@ use Modules\Farms\Filament\Resources\FarmDailyReportResource;
 use Modules\Farms\Filament\Resources\FarmDocumentResource;
 use Modules\Farms\Filament\Resources\FarmEquipmentResource;
 use Modules\Farms\Filament\Resources\FarmExpenseResource;
+use Modules\Farms\Filament\Resources\FarmBundleResource;
+use Modules\Farms\Filament\Resources\FarmCouponResource;
+use Modules\Farms\Filament\Resources\FarmOrderResource;
+use Modules\Farms\Filament\Resources\FarmReturnRequestResource;
+use Modules\Farms\Filament\Resources\FarmSubscriptionResource;
+use Modules\Farms\Filament\Resources\FarmShopBannerResource;
+use Modules\Farms\Filament\Resources\FarmShopNavItemResource;
+use Modules\Farms\Filament\Resources\FarmB2bAccountResource;
+use Modules\Farms\Filament\Resources\FarmShopBlogPostResource;
+use Modules\Farms\Filament\Resources\FarmShopPageResource;
 use Modules\Farms\Filament\Resources\FarmProduceInventoryResource;
 use Modules\Farms\Filament\Resources\FarmRequestResource;
 use Modules\Farms\Filament\Resources\FarmResource;
@@ -30,6 +45,7 @@ use Modules\Farms\Filament\Resources\FarmWorkerResource;
 use Modules\Farms\Filament\Resources\LivestockBatchResource;
 use Modules\Farms\Filament\Resources\LivestockEventResource;
 use Modules\Farms\Filament\Resources\LivestockHealthRecordResource;
+use Modules\Farms\Filament\Resources\HarvestRecordResource;
 use Modules\Farms\Filament\Resources\SoilTestRecordResource;
 
 class FarmsFilamentPlugin implements Plugin
@@ -53,6 +69,7 @@ class FarmsFilamentPlugin implements Plugin
             CropVarietyResource::class,
             CropActivityResource::class,
             CropScoutingResource::class,
+            HarvestRecordResource::class,
             // Livestock cluster
             LivestockBatchResource::class,
             LivestockHealthRecordResource::class,
@@ -69,6 +86,16 @@ class FarmsFilamentPlugin implements Plugin
             FarmBudgetResource::class,
             FarmSaleResource::class,
             FarmProduceInventoryResource::class,
+            FarmOrderResource::class,
+            FarmCouponResource::class,
+            FarmReturnRequestResource::class,
+            FarmBundleResource::class,
+            FarmSubscriptionResource::class,
+            FarmShopBannerResource::class,
+            FarmShopNavItemResource::class,
+            FarmShopPageResource::class,
+            FarmShopBlogPostResource::class,
+            FarmB2bAccountResource::class,
         ]);
 
         // Clusters extend Page — register via pages() so Filament recognises
@@ -78,7 +105,12 @@ class FarmsFilamentPlugin implements Plugin
             LivestockCluster::class,
             FarmOperationsCluster::class,
             FarmFinanceCluster::class,
+            FarmMarketplaceCluster::class,
             FarmDashboard::class,
+            CropYieldReport::class,
+            LivestockReport::class,
+            FarmFinancialReport::class,
+            FarmShopSettingsPage::class,
         ]);
     }
 

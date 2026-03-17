@@ -26,6 +26,7 @@ class Department extends Model
         'code',
         'description',
         'parent_id',
+        'head_employee_id',
         'is_active',
     ];
 
@@ -50,6 +51,14 @@ class Department extends Model
     public function company()
     {
         return $this->belongsTo(Company::class);
+    }
+
+    /**
+     * Get the department head employee.
+     */
+    public function head()
+    {
+        return $this->belongsTo(Employee::class, 'head_employee_id');
     }
 
     /**

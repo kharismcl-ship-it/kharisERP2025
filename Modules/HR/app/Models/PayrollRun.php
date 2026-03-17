@@ -17,7 +17,7 @@ class PayrollRun extends Model
 
     protected $fillable = [
         'company_id', 'period_year', 'period_month', 'status', 'payment_date',
-        'total_gross', 'total_deductions', 'total_net', 'employee_count',
+        'total_gross', 'total_deductions', 'total_net', 'total_paye', 'total_ssnit', 'employee_count',
         'notes', 'created_by', 'finalized_by', 'finalized_at',
     ];
 
@@ -28,6 +28,8 @@ class PayrollRun extends Model
         'total_gross'      => 'decimal:2',
         'total_deductions' => 'decimal:2',
         'total_net'        => 'decimal:2',
+        'total_paye'       => 'decimal:2',
+        'total_ssnit'      => 'decimal:2',
         'employee_count'   => 'integer',
         'finalized_at'     => 'datetime',
     ];

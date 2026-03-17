@@ -62,11 +62,18 @@ class ConstructionServiceProvider extends ServiceProvider
 
     protected function registerPolicies(): void
     {
-        Gate::policy(ConstructionProject::class, ConstructionProjectPolicy::class);
-        Gate::policy(Contractor::class, ContractorPolicy::class);
-        Gate::policy(ProjectPhase::class, ProjectPhasePolicy::class);
-        Gate::policy(ProjectTask::class, ProjectTaskPolicy::class);
-        Gate::policy(MaterialUsage::class, MaterialUsagePolicy::class);
+        $policiesPath = module_path($this->name, 'app/Policies');
+        if (! is_dir($policiesPath)) {
+            return;
+        }
+        foreach (glob($policiesPath . DIRECTORY_SEPARATOR . '*.php') as $file) {
+            $policyBaseName = basename($file, '.php');
+            $policyClass    = "Modules\\{$this->name}\\Policies\\{$policyBaseName}";
+            $modelClass     = "Modules\\{$this->name}\\Models\\" . str_replace('Policy', '', $policyBaseName);
+            if (class_exists($policyClass) && class_exists($modelClass)) {
+                Gate::policy($modelClass, $policyClass);
+            }
+        }
     }
 
     /**

@@ -244,6 +244,16 @@ class Employee extends Model
         return $this->hasMany(EmployeeSalary::class);
     }
 
+    public function shiftAssignments()
+    {
+        return $this->hasMany(ShiftAssignment::class);
+    }
+
+    public function benefits()
+    {
+        return $this->hasMany(EmployeeBenefit::class);
+    }
+
     /**
      * Get the fullname of the employee.
      */

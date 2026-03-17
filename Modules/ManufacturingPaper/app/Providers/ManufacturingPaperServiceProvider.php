@@ -2,9 +2,12 @@
 
 namespace Modules\ManufacturingPaper\Providers;
 
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
+use Modules\ManufacturingPaper\Console\Commands\MpBatchOverdueAlertCommand;
+use Modules\ManufacturingPaper\Console\Commands\MpQualityFailureAlertCommand;
 use Modules\ManufacturingPaper\Models\MpEquipmentLog;
 use Modules\ManufacturingPaper\Models\MpPaperGrade;
 use Modules\ManufacturingPaper\Models\MpPlant;
@@ -77,7 +80,10 @@ class ManufacturingPaperServiceProvider extends ServiceProvider
      */
     protected function registerCommands(): void
     {
-        // $this->commands([]);
+        $this->commands([
+            MpBatchOverdueAlertCommand::class,
+            MpQualityFailureAlertCommand::class,
+        ]);
     }
 
     /**
@@ -85,10 +91,11 @@ class ManufacturingPaperServiceProvider extends ServiceProvider
      */
     protected function registerCommandSchedules(): void
     {
-        // $this->app->booted(function () {
-        //     $schedule = $this->app->make(Schedule::class);
-        //     $schedule->command('inspire')->hourly();
-        // });
+        $this->app->booted(function () {
+            $schedule = $this->app->make(Schedule::class);
+            $schedule->command('mp:batch-overdue-alert')->dailyAt('08:00');
+            $schedule->command('mp:quality-failure-alert')->dailyAt('08:30');
+        });
     }
 
     /**

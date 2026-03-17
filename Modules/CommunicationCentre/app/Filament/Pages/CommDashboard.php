@@ -2,6 +2,7 @@
 
 namespace Modules\CommunicationCentre\Filament\Pages;
 
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Carbon\Carbon;
 use Filament\Pages\Page;
 use Filament\Support\Icons\Heroicon;
@@ -14,6 +15,8 @@ class CommDashboard extends Page
     protected static string|\UnitEnum|null $navigationGroup = 'Communication';
 
     protected static ?int $navigationSort = 1;
+
+    use HasPageShield;
 
     protected static ?string $navigationLabel = 'Dashboard';
 

@@ -5,6 +5,7 @@ namespace Modules\HR\Models;
 use App\Models\Company;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\Concerns\BelongsToCompany;
 
 class PerformanceReview extends Model
@@ -68,5 +69,10 @@ class PerformanceReview extends Model
     public function reviewer()
     {
         return $this->belongsTo(Employee::class, 'reviewer_employee_id');
+    }
+
+    public function kpiScores(): HasMany
+    {
+        return $this->hasMany(KpiScore::class);
     }
 }

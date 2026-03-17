@@ -2,11 +2,14 @@
 
 namespace Modules\HR\Filament\Resources;
 
+use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
@@ -53,14 +56,16 @@ class LeaveRequestResource extends Resource
                             ->required(),
                         Forms\Components\Select::make('status')
                             ->options([
-                                'draft' => 'Draft',
-                                'pending' => 'Pending',
-                                'approved' => 'Approved',
-                                'rejected' => 'Rejected',
-                                'cancelled' => 'Cancelled',
+                                'draft'            => 'Draft',
+                                'pending'          => 'Pending',
+                                'pending_approval' => 'In Review',
+                                'approved'         => 'Approved',
+                                'rejected'         => 'Rejected',
+                                'cancelled'        => 'Cancelled',
                             ])
                             ->required()
-                            ->default('draft'),
+                            ->default('draft')
+                            ->native(false),
                         Forms\Components\Textarea::make('reason')
                             ->columnSpanFull(),
                     ]),
@@ -150,12 +155,17 @@ class LeaveRequestResource extends Resource
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
                     ->color(fn ($state) => match ($state) {
-                        'approved' => 'success',
-                        'rejected' => 'danger',
-                        'pending' => 'warning',
-                        'cancelled' => 'gray',
-                        'draft' => 'secondary',
-                        default => 'gray',
+                        'approved'         => 'success',
+                        'rejected'         => 'danger',
+                        'pending'          => 'warning',
+                        'pending_approval' => 'info',
+                        'cancelled'        => 'gray',
+                        'draft'            => 'gray',
+                        default            => 'gray',
+                    })
+                    ->formatStateUsing(fn ($state) => match ($state) {
+                        'pending_approval' => 'In Review',
+                        default            => ucfirst(str_replace('_', ' ', $state)),
                     })
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
@@ -176,16 +186,55 @@ class LeaveRequestResource extends Resource
                     ->relationship('leaveType', 'name'),
                 Tables\Filters\SelectFilter::make('status')
                     ->options([
-                        'draft' => 'Draft',
-                        'pending' => 'Pending',
-                        'approved' => 'Approved',
-                        'rejected' => 'Rejected',
-                        'cancelled' => 'Cancelled',
+                        'draft'            => 'Draft',
+                        'pending'          => 'Pending',
+                        'pending_approval' => 'In Review',
+                        'approved'         => 'Approved',
+                        'rejected'         => 'Rejected',
+                        'cancelled'        => 'Cancelled',
                     ]),
             ])
             ->actions([
-                ViewAction::make(),
-                EditAction::make(),
+                ActionGroup::make([
+                    ViewAction::make(),
+                    EditAction::make(),
+                    Action::make('approve')
+                        ->label('Approve')
+                        ->icon('heroicon-o-check-circle')
+                        ->color('success')
+                        ->requiresConfirmation()
+                        ->visible(fn (LeaveRequest $r) => in_array($r->status, ['pending', 'pending_approval']))
+                        ->action(function (LeaveRequest $record) {
+                            $companyId = \Filament\Facades\Filament::getTenant()?->id;
+                            $approver  = \Modules\HR\Models\Employee::where('user_id', auth()->id())
+                                ->where('company_id', $companyId)
+                                ->first();
+                            $record->update([
+                                'status'                  => 'approved',
+                                'approved_by_employee_id' => $approver?->id,
+                                'approved_at'             => now(),
+                            ]);
+                            Notification::make()->title('Leave approved')->success()->send();
+                        }),
+                    Action::make('reject')
+                        ->label('Reject')
+                        ->icon('heroicon-o-x-circle')
+                        ->color('danger')
+                        ->form([
+                            Forms\Components\Textarea::make('rejected_reason')
+                                ->label('Reason for Rejection')
+                                ->required()
+                                ->rows(3),
+                        ])
+                        ->visible(fn (LeaveRequest $r) => in_array($r->status, ['pending', 'pending_approval']))
+                        ->action(function (LeaveRequest $record, array $data) {
+                            $record->update([
+                                'status'          => 'rejected',
+                                'rejected_reason' => $data['rejected_reason'],
+                            ]);
+                            Notification::make()->title('Leave rejected')->warning()->send();
+                        }),
+                ]),
             ])
             ->bulkActions([
                 BulkActionGroup::make([

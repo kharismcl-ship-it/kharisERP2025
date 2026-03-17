@@ -63,6 +63,8 @@ class DatabaseSeeder extends Seeder
         User::factory(5)->withCompany($kharisHostels)->create();
         User::factory(3)->withCompany($kharisFarms)->create();
 
+        $this->call(StaffPortalPermissionsSeeder::class);
+
         $this->command->info('Database seeded with companies and users!');
         $this->command->info('Super Admin: admin@admin.com / password');
     }

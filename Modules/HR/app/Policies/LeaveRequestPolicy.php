@@ -29,12 +29,13 @@ class LeaveRequestPolicy
 
     public function update(AuthUser $authUser, LeaveRequest $leaveRequest): bool
     {
-        return $authUser->can('Update:LeaveRequest');
+        // Shield controls the role toggle; business rule ensures only pending leaves are editable.
+        return $authUser->can('Update:LeaveRequest') && $leaveRequest->status === 'pending';
     }
 
     public function delete(AuthUser $authUser, LeaveRequest $leaveRequest): bool
     {
-        return $authUser->can('Delete:LeaveRequest');
+        return $authUser->can('Delete:LeaveRequest') && $leaveRequest->status === 'pending';
     }
 
     public function restore(AuthUser $authUser, LeaveRequest $leaveRequest): bool

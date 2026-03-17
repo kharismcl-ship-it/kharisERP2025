@@ -2,6 +2,7 @@
 
 namespace Modules\ProcurementInventory\Filament\Pages;
 
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Filament\Pages\Page;
 use Filament\Support\Icons\Heroicon;
 use Modules\ProcurementInventory\Models\PurchaseOrder;
@@ -15,6 +16,8 @@ class ProcurementDashboard extends Page
     protected static string|\UnitEnum|null $navigationGroup = 'Procurement';
 
     protected static ?int $navigationSort = 1;
+
+    use HasPageShield;
 
     protected static ?string $navigationLabel = 'Dashboard';
 

@@ -8,9 +8,13 @@ use Modules\Finance\Models\Account;
 use Modules\Finance\Models\JournalEntry;
 use Modules\Finance\Models\JournalLine;
 use Modules\HR\Models\AllowanceType;
+use Modules\HR\Models\BenefitType;
 use Modules\HR\Models\DeductionType;
 use Modules\HR\Models\Employee;
+use Modules\HR\Models\EmployeeBenefit;
+use Modules\HR\Models\EmployeeLoan;
 use Modules\HR\Models\EmployeeSalary;
+use Modules\HR\Models\LoanRepayment;
 use Modules\HR\Models\PayrollLine;
 use Modules\HR\Models\PayrollRun;
 
@@ -40,6 +44,39 @@ class PayrollService
         $run->refresh();
         $run->update([
             'total_gross'      => $run->lines->sum('gross_salary'),
+            'total_deductions' => $run->lines->sum('total_deductions'),
+            'total_net'        => $run->lines->sum('net_salary'),
+            'total_paye'       => $run->lines->sum('paye_tax'),
+            'total_ssnit'      => $run->lines->sum('ssnit_employee'),
+            'employee_count'   => $run->lines->count(),
+        ]);
+
+        return $run;
+    }
+
+    /**
+     * Process (or reprocess) an existing draft PayrollRun.
+     * Deletes any existing lines, recalculates for all active employees,
+     * updates run totals, and sets status to 'processing'.
+     */
+    public function processExistingRun(PayrollRun $run): PayrollRun
+    {
+        // Wipe any previously generated lines so we can start fresh
+        $run->lines()->delete();
+
+        $employees = Employee::where('company_id', $run->company_id)
+            ->where('employment_status', 'active')
+            ->get();
+
+        foreach ($employees as $employee) {
+            $this->calculateEmployeePayroll($run, $employee);
+        }
+
+        $run->refresh();
+        $run->update([
+            'status'           => 'processing',
+            'total_gross'      => $run->lines->sum('gross_salary'),
+            'total_deductions' => $run->lines->sum('total_deductions'),
             'total_net'        => $run->lines->sum('net_salary'),
             'total_paye'       => $run->lines->sum('paye_tax'),
             'total_ssnit'      => $run->lines->sum('ssnit_employee'),
@@ -72,6 +109,14 @@ class PayrollService
         $allowances = $this->computeAllowances($allowanceTypes, $basicSalary);
         $deductions = $this->computeDeductions($deductionTypes, $basicSalary);
 
+        // Loan deductions
+        $loanDeductions = $this->computeLoanDeductions($employee, $run);
+        $deductions = array_merge($deductions, $loanDeductions);
+
+        // Benefit employee contributions
+        $benefitDeductions = $this->computeBenefitDeductions($employee);
+        $deductions = array_merge($deductions, $benefitDeductions);
+
         $grossSalary   = $basicSalary + array_sum(array_column($allowances, 'amount'));
         $ssnitEmployee = round($basicSalary * 0.055, 2);   // 5.5%
         $ssnitEmployer = round($basicSalary * 0.13, 2);    // 13%
@@ -84,6 +129,8 @@ class PayrollService
             'employee_id'       => $employee->id,
             'basic_salary'      => $basicSalary,
             'gross_salary'      => $grossSalary,
+            'total_allowances'  => round(array_sum(array_column($allowances, 'amount')), 2),
+            'total_deductions'  => round($totalDeductions, 2),
             'net_salary'        => $netSalary,
             'paye_tax'          => $payeTax,
             'ssnit_employee'    => $ssnitEmployee,
@@ -222,6 +269,89 @@ class PayrollService
     // -------------------------------------------------------------------------
     // Private helpers
     // -------------------------------------------------------------------------
+
+    /**
+     * Compute loan repayment deductions for an employee and create LoanRepayment records.
+     */
+    private function computeLoanDeductions(Employee $employee, PayrollRun $run): array
+    {
+        $activeLoans = EmployeeLoan::where('employee_id', $employee->id)
+            ->where('status', 'active')
+            ->where('outstanding_balance', '>', 0)
+            ->get();
+
+        $deductions = [];
+
+        foreach ($activeLoans as $loan) {
+            $deductionAmount = min((float) $loan->monthly_deduction, (float) $loan->outstanding_balance);
+
+            if ($deductionAmount <= 0) {
+                continue;
+            }
+
+            $outstandingBefore = (float) $loan->outstanding_balance;
+            $outstandingAfter  = round($outstandingBefore - $deductionAmount, 2);
+
+            LoanRepayment::create([
+                'employee_loan_id'   => $loan->id,
+                'payment_date'       => now()->toDateString(),
+                'amount'             => $deductionAmount,
+                'outstanding_before' => $outstandingBefore,
+                'outstanding_after'  => $outstandingAfter,
+                'payment_method'     => 'payroll_deduction',
+                'payroll_run_id'     => $run->id,
+            ]);
+
+            // Update loan outstanding balance; mark cleared if fully repaid
+            $loan->outstanding_balance = $outstandingAfter;
+            if ($outstandingAfter <= 0) {
+                $loan->status = 'cleared';
+            }
+            $loan->save();
+
+            $deductions[] = [
+                'name'   => "Loan Repayment ({$loan->loan_type})",
+                'amount' => $deductionAmount,
+            ];
+        }
+
+        return $deductions;
+    }
+
+    /**
+     * Compute benefit employee contribution deductions.
+     */
+    private function computeBenefitDeductions(Employee $employee): array
+    {
+        $activeBenefits = EmployeeBenefit::where('employee_id', $employee->id)
+            ->where('status', 'active')
+            ->with('benefitType')
+            ->get();
+
+        $deductions = [];
+
+        foreach ($activeBenefits as $benefit) {
+            $type = $benefit->benefitType;
+            if (! $type || ! $type->employee_contribution_required) {
+                continue;
+            }
+
+            $amount = $benefit->employee_contribution_override !== null
+                ? (float) $benefit->employee_contribution_override
+                : (float) $type->employee_contribution;
+
+            if ($amount <= 0) {
+                continue;
+            }
+
+            $deductions[] = [
+                'name'   => "{$type->name} (Employee Contribution)",
+                'amount' => round($amount, 2),
+            ];
+        }
+
+        return $deductions;
+    }
 
     private function computeAllowances(Collection $types, float $basicSalary): array
     {

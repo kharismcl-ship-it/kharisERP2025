@@ -14,7 +14,11 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Log;
+use Modules\CommunicationCentre\Services\CommunicationService;
+use Modules\HR\Events\NewEmployeeOnboarded;
 use Modules\HR\Models\Applicant;
+use Modules\HR\Models\Employee;
 
 class ApplicantsRelationManager extends RelationManager
 {
@@ -98,6 +102,91 @@ class ApplicantsRelationManager extends RelationManager
                     ->action(function (Applicant $record) {
                         $record->update(['status' => 'rejected']);
                         Notification::make()->title('Applicant rejected')->danger()->send();
+                    }),
+                Action::make('sendOfferLetter')
+                    ->label('Send Offer Letter')
+                    ->icon('heroicon-o-envelope')
+                    ->color('success')
+                    ->visible(fn (Applicant $r) => in_array($r->status, ['shortlisted', 'interviewed']) && $r->email)
+                    ->form([
+                        Forms\Components\DatePicker::make('start_date')
+                            ->label('Proposed Start Date')
+                            ->required()
+                            ->native(false),
+                        Forms\Components\TextInput::make('salary')
+                            ->label('Offered Salary (per month)')
+                            ->numeric()
+                            ->required(),
+                        Forms\Components\Textarea::make('additional_notes')
+                            ->label('Additional Notes')
+                            ->rows(3)
+                            ->placeholder('Any conditions, benefits, or details to include...'),
+                    ])
+                    ->action(function (Applicant $record, array $data) {
+                        $vacancy = $record->jobVacancy;
+                        $position = $vacancy?->jobPosition?->title ?? $vacancy?->title ?? 'the position';
+                        $company  = $vacancy?->company?->name ?? 'our organisation';
+                        $startDate = \Carbon\Carbon::parse($data['start_date'])->format('F j, Y');
+                        $salary    = number_format((float) $data['salary'], 2);
+
+                        $body = "Dear {$record->first_name} {$record->last_name},\n\n"
+                            . "We are pleased to offer you the position of **{$position}** at {$company}.\n\n"
+                            . "**Proposed Start Date:** {$startDate}\n"
+                            . "**Monthly Salary:** GHS {$salary}\n\n"
+                            . ($data['additional_notes'] ? "{$data['additional_notes']}\n\n" : '')
+                            . "Please confirm your acceptance by replying to this email.\n\n"
+                            . "Congratulations and we look forward to welcoming you to the team!\n\n"
+                            . "HR Department\n{$company}";
+
+                        try {
+                            app(CommunicationService::class)->sendRawEmail(
+                                $record->email,
+                                $record->first_name . ' ' . $record->last_name,
+                                "Offer Letter — {$position} at {$company}",
+                                $body,
+                            );
+                            $record->update(['status' => 'offered']);
+                            Notification::make()->title('Offer letter sent to ' . $record->email)->success()->send();
+                        } catch (\Throwable $e) {
+                            Log::warning('SendOfferLetter failed', ['applicant_id' => $record->id, 'error' => $e->getMessage()]);
+                            Notification::make()->title('Failed to send offer letter — check email configuration')->danger()->send();
+                        }
+                    }),
+                Action::make('convertToEmployee')
+                    ->label('Convert to Employee')
+                    ->icon('heroicon-o-user-plus')
+                    ->color('success')
+                    ->requiresConfirmation()
+                    ->modalHeading('Convert Applicant to Employee')
+                    ->modalDescription('This will create a new Employee record pre-filled with the applicant\'s details. You can edit the full profile afterwards.')
+                    ->visible(fn (Applicant $r) => in_array($r->status, ['offered', 'hired']))
+                    ->action(function (Applicant $record) {
+                        $vacancy = $record->jobVacancy;
+                        $companyId = $vacancy?->company_id ?? app('current_company_id');
+
+                        $nameParts = explode(' ', trim($record->first_name . ' ' . $record->last_name), 2);
+                        $employee = Employee::create([
+                            'company_id'         => $companyId,
+                            'first_name'         => $record->first_name,
+                            'last_name'          => $record->last_name ?? '',
+                            'email'              => $record->email,
+                            'phone'              => $record->phone,
+                            'department_id'      => $vacancy?->department_id,
+                            'job_position_id'    => $vacancy?->job_position_id,
+                            'employment_type'    => $vacancy?->employment_type ?? 'full_time',
+                            'employment_status'  => 'active',
+                            'hire_date'          => now()->toDateString(),
+                        ]);
+
+                        $record->update(['status' => 'hired']);
+
+                        event(new NewEmployeeOnboarded($employee));
+
+                        Notification::make()
+                            ->title('Employee record created')
+                            ->body("Employee #{$employee->employee_code} created from applicant. Complete the profile in HR Records > Employees.")
+                            ->success()
+                            ->send();
                     }),
                 DeleteAction::make(),
             ])

@@ -16,6 +16,7 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Modules\HR\Filament\Resources\PerformanceReviewResource\Pages;
+use Modules\HR\Filament\Resources\PerformanceReviewResource\RelationManagers\KpiScoresRelationManager;
 use Modules\HR\Models\PerformanceReview;
 
 class PerformanceReviewResource extends Resource
@@ -112,7 +113,7 @@ class PerformanceReviewResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            KpiScoresRelationManager::class,
         ];
     }
 

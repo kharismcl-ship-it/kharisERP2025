@@ -20,7 +20,9 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Modules\HR\Filament\Resources\GrievanceCaseResource\Pages;
+use Modules\HR\Models\Employee;
 use Modules\HR\Models\GrievanceCase;
+use Modules\HR\Services\WorkplaceRelationsService;
 
 class GrievanceCaseResource extends Resource
 {
@@ -114,10 +116,33 @@ class GrievanceCaseResource extends Resource
                 ActionGroup::make([
                     ViewAction::make(),
                     EditAction::make(),
+                    Action::make('assign')
+                        ->label('Assign Investigator')
+                        ->icon('heroicon-o-user-circle')
+                        ->color('warning')
+                        ->form([
+                            Forms\Components\Select::make('handler_id')
+                                ->label('Investigator')
+                                ->options(fn (GrievanceCase $record) =>
+                                    Employee::where('company_id', $record->company_id)
+                                        ->where('employment_status', 'active')
+                                        ->get()
+                                        ->pluck('full_name', 'id')
+                                        ->all()
+                                )
+                                ->required()
+                                ->searchable(),
+                        ])
+                        ->visible(fn (GrievanceCase $r) => in_array($r->status, ['filed', 'under_investigation']))
+                        ->action(function (GrievanceCase $record, array $data) {
+                            $handler = Employee::findOrFail($data['handler_id']);
+                            app(WorkplaceRelationsService::class)->assignGrievanceCase($record, $handler);
+                            Notification::make()->title('Case assigned to ' . $handler->full_name)->success()->send();
+                        }),
                     Action::make('investigate')
                         ->label('Start Investigation')
                         ->icon('heroicon-o-magnifying-glass')
-                        ->color('warning')
+                        ->color('info')
                         ->visible(fn (GrievanceCase $r) => $r->status === 'filed')
                         ->action(function (GrievanceCase $record) {
                             $record->update(['status' => 'under_investigation']);
@@ -127,10 +152,17 @@ class GrievanceCaseResource extends Resource
                         ->label('Resolve')
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
-                        ->requiresConfirmation()
+                        ->form([
+                            Forms\Components\Textarea::make('resolution')
+                                ->label('Resolution Summary')
+                                ->required(),
+                        ])
                         ->visible(fn (GrievanceCase $r) => in_array($r->status, ['under_investigation', 'hearing_scheduled']))
-                        ->action(function (GrievanceCase $record) {
-                            $record->update(['status' => 'resolved', 'resolution_date' => now()]);
+                        ->action(function (GrievanceCase $record, array $data) {
+                            app(WorkplaceRelationsService::class)->resolveGrievanceCase(
+                                $record,
+                                $data['resolution'],
+                            );
                             Notification::make()->title('Grievance resolved')->success()->send();
                         }),
                     DeleteAction::make(),

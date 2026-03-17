@@ -11,13 +11,13 @@ use Illuminate\Auth\Access\HandlesAuthorization;
 class FarmDocumentPolicy
 {
     use HandlesAuthorization;
-
+    
     public function viewAny(AuthUser $authUser): bool
     {
         return $authUser->can('ViewAny:FarmDocument');
     }
 
-    public function view(AuthUser $authUser, FarmDocument $record): bool
+    public function view(AuthUser $authUser, FarmDocument $farmDocument): bool
     {
         return $authUser->can('View:FarmDocument');
     }
@@ -27,22 +27,22 @@ class FarmDocumentPolicy
         return $authUser->can('Create:FarmDocument');
     }
 
-    public function update(AuthUser $authUser, FarmDocument $record): bool
+    public function update(AuthUser $authUser, FarmDocument $farmDocument): bool
     {
         return $authUser->can('Update:FarmDocument');
     }
 
-    public function delete(AuthUser $authUser, FarmDocument $record): bool
+    public function delete(AuthUser $authUser, FarmDocument $farmDocument): bool
     {
         return $authUser->can('Delete:FarmDocument');
     }
 
-    public function restore(AuthUser $authUser, FarmDocument $record): bool
+    public function restore(AuthUser $authUser, FarmDocument $farmDocument): bool
     {
         return $authUser->can('Restore:FarmDocument');
     }
 
-    public function forceDelete(AuthUser $authUser, FarmDocument $record): bool
+    public function forceDelete(AuthUser $authUser, FarmDocument $farmDocument): bool
     {
         return $authUser->can('ForceDelete:FarmDocument');
     }
@@ -57,7 +57,7 @@ class FarmDocumentPolicy
         return $authUser->can('RestoreAny:FarmDocument');
     }
 
-    public function replicate(AuthUser $authUser, FarmDocument $record): bool
+    public function replicate(AuthUser $authUser, FarmDocument $farmDocument): bool
     {
         return $authUser->can('Replicate:FarmDocument');
     }
@@ -66,4 +66,5 @@ class FarmDocumentPolicy
     {
         return $authUser->can('Reorder:FarmDocument');
     }
+
 }

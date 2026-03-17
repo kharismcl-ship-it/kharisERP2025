@@ -21,6 +21,7 @@ use Modules\HR\Events\PayrollFinalized;
 use Modules\HR\Filament\Resources\PayrollRunResource\Pages;
 use Modules\HR\Filament\Resources\PayrollRunResource\RelationManagers\PayrollLinesRelationManager;
 use Modules\HR\Models\PayrollRun;
+use Modules\HR\Services\PayrollService;
 
 class PayrollRunResource extends Resource
 {
@@ -81,6 +82,12 @@ class PayrollRunResource extends Resource
                         Forms\Components\TextInput::make('total_deductions')
                             ->numeric()->prefix('GHS')->readOnly(),
                         Forms\Components\TextInput::make('total_net')
+                            ->numeric()->prefix('GHS')->readOnly(),
+                        Forms\Components\TextInput::make('total_paye')
+                            ->label('PAYE Tax')
+                            ->numeric()->prefix('GHS')->readOnly(),
+                        Forms\Components\TextInput::make('total_ssnit')
+                            ->label('SSNIT (Employee)')
                             ->numeric()->prefix('GHS')->readOnly(),
                         Forms\Components\TextInput::make('employee_count')
                             ->label('No. of Employees')
@@ -152,11 +159,23 @@ class PayrollRunResource extends Resource
                         ->color('warning')
                         ->requiresConfirmation()
                         ->modalHeading('Process Payroll')
-                        ->modalDescription('This will calculate payroll lines for all active employees. Continue?')
+                        ->modalDescription('This will calculate payroll lines for all active employees in this period. Existing lines will be replaced. Continue?')
                         ->visible(fn (PayrollRun $record) => $record->status === 'draft')
                         ->action(function (PayrollRun $record) {
-                            $record->update(['status' => 'processing']);
-                            Notification::make()->title('Payroll is being processed')->warning()->send();
+                            try {
+                                $run = app(PayrollService::class)->processExistingRun($record);
+                                Notification::make()
+                                    ->title('Payroll processed successfully')
+                                    ->body("{$run->employee_count} employee lines generated.")
+                                    ->success()
+                                    ->send();
+                            } catch (\Throwable $e) {
+                                Notification::make()
+                                    ->title('Payroll processing failed')
+                                    ->body($e->getMessage())
+                                    ->danger()
+                                    ->send();
+                            }
                         }),
                     Action::make('finalize')
                         ->label('Finalize')
@@ -186,6 +205,30 @@ class PayrollRunResource extends Resource
                             $record->update(['status' => 'paid']);
                             event(new PayrollFinalized($record));
                             Notification::make()->title('Payroll marked as paid')->success()->send();
+                        }),
+                    Action::make('postToFinance')
+                        ->label('Post to Finance')
+                        ->icon('heroicon-o-book-open')
+                        ->color('gray')
+                        ->requiresConfirmation()
+                        ->modalHeading('Post Payroll to Finance')
+                        ->modalDescription('This will create a journal entry in the Finance module for this payroll run. The accounts 5210, 5220, 2120, 2140, and 2150 must exist.')
+                        ->visible(fn (PayrollRun $record) => in_array($record->status, ['finalized', 'paid']))
+                        ->action(function (PayrollRun $record) {
+                            try {
+                                app(PayrollService::class)->postToFinance($record);
+                                Notification::make()
+                                    ->title('Payroll posted to Finance')
+                                    ->body('Journal entry created successfully.')
+                                    ->success()
+                                    ->send();
+                            } catch (\Throwable $e) {
+                                Notification::make()
+                                    ->title('Finance posting failed')
+                                    ->body($e->getMessage())
+                                    ->danger()
+                                    ->send();
+                            }
                         }),
                     DeleteAction::make(),
                 ]),

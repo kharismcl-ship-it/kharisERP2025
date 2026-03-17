@@ -4,6 +4,7 @@ namespace Modules\Farms\Filament\Resources;
 
 use EduardoRibeiroDev\FilamentLeaflet\Fields\MapPicker;
 use EduardoRibeiroDev\FilamentLeaflet\Tables\MapColumn;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -60,6 +61,45 @@ class FarmResource extends Resource
                 Textarea::make('description')->rows(3)->columnSpanFull(),
                 Textarea::make('notes')->rows(2)->columnSpanFull(),
             ]),
+
+            Section::make('"Meet the Farm" Profile')
+                ->description('Public shop profile — story, media, and gallery')
+                ->collapsible()
+                ->collapsed()
+                ->schema([
+                    TextInput::make('established_year')
+                        ->label('Established Year')
+                        ->numeric()
+                        ->minValue(1900)
+                        ->maxValue(now()->year)
+                        ->placeholder(now()->year),
+
+                    Textarea::make('about')
+                        ->label('Farm Story')
+                        ->rows(4)
+                        ->columnSpanFull()
+                        ->placeholder('Tell customers your story — how the farm started, what you grow, your values…'),
+
+                    FileUpload::make('cover_image')
+                        ->label('Cover Photo')
+                        ->image()
+                        ->directory('farm-profiles')
+                        ->columnSpanFull(),
+
+                    FileUpload::make('gallery_images')
+                        ->label('Gallery Photos')
+                        ->multiple()
+                        ->image()
+                        ->directory('farm-gallery')
+                        ->columnSpanFull(),
+
+                    TextInput::make('video_url')
+                        ->label('Video URL (YouTube embed)')
+                        ->url()
+                        ->maxLength(500)
+                        ->placeholder('https://www.youtube.com/embed/...')
+                        ->columnSpanFull(),
+                ]),
 
             Section::make('Location & Map')
                 ->icon('heroicon-o-map-pin')

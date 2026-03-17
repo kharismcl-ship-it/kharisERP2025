@@ -11,13 +11,13 @@ use Illuminate\Auth\Access\HandlesAuthorization;
 class FarmDailyReportPolicy
 {
     use HandlesAuthorization;
-
+    
     public function viewAny(AuthUser $authUser): bool
     {
         return $authUser->can('ViewAny:FarmDailyReport');
     }
 
-    public function view(AuthUser $authUser, FarmDailyReport $record): bool
+    public function view(AuthUser $authUser, FarmDailyReport $farmDailyReport): bool
     {
         return $authUser->can('View:FarmDailyReport');
     }
@@ -27,22 +27,22 @@ class FarmDailyReportPolicy
         return $authUser->can('Create:FarmDailyReport');
     }
 
-    public function update(AuthUser $authUser, FarmDailyReport $record): bool
+    public function update(AuthUser $authUser, FarmDailyReport $farmDailyReport): bool
     {
         return $authUser->can('Update:FarmDailyReport');
     }
 
-    public function delete(AuthUser $authUser, FarmDailyReport $record): bool
+    public function delete(AuthUser $authUser, FarmDailyReport $farmDailyReport): bool
     {
         return $authUser->can('Delete:FarmDailyReport');
     }
 
-    public function restore(AuthUser $authUser, FarmDailyReport $record): bool
+    public function restore(AuthUser $authUser, FarmDailyReport $farmDailyReport): bool
     {
         return $authUser->can('Restore:FarmDailyReport');
     }
 
-    public function forceDelete(AuthUser $authUser, FarmDailyReport $record): bool
+    public function forceDelete(AuthUser $authUser, FarmDailyReport $farmDailyReport): bool
     {
         return $authUser->can('ForceDelete:FarmDailyReport');
     }
@@ -57,7 +57,7 @@ class FarmDailyReportPolicy
         return $authUser->can('RestoreAny:FarmDailyReport');
     }
 
-    public function replicate(AuthUser $authUser, FarmDailyReport $record): bool
+    public function replicate(AuthUser $authUser, FarmDailyReport $farmDailyReport): bool
     {
         return $authUser->can('Replicate:FarmDailyReport');
     }
@@ -66,4 +66,5 @@ class FarmDailyReportPolicy
     {
         return $authUser->can('Reorder:FarmDailyReport');
     }
+
 }

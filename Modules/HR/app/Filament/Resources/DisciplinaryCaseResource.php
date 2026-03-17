@@ -21,6 +21,8 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Modules\HR\Filament\Resources\DisciplinaryCaseResource\Pages;
 use Modules\HR\Models\DisciplinaryCase;
+use Modules\HR\Models\Employee;
+use Modules\HR\Services\WorkplaceRelationsService;
 
 class DisciplinaryCaseResource extends Resource
 {
@@ -129,14 +131,48 @@ class DisciplinaryCaseResource extends Resource
                 ActionGroup::make([
                     ViewAction::make(),
                     EditAction::make(),
+                    Action::make('assign')
+                        ->label('Assign Handler')
+                        ->icon('heroicon-o-user-circle')
+                        ->color('warning')
+                        ->form([
+                            Forms\Components\Select::make('handler_id')
+                                ->label('HR Handler')
+                                ->options(fn (DisciplinaryCase $record) =>
+                                    Employee::where('company_id', $record->company_id)
+                                        ->where('employment_status', 'active')
+                                        ->get()
+                                        ->pluck('full_name', 'id')
+                                        ->all()
+                                )
+                                ->required()
+                                ->searchable(),
+                        ])
+                        ->visible(fn (DisciplinaryCase $r) => in_array($r->status, ['open', 'under_review']))
+                        ->action(function (DisciplinaryCase $record, array $data) {
+                            $handler = Employee::findOrFail($data['handler_id']);
+                            app(WorkplaceRelationsService::class)->assignDisciplinaryCase($record, $handler);
+                            Notification::make()->title('Case assigned to ' . $handler->full_name)->success()->send();
+                        }),
                     Action::make('resolve')
                         ->label('Resolve Case')
                         ->icon('heroicon-o-check-circle')
                         ->color('success')
-                        ->requiresConfirmation()
+                        ->form([
+                            Forms\Components\Textarea::make('resolution')
+                                ->label('Resolution Summary')
+                                ->required(),
+                            Forms\Components\Textarea::make('notes')
+                                ->label('Additional Notes')
+                                ->nullable(),
+                        ])
                         ->visible(fn (DisciplinaryCase $r) => in_array($r->status, ['open', 'under_review']))
-                        ->action(function (DisciplinaryCase $record) {
-                            $record->update(['status' => 'resolved', 'resolution_date' => now()]);
+                        ->action(function (DisciplinaryCase $record, array $data) {
+                            app(WorkplaceRelationsService::class)->resolveDisciplinaryCase(
+                                $record,
+                                $data['resolution'],
+                                $data['notes'] ?? null,
+                            );
                             Notification::make()->title('Case resolved')->success()->send();
                         }),
                     Action::make('close')

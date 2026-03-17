@@ -30,13 +30,20 @@ class Farm extends Model
         'status',
         'notes',
         'geometry',
+        'about',
+        'cover_image',
+        'gallery_images',
+        'video_url',
+        'established_year',
     ];
 
     protected $casts = [
-        'total_area' => 'decimal:4',
-        'latitude'   => 'float',
-        'longitude'  => 'float',
-        'geometry'   => 'array',
+        'total_area'       => 'decimal:4',
+        'latitude'         => 'float',
+        'longitude'        => 'float',
+        'geometry'         => 'array',
+        'gallery_images'   => 'array',
+        'established_year' => 'integer',
     ];
 
     const TYPES    = ['crop', 'livestock', 'mixed', 'aquaculture'];

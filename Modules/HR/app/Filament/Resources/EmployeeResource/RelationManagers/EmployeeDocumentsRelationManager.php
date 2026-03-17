@@ -12,9 +12,12 @@ use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 
 class EmployeeDocumentsRelationManager extends RelationManager
 {
+    public static function canViewForRecord(Model $ownerRecord, string $pageClass): bool { return true; }
+
     protected static string $relationship = 'documents';
 
     protected static ?string $label = 'Documents';

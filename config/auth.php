@@ -50,6 +50,16 @@ return [
             'driver' => 'session',
             'provider' => 'hostel_occupants',
         ],
+
+        'vendor' => [
+            'driver' => 'session',
+            'provider' => 'vendor_contacts',
+        ],
+
+        'shop_customer' => [
+            'driver' => 'session',
+            'provider' => 'shop_customers',
+        ],
     ],
 
     /*
@@ -83,6 +93,16 @@ return [
         'hostel_occupants' => [
             'driver' => 'eloquent',
             'model' => Modules\Hostels\Models\HostelOccupantUser::class,
+        ],
+
+        'vendor_contacts' => [
+            'driver' => 'eloquent',
+            'model' => Modules\ProcurementInventory\Models\VendorContact::class,
+        ],
+
+        'shop_customers' => [
+            'driver' => 'eloquent',
+            'model' => Modules\Farms\Models\ShopCustomer::class,
         ],
     ],
 
@@ -122,6 +142,20 @@ return [
 
         'hostel_occupants' => [
             'provider' => 'hostel_occupants',
+            'table' => 'password_reset_tokens',
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+
+        'vendor_contacts' => [
+            'provider' => 'vendor_contacts',
+            'table' => 'password_reset_tokens',
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+
+        'shop_customers' => [
+            'provider' => 'shop_customers',
             'table' => 'password_reset_tokens',
             'expire' => 60,
             'throttle' => 60,

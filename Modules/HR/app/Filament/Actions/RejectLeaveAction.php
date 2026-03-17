@@ -23,7 +23,7 @@ class RejectLeaveAction extends Action
         $this->label('Reject Leave')
             ->color('danger')
             ->icon('heroicon-o-x-circle')
-            ->visible(fn ($record) => $record->status === 'pending')
+            ->visible(fn ($record) => in_array($record->status, ['pending', 'pending_approval']))
             ->form([
                 Textarea::make('rejected_reason')
                     ->label('Rejection Reason')

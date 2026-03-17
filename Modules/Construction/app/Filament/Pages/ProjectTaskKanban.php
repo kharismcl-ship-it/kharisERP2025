@@ -2,16 +2,14 @@
 
 namespace Modules\Construction\Filament\Pages;
 
-use Filament\Pages\Page;
-use Filament\Forms\Components\Select;
-use Livewire\Attributes\On;
+use App\Filament\Pages\KanbanPage;
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
+use Illuminate\Database\Eloquent\Collection;
 use Modules\Construction\Models\ConstructionProject;
 use Modules\Construction\Models\ProjectTask;
 
-class ProjectTaskKanban extends Page
+class ProjectTaskKanban extends KanbanPage
 {
-    protected string $view = 'construction::filament.pages.project-task-kanban';
-
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-view-columns';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Construction';
@@ -20,48 +18,63 @@ class ProjectTaskKanban extends Page
 
     protected static ?string $navigationLabel = 'Task Board';
 
+    use HasPageShield;
+
     public ?int $selectedProjectId = null;
 
-    public function getColumns(): array
+    public function getKanbanStatuses(): array
     {
         return [
-            ['key' => 'pending',     'label' => 'Pending',     'color' => 'gray'],
-            ['key' => 'in_progress', 'label' => 'In Progress', 'color' => 'warning'],
-            ['key' => 'blocked',     'label' => 'Blocked',     'color' => 'danger'],
-            ['key' => 'completed',   'label' => 'Completed',   'color' => 'success'],
+            ['key' => 'pending',     'label' => 'Pending',     'border_class' => 'border-gray-400',   'dot_color' => 'bg-gray-400'],
+            ['key' => 'in_progress', 'label' => 'In Progress', 'border_class' => 'border-yellow-400', 'dot_color' => 'bg-yellow-400'],
+            ['key' => 'blocked',     'label' => 'Blocked',     'border_class' => 'border-red-400',    'dot_color' => 'bg-red-500'],
+            ['key' => 'completed',   'label' => 'Completed',   'border_class' => 'border-green-500',  'dot_color' => 'bg-green-500'],
         ];
     }
 
-    public function getTasksByStatus(string $status): \Illuminate\Database\Eloquent\Collection
+    public function getKanbanRecords(string $status): Collection
     {
-        $query = ProjectTask::query()
+        return ProjectTask::query()
             ->with(['project', 'contractor'])
             ->where('status', $status)
+            ->when($this->selectedProjectId, fn ($q) =>
+                $q->where('construction_project_id', $this->selectedProjectId)
+            )
+            ->when($this->search, fn ($q) =>
+                $q->where('name', 'like', "%{$this->search}%")
+            )
             ->orderByDesc('priority')
-            ->orderBy('due_date');
+            ->orderBy('due_date')
+            ->get();
+    }
 
-        if ($this->selectedProjectId) {
-            $query->where('construction_project_id', $this->selectedProjectId);
+    protected function onCardMoved(int|string $recordId, string $newStatus): void
+    {
+        $validKeys = array_column($this->getKanbanStatuses(), 'key');
+        if (! in_array($newStatus, $validKeys, true)) {
+            return;
         }
 
-        return $query->get();
-    }
-
-    public function getProjects(): array
-    {
-        return ConstructionProject::pluck('name', 'id')->toArray();
-    }
-
-    #[On('task-status-changed')]
-    public function handleStatusChanged(int $taskId, string $newStatus): void
-    {
-        $task = ProjectTask::findOrFail($taskId);
+        $task   = ProjectTask::findOrFail($recordId);
         $update = ['status' => $newStatus];
 
-        if ($newStatus === 'completed' && !$task->completed_at) {
+        if ($newStatus === 'completed' && ! $task->completed_at) {
             $update['completed_at'] = now();
         }
 
         $task->update($update);
+    }
+
+    public function getCardView(): string
+    {
+        return 'construction::filament.kanban.task-card';
+    }
+
+    public function getKanbanFilterBarView(): ?array
+    {
+        return [
+            'view'  => 'construction::filament.kanban.project-filter-bar',
+            'props' => ['projects' => ConstructionProject::pluck('name', 'id')->toArray()],
+        ];
     }
 }

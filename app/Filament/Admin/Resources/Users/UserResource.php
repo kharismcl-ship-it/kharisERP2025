@@ -90,7 +90,17 @@ class UserResource extends Resource
                             ->relationship('companies', 'name')
                             ->searchable()
                             ->preload()
-                            ->helperText('Which companies can this user access in the tenant switcher?'),
+                            ->helperText('Which companies can this user access in the tenant switcher?')
+                            ->saveRelationshipsUsing(function ($record, $state) {
+                                // Sync with is_active = true so canAccessPanel() passes
+                                $syncData = collect($state ?? [])
+                                    ->mapWithKeys(fn ($id) => [(int) $id => [
+                                        'is_active'   => true,
+                                        'assigned_at' => now(),
+                                    ]])
+                                    ->all();
+                                $record->companies()->sync($syncData);
+                            }),
 
                         Forms\Components\Toggle::make('is_global_super_admin')
                             ->label('Global Super Admin')
@@ -102,12 +112,14 @@ class UserResource extends Resource
                                 }
                                 $teamKey  = config('permission.column_names.team_foreign_key', 'company_id');
                                 $tables   = config('permission.table_names');
+                                // Check roles.company_id IS NULL (the role's own column), NOT the pivot column
+                                // because model_has_roles.company_id is NOT NULL (part of PRIMARY KEY).
                                 $isGlobal = DB::table($tables['model_has_roles'])
                                     ->join($tables['roles'], $tables['roles'] . '.id', '=', $tables['model_has_roles'] . '.role_id')
                                     ->where($tables['model_has_roles'] . '.model_type', get_class($record))
                                     ->where($tables['model_has_roles'] . '.model_id', $record->getKey())
                                     ->where($tables['roles'] . '.name', 'super_admin')
-                                    ->whereNull($tables['model_has_roles'] . '.' . $teamKey)
+                                    ->whereNull($tables['roles'] . '.' . $teamKey)
                                     ->exists();
                                 $set('is_global_super_admin', $isGlobal);
                             })
@@ -134,20 +146,34 @@ class UserResource extends Resource
                                         $globalRoleId = $globalRole->id;
                                     }
 
-                                    DB::table($tables['model_has_roles'])->updateOrInsert(
-                                        ['role_id' => $globalRoleId, 'model_type' => get_class($record), 'model_id' => $record->getKey(), $teamKey => null],
-                                        ['role_id' => $globalRoleId, 'model_type' => get_class($record), 'model_id' => $record->getKey(), $teamKey => null]
-                                    );
+                                    // model_has_roles.company_id is NOT NULL (part of PRIMARY KEY),
+                                    // so we cannot insert with NULL. Assign the global role for every
+                                    // existing company. isGlobalSuperAdmin() detects this by checking
+                                    // roles.company_id IS NULL (the role's own column).
+                                    $companyIds = DB::table('companies')->pluck('id');
+                                    foreach ($companyIds as $companyId) {
+                                        DB::table($tables['model_has_roles'])->updateOrInsert(
+                                            ['role_id' => $globalRoleId, 'model_type' => get_class($record), 'model_id' => $record->getKey(), $teamKey => $companyId],
+                                            ['role_id' => $globalRoleId, 'model_type' => get_class($record), 'model_id' => $record->getKey(), $teamKey => $companyId]
+                                        );
+                                    }
 
                                     // Invalidate cache so EnsureGlobalSuperAdminRole propagates immediately
                                     \Illuminate\Support\Facades\Cache::forget("super_admin_synced_{$record->getKey()}");
-                                } elseif ($globalRole) {
+                                } else {
+                                    // Remove ALL super_admin role assignments (global + company-scoped) for this user.
+                                    // model_has_roles.company_id is NOT NULL so ->whereNull() would match nothing.
+                                    $superAdminRoleIds = DB::table($tables['roles'])
+                                        ->where('name', 'super_admin')
+                                        ->pluck('id');
+
                                     DB::table($tables['model_has_roles'])
-                                        ->where('role_id', $globalRole->id)
                                         ->where('model_type', get_class($record))
                                         ->where('model_id', $record->getKey())
-                                        ->whereNull($teamKey)
+                                        ->whereIn('role_id', $superAdminRoleIds)
                                         ->delete();
+
+                                    \Illuminate\Support\Facades\Cache::forget("super_admin_synced_{$record->getKey()}");
                                 }
                             }),
 
@@ -170,7 +196,12 @@ class UserResource extends Resource
                                             return [];
                                         }
                                         $teamKey = config('permission.column_names.team_foreign_key', 'company_id');
-                                        return Role::where($teamKey, $companyId)
+                                        // Include company-specific roles AND global (company_id = NULL) roles
+                                        return Role::where(function ($q) use ($teamKey, $companyId) {
+                                                $q->where($teamKey, $companyId)
+                                                  ->orWhereNull($teamKey);
+                                            })
+                                            ->where('name', '!=', 'super_admin')
                                             ->orderBy('name')
                                             ->pluck('name', 'id')
                                             ->mapWithKeys(fn ($name, $id) => [
@@ -225,18 +256,35 @@ class UserResource extends Resource
                                     if (empty($row['company_id']) || empty($row['role_id'])) {
                                         continue;
                                     }
+
+                                    $roleId  = (int) $row['role_id'];
+                                    $companyId = (int) $row['company_id'];
+
+                                    // If the selected role is global (company_id = NULL), ensure a
+                                    // company-scoped copy exists so Spatie's team-mode check passes
+                                    $role = Role::find($roleId);
+                                    if ($role && is_null($role->$teamKey)) {
+                                        $scopedRole = Role::firstOrCreate(
+                                            ['name' => $role->name, 'guard_name' => $role->guard_name, $teamKey => $companyId],
+                                            ['name' => $role->name, 'guard_name' => $role->guard_name, $teamKey => $companyId]
+                                        );
+                                        // Mirror permissions from the global role to the scoped copy
+                                        $scopedRole->syncPermissions($role->permissions);
+                                        $roleId = $scopedRole->id;
+                                    }
+
                                     DB::table($tables['model_has_roles'])->updateOrInsert(
                                         [
-                                            'role_id'    => $row['role_id'],
+                                            'role_id'    => $roleId,
                                             'model_type' => get_class($record),
                                             'model_id'   => $record->getKey(),
-                                            $teamKey     => $row['company_id'],
+                                            $teamKey     => $companyId,
                                         ],
                                         [
-                                            'role_id'    => $row['role_id'],
+                                            'role_id'    => $roleId,
                                             'model_type' => get_class($record),
                                             'model_id'   => $record->getKey(),
-                                            $teamKey     => $row['company_id'],
+                                            $teamKey     => $companyId,
                                         ]
                                     );
                                 }

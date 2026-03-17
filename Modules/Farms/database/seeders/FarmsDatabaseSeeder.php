@@ -13,6 +13,7 @@ class FarmsDatabaseSeeder extends Seeder
     {
         $this->call([
             FarmsCommTemplateSeeder::class,
+            FarmMarketplaceSeeder::class,
         ]);
     }
 }

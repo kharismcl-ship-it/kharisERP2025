@@ -2,6 +2,7 @@
 
 namespace Modules\Hostels\Filament\Pages;
 
+use BezhanSalleh\FilamentShield\Traits\HasPageShield;
 use Filament\Pages\Page;
 use Modules\Hostels\Models\Booking;
 use Modules\Hostels\Models\Hostel;
@@ -24,6 +25,8 @@ class HostelsDashboard extends Page
 
     public array $stats  = [];
     public array $alerts = [];
+
+    use HasPageShield;
 
     public function mount(): void
     {
