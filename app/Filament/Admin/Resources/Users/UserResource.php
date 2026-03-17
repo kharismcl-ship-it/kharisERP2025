@@ -105,6 +105,9 @@ class UserResource extends Resource
                         Forms\Components\Toggle::make('is_global_super_admin')
                             ->label('Global Super Admin')
                             ->helperText('Grants unrestricted access to all panels and all companies. Bypasses all role checks.')
+                            ->disabled(fn ($record) => $record && $record->getKey() === auth()->id())
+                            ->hintIcon(fn ($record) => ($record && $record->getKey() === auth()->id()) ? 'heroicon-o-lock-closed' : null)
+                            ->hintIconTooltip('Cannot remove your own super-admin role.')
                             ->dehydrated(false)
                             ->afterStateHydrated(function ($record, $set) {
                                 if (! $record) {
@@ -224,11 +227,17 @@ class UserResource extends Resource
                                 $teamKey = config('permission.column_names.team_foreign_key', 'company_id');
                                 $tables  = config('permission.table_names');
 
+                                // Exclude super_admin rows — those are managed by the toggle above.
+                                $superAdminRoleIds = DB::table($tables['roles'])
+                                    ->where('name', 'super_admin')
+                                    ->pluck('id');
+
                                 $assignments = DB::table($tables['model_has_roles'])
                                     ->join($tables['roles'], $tables['roles'] . '.id', '=', $tables['model_has_roles'] . '.role_id')
                                     ->where($tables['model_has_roles'] . '.model_type', get_class($record))
                                     ->where($tables['model_has_roles'] . '.model_id', $record->getKey())
                                     ->whereNotNull($tables['model_has_roles'] . '.' . $teamKey)
+                                    ->whereNotIn($tables['model_has_roles'] . '.role_id', $superAdminRoleIds)
                                     ->select(
                                         $tables['model_has_roles'] . '.' . $teamKey . ' as company_id',
                                         $tables['roles'] . '.id as role_id'
@@ -246,11 +255,17 @@ class UserResource extends Resource
                                 $teamKey = config('permission.column_names.team_foreign_key', 'company_id');
                                 $tables  = config('permission.table_names');
 
-                                // Remove all existing company-scoped role assignments
+                                // Remove company-scoped role assignments — but NOT super_admin rows,
+                                // which are managed exclusively by the Global Super Admin toggle above.
+                                $superAdminRoleIds = DB::table($tables['roles'])
+                                    ->where('name', 'super_admin')
+                                    ->pluck('id');
+
                                 DB::table($tables['model_has_roles'])
                                     ->where('model_type', get_class($record))
                                     ->where('model_id', $record->getKey())
                                     ->whereNotNull($teamKey)
+                                    ->whereNotIn('role_id', $superAdminRoleIds)
                                     ->delete();
 
                                 // Re-insert from the repeater state
