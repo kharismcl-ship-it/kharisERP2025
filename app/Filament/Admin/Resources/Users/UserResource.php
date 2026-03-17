@@ -152,10 +152,12 @@ class UserResource extends Resource
                                     // roles.company_id IS NULL (the role's own column).
                                     $companyIds = DB::table('companies')->pluck('id');
                                     foreach ($companyIds as $companyId) {
-                                        DB::table($tables['model_has_roles'])->updateOrInsert(
-                                            ['role_id' => $globalRoleId, 'model_type' => get_class($record), 'model_id' => $record->getKey(), $teamKey => $companyId],
-                                            ['role_id' => $globalRoleId, 'model_type' => get_class($record), 'model_id' => $record->getKey(), $teamKey => $companyId]
-                                        );
+                                        DB::table($tables['model_has_roles'])->insertOrIgnore([
+                                            'role_id'    => $globalRoleId,
+                                            'model_type' => get_class($record),
+                                            'model_id'   => $record->getKey(),
+                                            $teamKey     => $companyId,
+                                        ]);
                                     }
 
                                     // Invalidate cache so EnsureGlobalSuperAdminRole propagates immediately

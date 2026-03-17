@@ -100,21 +100,17 @@ class EnsureGlobalSuperAdminRole
                 ]);
             }
 
-            // Assign the company-scoped super_admin role to this user
-            DB::table($tableNames['model_has_roles'])->updateOrInsert(
-                [
-                    'role_id'    => $companyRoleId,
-                    'model_id'   => $user->getKey(),
-                    'model_type' => get_class($user),
-                    $teamKey     => $companyId,
-                ],
-                [
-                    'role_id'    => $companyRoleId,
-                    'model_id'   => $user->getKey(),
-                    'model_type' => get_class($user),
-                    $teamKey     => $companyId,
-                ]
-            );
+            // Assign the company-scoped super_admin role to this user.
+            // Use insertOrIgnore (atomic INSERT IGNORE) instead of updateOrInsert to avoid a
+            // race condition: if the cache is cleared, multiple simultaneous Livewire requests
+            // can all pass the Cache::has() check before the cache is written, causing all of
+            // them to attempt the same INSERT and hitting a duplicate-key violation.
+            DB::table($tableNames['model_has_roles'])->insertOrIgnore([
+                'role_id'    => $companyRoleId,
+                'model_id'   => $user->getKey(),
+                'model_type' => get_class($user),
+                $teamKey     => $companyId,
+            ]);
         }
 
         // NOTE: We intentionally skip a NULL company_id entry here because the
