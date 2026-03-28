@@ -15,6 +15,7 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Modules\Finance\Filament\Resources\InvoiceResource\Pages;
+use Modules\Finance\Filament\Resources\InvoiceResource\RelationManagers\InvoiceDocumentsRelationManager;
 use Modules\Finance\Filament\Resources\InvoiceResource\RelationManagers\InvoiceLinesRelationManager;
 use Modules\Finance\Filament\Resources\InvoiceResource\RelationManagers\PaymentsRelationManager;
 use Modules\Finance\Models\Invoice;
@@ -177,6 +178,7 @@ class InvoiceResource extends Resource
         return [
             InvoiceLinesRelationManager::class,
             PaymentsRelationManager::class,
+            InvoiceDocumentsRelationManager::class,
         ];
     }
 
