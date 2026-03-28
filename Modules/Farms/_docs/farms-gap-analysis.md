@@ -197,8 +197,12 @@
 ⚠️ **23. Variable Rate Technology (VRT) Prescription Maps**
 - *Status: Not yet implemented — depends on NDVI zones*
 
-⚠️ **24. GPS Field Boundary Drawing Tool**
-- *Status: Partial — lat/lng stored, no interactive polygon drawing UI*
+✅ **24. GPS Field Boundary Drawing Tool**
+- `eduardoribeirodev/filament-leaflet` MapPicker used on FarmResource and FarmPlotsRelationManager
+- Full drawing tools: polygon, polyline, rectangle, circle, edit, drag, delete
+- GeoJSON stored in `geometry` JSON column on both `farms` and `farm_plots` via `HasGeoJsonFile` trait
+- 80px MapColumn table preview on farm list
+- `dotswan/filament-map-picker` also installed (point-only, used only in Hostels)
 
 ✅ **25. Livestock — Pasture / Grazing Management**
 - `farm_pastures` table (FOO kg/ha, carrying_capacity_au_ha, is_occupied, current_batch_id, rest_days_required, available_from_date)
