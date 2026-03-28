@@ -226,6 +226,8 @@ class PurchaseOrderResource extends Resource
         return [
             RelationManagers\PurchaseOrderLinesRelationManager::class,
             RelationManagers\GoodsReceiptsRelationManager::class,
+            RelationManagers\ChangeOrdersRelationManager::class,
+            RelationManagers\ProcurementAsnRelationManager::class,
         ];
     }
 

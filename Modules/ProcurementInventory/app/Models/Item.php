@@ -60,6 +60,16 @@ class Item extends Model
         return $this->hasOne(StockLevel::class);
     }
 
+    public function boms(): HasMany
+    {
+        return $this->hasMany(Bom::class);
+    }
+
+    public function usedInBoms(): HasMany
+    {
+        return $this->hasMany(BomLine::class, 'component_item_id');
+    }
+
     public function scopeActive($query)
     {
         return $query->where('is_active', true);

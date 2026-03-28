@@ -46,4 +46,9 @@ class GoodsReceiptLine extends Model
     {
         return $this->belongsTo(Item::class);
     }
+
+    public function lots(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(StockLot::class, 'goods_receipt_line_id');
+    }
 }

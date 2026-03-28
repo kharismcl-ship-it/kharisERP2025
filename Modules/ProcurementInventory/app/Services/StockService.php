@@ -81,21 +81,30 @@ class StockService
             $newOnOrder = max(0, (float) $stock->fresh()->quantity_on_order - (float) $line->quantity_received);
             $stock->update(['quantity_on_order' => $newOnOrder]);
 
+            $qtyReceived = (float) $line->quantity_received;
+            $unitCost    = (float) ($line->unit_price ?? 0);
+
             // Log movement — tagged to destination warehouse
             StockMovement::create([
                 'company_id'      => $receipt->company_id,
                 'item_id'         => $line->item_id,
                 'to_warehouse_id' => $warehouseId,
                 'type'            => 'receipt',
-                'quantity'        => (float) $line->quantity_received,
+                'quantity'        => $qtyReceived,
                 'quantity_before' => $before,
                 'quantity_after'  => $after,
+                'unit_cost'       => $unitCost,
+                'total_cost'      => $qtyReceived * $unitCost,
                 'reference'       => $receipt->grn_number ?? ('GRN-' . $receipt->id),
                 'source_type'     => GoodsReceipt::class,
                 'source_id'       => $receipt->id,
                 'user_id'         => auth()->id(),
                 'note'            => 'Goods received against ' . ($receipt->purchaseOrder->po_number ?? 'PO'),
             ]);
+
+            // Recalculate WAC after receipt
+            $stock->refresh();
+            $stock->recalculateWac($qtyReceived, $unitCost);
 
             // Check reorder threshold even after receipt (stock may still be below minimum)
             $stock->refresh();
@@ -195,9 +204,12 @@ class StockService
         $before = (float) $stock->quantity_on_hand;
         $after  = max(0, $before + $adjustment);
 
+        $avgCost = (float) $stock->average_unit_cost;
+
         $stock->update([
             'quantity_on_hand' => $after,
             'last_counted_at'  => now(),
+            'total_value'      => $after * $avgCost,
         ]);
 
         StockMovement::create([
@@ -208,6 +220,8 @@ class StockService
             'quantity'        => $adjustment,
             'quantity_before' => $before,
             'quantity_after'  => $after,
+            'unit_cost'       => $avgCost,
+            'total_cost'      => abs($adjustment) * $avgCost,
             'user_id'         => $userId ?? auth()->id(),
             'note'            => $note,
         ]);

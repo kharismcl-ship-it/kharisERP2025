@@ -5,6 +5,7 @@ namespace Modules\ProcurementInventory\Filament;
 use Filament\Contracts\Plugin;
 use Filament\Panel;
 use Modules\ProcurementInventory\Filament\Vendor\Pages\VendorDashboardPage;
+use Modules\ProcurementInventory\Filament\Vendor\Resources\VendorAsnResource;
 use Modules\ProcurementInventory\Filament\Vendor\Resources\VendorPurchaseOrderResource;
 
 class VendorPlugin implements Plugin
@@ -23,6 +24,7 @@ class VendorPlugin implements Plugin
     {
         $panel->resources([
             VendorPurchaseOrderResource::class,
+            VendorAsnResource::class,
         ]);
 
         $panel->pages([

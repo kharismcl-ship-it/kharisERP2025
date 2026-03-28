@@ -22,13 +22,17 @@ class StockLevel extends Model
         'quantity_reserved',
         'quantity_on_order',
         'last_counted_at',
+        'average_unit_cost',
+        'total_value',
     ];
 
     protected $casts = [
-        'quantity_on_hand'  => 'decimal:4',
-        'quantity_reserved' => 'decimal:4',
-        'quantity_on_order' => 'decimal:4',
-        'last_counted_at'   => 'datetime',
+        'quantity_on_hand'   => 'decimal:4',
+        'quantity_reserved'  => 'decimal:4',
+        'quantity_on_order'  => 'decimal:4',
+        'last_counted_at'    => 'datetime',
+        'average_unit_cost'  => 'decimal:4',
+        'total_value'        => 'decimal:4',
     ];
 
     public function company(): BelongsTo
@@ -56,5 +60,27 @@ class StockLevel extends Model
         $reorderLevel = (float) ($this->item->reorder_level ?? 0);
 
         return $reorderLevel > 0 && (float) $this->quantity_on_hand <= $reorderLevel;
+    }
+
+    /**
+     * Recalculate the weighted average cost after receiving new stock.
+     */
+    public function recalculateWac(float $incomingQty, float $incomingCost): void
+    {
+        $currentOnHand   = (float) $this->quantity_on_hand;
+        $currentAvgCost  = (float) $this->average_unit_cost;
+        $totalUnits      = $currentOnHand + $incomingQty;
+
+        if ($totalUnits <= 0) {
+            $this->update(['total_value' => 0, 'average_unit_cost' => 0]);
+            return;
+        }
+
+        $newWac = ($currentOnHand * $currentAvgCost + $incomingQty * $incomingCost) / $totalUnits;
+
+        $this->update([
+            'average_unit_cost' => $newWac,
+            'total_value'       => $totalUnits * $newWac,
+        ]);
     }
 }

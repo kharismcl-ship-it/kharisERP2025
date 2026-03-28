@@ -11,6 +11,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Modules\ProcurementInventory\Filament\Resources\GoodsReceiptResource;
 use Modules\ProcurementInventory\Filament\Resources\PurchaseOrderResource;
+use Modules\ProcurementInventory\Models\PoChangeOrder;
 use Modules\ProcurementInventory\Models\PurchaseOrder;
 use Modules\ProcurementInventory\Services\ProcurementService;
 
@@ -133,6 +134,50 @@ class ViewPurchaseOrder extends ViewRecord
                 ->color('success')
                 ->visible(fn () => in_array($this->record->status, ['ordered', 'partially_received']))
                 ->url(fn () => GoodsReceiptResource::getUrl('create', ['purchase_order_id' => $this->record->id])),
+
+            \Filament\Actions\Action::make('request_change')
+                ->label('Request Change')
+                ->icon('heroicon-o-pencil-square')
+                ->color('warning')
+                ->visible(fn () => in_array($this->record->status, ['approved', 'ordered', 'partially_received']))
+                ->form([
+                    \Filament\Forms\Components\Select::make('change_type')
+                        ->options([
+                            'price_change'         => 'Price Change',
+                            'quantity_change'      => 'Quantity Change',
+                            'delivery_date_change' => 'Delivery Date Change',
+                            'vendor_change'        => 'Vendor Change',
+                            'cancellation'         => 'Cancellation',
+                            'other'                => 'Other',
+                        ])
+                        ->required(),
+                    \Filament\Forms\Components\TextInput::make('new_total')
+                        ->label('New Total')
+                        ->numeric()
+                        ->prefix('GHS'),
+                    \Filament\Forms\Components\Textarea::make('description')
+                        ->label('Description of Change')
+                        ->required()
+                        ->rows(3),
+                ])
+                ->action(function (array $data) {
+                    $previousTotal = (float) $this->record->total;
+                    $newTotal      = isset($data['new_total']) ? (float) $data['new_total'] : null;
+
+                    PoChangeOrder::create([
+                        'company_id'           => $this->record->company_id,
+                        'purchase_order_id'    => $this->record->id,
+                        'change_type'          => $data['change_type'],
+                        'description'          => $data['description'],
+                        'previous_total'       => $previousTotal,
+                        'new_total'            => $newTotal,
+                        'amount_change'        => $newTotal !== null ? $newTotal - $previousTotal : 0,
+                        'status'               => 'pending_approval',
+                        'requested_by_user_id' => auth()->id(),
+                    ]);
+
+                    Notification::make()->title('Change order submitted for approval')->success()->send();
+                }),
         ];
     }
 }

@@ -2,7 +2,10 @@
 
 namespace Modules\ProcurementInventory\Filament\Vendor\Resources;
 
+use Filament\Actions\Action;
 use Filament\Actions\ViewAction;
+use Filament\Forms;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -76,9 +79,53 @@ class VendorPurchaseOrderResource extends Resource
                         default              => 'gray',
                     })
                     ->formatStateUsing(fn ($state) => PurchaseOrder::STATUSES[$state] ?? ucfirst($state)),
+
+                Tables\Columns\TextColumn::make('vendor_acknowledged_at')
+                    ->label('Acknowledged')
+                    ->dateTime()
+                    ->placeholder('Not acknowledged')
+                    ->toggleable(),
+
+                Tables\Columns\TextColumn::make('vendor_confirmed_delivery_date')
+                    ->label('Confirmed Delivery')
+                    ->date()
+                    ->placeholder('—')
+                    ->toggleable(),
             ])
             ->actions([
                 ViewAction::make(),
+
+                Action::make('acknowledge')
+                    ->label('Acknowledge')
+                    ->icon('heroicon-o-check')
+                    ->color('info')
+                    ->visible(fn (PurchaseOrder $record) => in_array($record->status, ['ordered', 'partially_received']) && ! $record->vendor_acknowledged_at)
+                    ->requiresConfirmation()
+                    ->action(function (PurchaseOrder $record) {
+                        $record->update(['vendor_acknowledged_at' => now()]);
+                        Notification::make()->title('PO acknowledged')->success()->send();
+                    }),
+
+                Action::make('confirm_delivery')
+                    ->label('Confirm Delivery Date')
+                    ->icon('heroicon-o-calendar')
+                    ->color('warning')
+                    ->visible(fn (PurchaseOrder $record) => in_array($record->status, ['ordered', 'partially_received']))
+                    ->form([
+                        Forms\Components\DatePicker::make('vendor_confirmed_delivery_date')
+                            ->label('Confirmed Delivery Date')
+                            ->required(),
+                        Forms\Components\Textarea::make('vendor_delivery_notes')
+                            ->label('Delivery Notes')
+                            ->rows(3),
+                    ])
+                    ->action(function (PurchaseOrder $record, array $data) {
+                        $record->update([
+                            'vendor_confirmed_delivery_date' => $data['vendor_confirmed_delivery_date'],
+                            'vendor_delivery_notes'          => $data['vendor_delivery_notes'] ?? null,
+                        ]);
+                        Notification::make()->title('Delivery date confirmed')->success()->send();
+                    }),
             ])
             ->bulkActions([]);
     }
