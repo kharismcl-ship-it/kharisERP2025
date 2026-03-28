@@ -23,9 +23,14 @@ class EventServiceProvider extends ServiceProvider
         FarmOrderPlaced::class => [
             SendFarmOrderConfirmation::class,
         ],
-        // Farm sale comms — CommunicationCentre integration
+        // Farm sale comms — CommunicationCentre integration + Finance posting
         \Modules\Farms\Events\FarmSaleCreated::class => [
             \Modules\Farms\Listeners\SendFarmSaleConfirmation::class,
+            \Modules\Farms\Listeners\PostFarmSaleToFinance::class,
+        ],
+        // Farm expense — Finance posting
+        \Modules\Farms\Events\FarmExpenseRecorded::class => [
+            \Modules\Farms\Listeners\PostFarmExpenseToFinance::class,
         ],
         // Phase 2 — new event listeners
         \Modules\Farms\Events\FarmDailyReportSubmitted::class => [

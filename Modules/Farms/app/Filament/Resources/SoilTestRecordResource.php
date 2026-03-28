@@ -112,7 +112,22 @@ class SoilTestRecordResource extends Resource
                     )
                 ),
             ])
-            ->actions([ViewAction::make(), EditAction::make(), DeleteAction::make()])
+            ->actions([
+                ViewAction::make(),
+                EditAction::make(),
+                \Filament\Tables\Actions\Action::make('save_recommendations')
+                    ->label('Generate Recommendations')
+                    ->icon('heroicon-o-sparkles')
+                    ->color('success')
+                    ->action(function (\Modules\Farms\Models\SoilTestRecord $record) {
+                        $recs = $record->generateRecommendations();
+                        $record->update($recs);
+                    })
+                    ->requiresConfirmation()
+                    ->modalHeading('Generate Soil Recommendations')
+                    ->modalDescription('This will auto-calculate lime and fertiliser recommendations based on current test values and save them to this record.'),
+                DeleteAction::make(),
+            ])
             ->bulkActions([BulkActionGroup::make([DeleteBulkAction::make()])])
             ->defaultSort('test_date', 'desc');
     }
