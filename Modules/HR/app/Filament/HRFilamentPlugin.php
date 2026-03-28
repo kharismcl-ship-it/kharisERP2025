@@ -9,6 +9,7 @@ use Modules\HR\Filament\Clusters\HrPerformanceCluster;
 use Modules\HR\Filament\Clusters\HrRecordsCluster;
 use Modules\HR\Filament\Clusters\HrRecruitmentCluster;
 use Modules\HR\Filament\Clusters\HrRelationsCluster;
+use Modules\HR\Filament\Clusters\HrSafetyCluster;
 use Modules\HR\Filament\Clusters\HrSetupCluster;
 use Modules\HR\Filament\Pages\ApplicantKanban;
 use Modules\HR\Filament\Pages\HrAnalyticsDashboard;
@@ -50,6 +51,13 @@ use Modules\HR\Filament\Resources\PerformanceImprovementPlanResource;
 use Modules\HR\Filament\Resources\ProbationReviewResource;
 use Modules\HR\Filament\Resources\TrainingNominationResource;
 use Modules\HR\Filament\Resources\TrainingProgramResource;
+use Modules\HR\Filament\Resources\SkillCategoryResource;
+use Modules\HR\Filament\Resources\SkillResource;
+use Modules\HR\Filament\Resources\EmployeeSkillResource;
+use Modules\HR\Filament\Resources\SafetyIncidentResource;
+use Modules\HR\Filament\Resources\SafetyInspectionResource;
+use Modules\HR\Filament\Resources\SurveyResource;
+use Modules\HR\Filament\Resources\OnboardingTaskResource;
 
 class HRFilamentPlugin implements Plugin
 {
@@ -122,6 +130,21 @@ class HRFilamentPlugin implements Plugin
 
                 // HR Comms
                 AnnouncementResource::class,
+
+                // Skills Management
+                SkillCategoryResource::class,
+                SkillResource::class,
+                EmployeeSkillResource::class,
+
+                // Health & Safety
+                SafetyIncidentResource::class,
+                SafetyInspectionResource::class,
+
+                // Engagement Surveys
+                SurveyResource::class,
+
+                // Onboarding
+                OnboardingTaskResource::class,
             ]);
         } elseif ($panel->getId() === 'company-admin') {
             $panel->resources([
@@ -182,6 +205,21 @@ class HRFilamentPlugin implements Plugin
 
                 // HR Comms
                 AnnouncementResource::class,
+
+                // Skills Management
+                SkillCategoryResource::class,
+                SkillResource::class,
+                EmployeeSkillResource::class,
+
+                // Health & Safety
+                SafetyIncidentResource::class,
+                SafetyInspectionResource::class,
+
+                // Engagement Surveys
+                SurveyResource::class,
+
+                // Onboarding
+                OnboardingTaskResource::class,
             ]);
         }
 
@@ -194,6 +232,7 @@ class HRFilamentPlugin implements Plugin
             HrRelationsCluster::class,
             HrLearningCluster::class,
             HrRecordsCluster::class,
+            HrSafetyCluster::class,
             HrAnalyticsDashboard::class,
             ApplicantKanban::class,
         ]);
