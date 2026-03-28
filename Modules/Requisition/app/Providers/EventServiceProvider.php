@@ -11,6 +11,7 @@ class EventServiceProvider extends ServiceProvider
             \Modules\Requisition\Listeners\NotifyRequisitionStatusChanged::class,
             \Modules\Requisition\Listeners\AutoCreatePurchaseOrderOnApproval::class,
             \Modules\Requisition\Listeners\ApplyWorkflowRulesOnSubmission::class,
+            \Modules\Requisition\Listeners\CreateIntercompanyInvoiceOnFulfillment::class,
         ],
         \Modules\Requisition\Events\RequisitionShared::class => [
             \Modules\Requisition\Listeners\NotifyRequisitionShared::class,
