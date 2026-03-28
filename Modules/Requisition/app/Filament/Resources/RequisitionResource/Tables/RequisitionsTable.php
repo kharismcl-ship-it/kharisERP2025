@@ -56,7 +56,7 @@ class RequisitionsTable
                         'under_review'                 => 'warning',
                         'pending_revision'             => 'warning',
                         'approved', 'fulfilled'        => 'success',
-                        'rejected'                     => 'danger',
+                        'rejected', 'cancelled'        => 'danger',
                         'closed'                       => 'gray',
                         default                        => 'gray',
                     }),

@@ -41,6 +41,7 @@ class Requisition extends Model
         'notification_channels',
         'template_id',
         'preferred_vendor_id',
+        'cancellation_reason',
     ];
 
     protected function casts(): array
@@ -72,6 +73,7 @@ class Requisition extends Model
         'rejected'         => 'Rejected',
         'fulfilled'        => 'Fulfilled',
         'closed'           => 'Closed',
+        'cancelled'        => 'Cancelled',
     ];
 
     const URGENCIES = [
@@ -92,7 +94,7 @@ class Requisition extends Model
     const COSTED_TYPES = ['material', 'equipment'];
 
     /** Statuses considered terminal / archived */
-    const RESOLVED_STATUSES = ['approved', 'fulfilled', 'closed', 'rejected'];
+    const RESOLVED_STATUSES = ['approved', 'fulfilled', 'closed', 'rejected', 'cancelled'];
 
     protected static function boot(): void
     {

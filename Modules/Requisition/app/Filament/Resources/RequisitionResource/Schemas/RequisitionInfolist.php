@@ -42,7 +42,7 @@ class RequisitionInfolist
                             'submitted'                    => 'info',
                             'under_review'                 => 'warning',
                             'pending_revision'             => 'warning',
-                            'rejected'                     => 'danger',
+                            'rejected', 'cancelled'        => 'danger',
                             'closed'                       => 'gray',
                             default                        => 'gray',
                         }),
@@ -82,6 +82,10 @@ class RequisitionInfolist
                     ->label('Rejection / Revision Notes')
                     ->columnSpanFull()
                     ->visible(fn ($record) => filled($record?->rejection_reason)),
+                TextEntry::make('cancellation_reason')
+                    ->label('Cancellation Reason')
+                    ->columnSpanFull()
+                    ->visible(fn ($record) => $record?->status === 'cancelled' && filled($record?->cancellation_reason)),
                 TextEntry::make('notes')->columnSpanFull()->placeholder('—'),
             ]),
 

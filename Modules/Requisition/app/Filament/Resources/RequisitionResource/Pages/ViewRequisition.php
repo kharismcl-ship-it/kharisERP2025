@@ -7,9 +7,12 @@ use Filament\Actions\EditAction;
 use Filament\Forms\Components\Textarea;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ViewRecord;
+use Modules\Requisition\Events\RequisitionStatusChanged;
 use Modules\Requisition\Filament\Resources\RequisitionResource;
 use Modules\Requisition\Models\Requisition;
 use Modules\Requisition\Models\RequisitionActivity;
+use Modules\Requisition\Models\RequisitionItem;
+use Modules\Requisition\Services\RequisitionPolicyEnforcementService;
 
 class ViewRequisition extends ViewRecord
 {
@@ -27,6 +30,22 @@ class ViewRequisition extends ViewRecord
                 ->modalHeading('Submit Requisition')
                 ->modalDescription('Once submitted, this request will be available for review and approval.')
                 ->action(function (): void {
+                    $enforcement = app(RequisitionPolicyEnforcementService::class);
+
+                    $budgetError = $enforcement->checkBudget($this->record);
+                    if ($budgetError) {
+                        Notification::make()->title('Submission Blocked')->body($budgetError)->danger()->send();
+                        $this->halt();
+                        return;
+                    }
+
+                    $sodError = $enforcement->checkSegregationOfDuties($this->record);
+                    if ($sodError) {
+                        Notification::make()->title('Submission Blocked')->body($sodError)->danger()->send();
+                        $this->halt();
+                        return;
+                    }
+
                     $this->record->update(['status' => 'submitted']);
                     Notification::make()->info()->title('Requisition submitted for review.')->send();
                     $this->refreshFormData(['status']);
@@ -121,6 +140,89 @@ class ViewRequisition extends ViewRecord
                     $this->record->update(['status' => 'closed']);
                     Notification::make()->success()->title('Requisition closed and archived.')->send();
                     $this->refreshFormData(['status']);
+                }),
+
+            // ── Feature 3: Cancel ──────────────────────────────────────────────
+
+            Action::make('cancel')
+                ->label('Cancel')
+                ->icon('heroicon-o-x-circle')
+                ->color('danger')
+                ->outlined()
+                ->visible(fn () => in_array($this->record->status, ['submitted', 'under_review', 'pending_revision']))
+                ->form([
+                    Textarea::make('cancellation_reason')
+                        ->label('Cancellation Reason')
+                        ->required()
+                        ->rows(3),
+                ])
+                ->modalHeading('Cancel Requisition')
+                ->modalDescription('This will cancel the requisition. Please provide a reason.')
+                ->action(function (array $data): void {
+                    $this->record->update([
+                        'status'              => 'cancelled',
+                        'cancellation_reason' => $data['cancellation_reason'],
+                    ]);
+                    RequisitionActivity::log(
+                        $this->record,
+                        'status_changed',
+                        "Cancelled: {$data['cancellation_reason']}",
+                        [],
+                        $this->record->getOriginal('status') ?? 'unknown',
+                        'cancelled',
+                    );
+                    Notification::make()->success()->title('Requisition cancelled.')->send();
+                    $this->refreshFormData(['status', 'cancellation_reason']);
+                }),
+
+            // ── Feature 4: Clone ───────────────────────────────────────────────
+
+            Action::make('clone')
+                ->label('Clone Request')
+                ->icon('heroicon-o-document-duplicate')
+                ->color('gray')
+                ->visible(fn () => in_array($this->record->status, ['approved', 'fulfilled', 'closed', 'rejected']))
+                ->requiresConfirmation()
+                ->modalHeading('Clone Requisition')
+                ->modalDescription('This will create a new draft requisition based on this one.')
+                ->action(function (): void {
+                    $original = $this->record;
+
+                    // Duplicate requisition without terminal fields
+                    $newReq = $original->replicate([
+                        'reference',
+                        'status',
+                        'approved_by',
+                        'approved_at',
+                        'fulfilled_at',
+                        'rejection_reason',
+                        'cancellation_reason',
+                    ]);
+                    $newReq->status    = 'draft';
+                    $newReq->reference = null; // auto-generated on create
+                    $newReq->save();
+
+                    // Duplicate items
+                    foreach ($original->items as $item) {
+                        $newItem = $item->replicate(['requisition_id']);
+                        $newItem->requisition_id = $newReq->id;
+                        $newItem->save();
+                    }
+
+                    RequisitionActivity::log(
+                        $newReq,
+                        'requisition_created',
+                        "Cloned from {$original->reference}.",
+                    );
+
+                    Notification::make()
+                        ->success()
+                        ->title("Draft requisition {$newReq->reference} created.")
+                        ->send();
+
+                    $this->redirect(
+                        RequisitionResource::getUrl('edit', ['record' => $newReq->id])
+                    );
                 }),
 
             EditAction::make(),

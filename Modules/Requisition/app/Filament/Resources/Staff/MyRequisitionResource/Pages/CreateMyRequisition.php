@@ -5,8 +5,11 @@ namespace Modules\Requisition\Filament\Resources\Staff\MyRequisitionResource\Pag
 use Filament\Facades\Filament;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\CreateRecord;
-use Modules\Requisition\Filament\Resources\Staff\MyRequisitionResource;
+use Illuminate\Validation\ValidationException;
 use Modules\HR\Models\Employee;
+use Modules\Requisition\Filament\Resources\Staff\MyRequisitionResource;
+use Modules\Requisition\Models\Requisition;
+use Modules\Requisition\Services\RequisitionPolicyEnforcementService;
 
 class CreateMyRequisition extends CreateRecord
 {
@@ -32,6 +35,15 @@ class CreateMyRequisition extends CreateRecord
         // Auto-fill department if not selected by staff
         if (empty($data['target_department_id'])) {
             $data['target_department_id'] = $employee->department_id;
+        }
+
+        // Run spend policy checks using a temporary unsaved model
+        $enforcement = app(RequisitionPolicyEnforcementService::class);
+        $tempReq     = new Requisition($data);
+
+        $budgetError = $enforcement->checkBudget($tempReq);
+        if ($budgetError) {
+            throw ValidationException::withMessages(['total_estimated_cost' => $budgetError]);
         }
 
         return $data;

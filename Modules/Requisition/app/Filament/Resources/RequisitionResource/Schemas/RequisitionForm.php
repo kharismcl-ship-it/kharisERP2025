@@ -133,6 +133,11 @@ class RequisitionForm
                     ->rows(2)
                     ->columnSpanFull()
                     ->visible(fn ($get) => in_array($get('status'), ['rejected', 'pending_revision'])),
+                Textarea::make('cancellation_reason')
+                    ->label('Cancellation Reason')
+                    ->rows(2)
+                    ->columnSpanFull()
+                    ->visible(fn ($get) => $get('status') === 'cancelled'),
                 Grid::make(2)->schema([
                     DateTimePicker::make('approved_at')->label('Approved At')->nullable(),
                     DateTimePicker::make('fulfilled_at')->label('Fulfilled At')->nullable(),

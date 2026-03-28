@@ -7,7 +7,10 @@ use Filament\Panel;
 use Modules\Requisition\Filament\Pages\RequisitionDashboard;
 use Modules\Requisition\Filament\Resources\RequisitionResource;
 use Modules\Requisition\Filament\Resources\RequisitionTemplateResource;
+use Modules\Requisition\Filament\Resources\RequisitionWorkflowRuleResource;
 use Modules\Requisition\Filament\Widgets\RequisitionChartWidget;
+use Modules\Requisition\Filament\Widgets\RequisitionCycleTimeWidget;
+use Modules\Requisition\Filament\Widgets\RequisitionSpendWidget;
 use Modules\Requisition\Filament\Widgets\RequisitionStatsWidget;
 
 class RequisitionFilamentPlugin implements Plugin
@@ -23,6 +26,7 @@ class RequisitionFilamentPlugin implements Plugin
             ->resources([
                 RequisitionResource::class,
                 RequisitionTemplateResource::class,
+                RequisitionWorkflowRuleResource::class,
             ])
             ->pages([
                 RequisitionDashboard::class,
@@ -30,6 +34,8 @@ class RequisitionFilamentPlugin implements Plugin
             ->widgets([
                 RequisitionStatsWidget::class,
                 RequisitionChartWidget::class,
+                RequisitionSpendWidget::class,
+                RequisitionCycleTimeWidget::class,
             ]);
     }
 
