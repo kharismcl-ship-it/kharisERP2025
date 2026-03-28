@@ -242,6 +242,18 @@ class Requisition extends Model
         return $this->hasMany(RequisitionActivity::class)->orderByDesc('created_at');
     }
 
+    /**
+     * Purchase orders generated from this requisition.
+     * Only available when ProcurementInventory module is loaded.
+     */
+    public function purchaseOrders()
+    {
+        if (! class_exists(\Modules\ProcurementInventory\Models\PurchaseOrder::class)) {
+            return $this->hasMany(self::class, 'id')->whereRaw('0=1'); // empty relation
+        }
+        return $this->hasMany(\Modules\ProcurementInventory\Models\PurchaseOrder::class, 'requisition_id');
+    }
+
     public function customFieldValues()
     {
         return $this->hasMany(RequisitionCustomFieldValue::class);

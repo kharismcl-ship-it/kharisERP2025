@@ -26,6 +26,59 @@
             </div>
         </div>
 
+        {{-- Intelligence Alerts --}}
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {{-- Maverick Spend --}}
+            <div class="fi-section rounded-xl p-5 shadow-sm ring-1 {{ $maverickSpendPct > 10 ? 'bg-red-50 ring-red-200 dark:bg-red-900/20 dark:ring-red-800' : 'bg-white ring-gray-950/5 dark:bg-gray-900 dark:ring-white/10' }}">
+                <p class="text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Maverick Spend</p>
+                <p class="text-2xl font-bold {{ $maverickSpendPct > 10 ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-white' }} mt-1">
+                    GHS {{ number_format($maverickSpendAmount, 0) }}
+                </p>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    {{ $maverickSpendPct }}% of spend ({{ $maverickSpendCount }} PO lines off-catalog)
+                </p>
+                @if($maverickSpendPct > 10)
+                    <p class="text-xs text-red-600 dark:text-red-400 mt-1 font-medium">Above 10% threshold</p>
+                @endif
+            </div>
+
+            {{-- Vendor Concentration --}}
+            <div class="fi-section rounded-xl p-5 shadow-sm ring-1 {{ $hasConcentrationRisk ? 'bg-amber-50 ring-amber-200 dark:bg-amber-900/20 dark:ring-amber-800' : 'bg-white ring-gray-950/5 dark:bg-gray-900 dark:ring-white/10' }}">
+                <p class="text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Top Vendor Concentration</p>
+                <p class="text-2xl font-bold {{ $hasConcentrationRisk ? 'text-amber-600 dark:text-amber-400' : 'text-gray-900 dark:text-white' }} mt-1">
+                    {{ $topConcentrationPct }}%
+                </p>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 truncate">
+                    {{ $topConcentratedVendor ?: 'No data' }}
+                </p>
+                @if($hasConcentrationRisk)
+                    <p class="text-xs text-amber-600 dark:text-amber-400 mt-1 font-medium">Single-source risk</p>
+                @endif
+            </div>
+
+            {{-- YoY Comparison --}}
+            <div class="fi-section rounded-xl bg-white p-5 shadow-sm ring-1 ring-gray-950/5 dark:bg-gray-900 dark:ring-white/10">
+                <p class="text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Year-on-Year Change</p>
+                <p class="text-2xl font-bold {{ $yoyChange >= 0 ? 'text-danger-600 dark:text-danger-400' : 'text-success-600 dark:text-success-400' }} mt-1">
+                    {{ $yoyChange >= 0 ? '+' : '' }}{{ $yoyChange }}%
+                </p>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Last year: GHS {{ number_format($spendLastYear, 0) }}
+                </p>
+            </div>
+
+            {{-- Savings Tracking --}}
+            <div class="fi-section rounded-xl bg-white p-5 shadow-sm ring-1 ring-gray-950/5 dark:bg-gray-900 dark:ring-white/10">
+                <p class="text-xs font-medium uppercase text-gray-500 dark:text-gray-400">Savings vs Catalog</p>
+                <p class="text-2xl font-bold text-success-600 dark:text-success-400 mt-1">
+                    GHS {{ number_format($savingsAmount, 0) }}
+                </p>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Negotiated below catalog price
+                </p>
+            </div>
+        </div>
+
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {{-- Spend Breakdown Table --}}
             <div class="lg:col-span-2 fi-section rounded-xl bg-white shadow-sm ring-1 ring-gray-950/5 dark:bg-gray-900 dark:ring-white/10 overflow-hidden">

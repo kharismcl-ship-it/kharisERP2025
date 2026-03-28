@@ -225,6 +225,64 @@ class ViewRequisition extends ViewRecord
                     );
                 }),
 
+            // ── Feature: Convert to PO ────────────────────────────────────────
+
+            Action::make('convert_to_po')
+                ->label('Create Purchase Order')
+                ->icon('heroicon-o-shopping-cart')
+                ->color('success')
+                ->visible(fn () => $this->record->status === 'approved'
+                    && class_exists(\Modules\ProcurementInventory\Models\PurchaseOrder::class)
+                    && $this->record->purchaseOrders()->count() === 0
+                )
+                ->requiresConfirmation()
+                ->modalHeading('Create Purchase Order')
+                ->modalDescription('This will create a draft Purchase Order from this approved requisition.')
+                ->action(function (): void {
+                    $req = $this->record;
+
+                    if (! class_exists(\Modules\ProcurementInventory\Models\PurchaseOrder::class)) {
+                        Notification::make()->title('ProcurementInventory module not available')->danger()->send();
+                        return;
+                    }
+
+                    // Determine vendor
+                    $vendorId = $req->preferred_vendor_id
+                        ?? \Modules\ProcurementInventory\Models\Vendor::where('company_id', $req->company_id)
+                            ->where('status', 'active')
+                            ->value('id');
+
+                    $po = \Modules\ProcurementInventory\Models\PurchaseOrder::create([
+                        'company_id'             => $req->company_id,
+                        'vendor_id'              => $vendorId,
+                        'po_date'                => now()->toDateString(),
+                        'expected_delivery_date' => $req->due_by?->toDateString(),
+                        'status'                 => 'draft',
+                        'currency'               => 'GHS',
+                        'notes'                  => "Generated from Requisition {$req->reference}",
+                        'requisition_id'         => $req->id,
+                    ]);
+
+                    foreach ($req->items as $item) {
+                        $po->lines()->create([
+                            'item_id'         => $item->item_id,
+                            'description'     => $item->description ?? $item->item_name ?? '',
+                            'quantity'        => $item->quantity ?? 1,
+                            'unit_of_measure' => $item->unit ?? 'pcs',
+                            'unit_price'      => $item->vendor_unit_price ?? $item->unit_cost ?? 0,
+                        ]);
+                    }
+
+                    if (method_exists($po, 'recalculateTotals')) {
+                        $po->recalculateTotals();
+                    }
+
+                    Notification::make()
+                        ->title("Purchase Order {$po->po_number} created successfully.")
+                        ->success()
+                        ->send();
+                }),
+
             EditAction::make(),
         ];
     }

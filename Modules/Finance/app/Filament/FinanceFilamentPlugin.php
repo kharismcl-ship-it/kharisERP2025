@@ -13,13 +13,16 @@ use Modules\Finance\Filament\Pages\ConsolidatedReport;
 use Modules\Finance\Filament\Pages\CostCentreReport;
 use Modules\Finance\Filament\Pages\CustomerStatementReport;
 use Modules\Finance\Filament\Pages\FinanceDashboard;
+use Modules\Finance\Filament\Pages\FinancialRatiosPage;
 use Modules\Finance\Filament\Pages\FixedAssetMapPage;
 use Modules\Finance\Filament\Pages\GeneralLedger;
 use Modules\Finance\Filament\Pages\IncomeStatement;
 use Modules\Finance\Filament\Pages\TrialBalance;
 use Modules\Finance\Filament\Pages\VatReturnReport;
+use Modules\Finance\Filament\Pages\WhtCertificatePage;
 use Modules\Finance\Filament\Resources\AccountingPeriodResource;
 use Modules\Finance\Filament\Resources\AccountResource;
+use Modules\Finance\Filament\Resources\AdvancePaymentResource;
 use Modules\Finance\Filament\Resources\AssetCategoryResource;
 use Modules\Finance\Filament\Resources\BankAccountResource;
 use Modules\Finance\Filament\Resources\BankReconciliationResource;
@@ -36,8 +39,10 @@ use Modules\Finance\Filament\Resources\FxRateResource;
 use Modules\Finance\Filament\Resources\InvoiceLineResource;
 use Modules\Finance\Filament\Resources\InvoiceReminderRuleResource;
 use Modules\Finance\Filament\Resources\InvoiceResource;
+use Modules\Finance\Filament\Resources\JournalEntryLogResource;
 use Modules\Finance\Filament\Resources\JournalEntryResource;
 use Modules\Finance\Filament\Resources\JournalLineResource;
+use Modules\Finance\Filament\Resources\PaymentAllocationResource;
 use Modules\Finance\Filament\Resources\PaymentBatchResource;
 use Modules\Finance\Filament\Resources\PaymentResource;
 use Modules\Finance\Filament\Resources\PettyCashResource;
@@ -70,6 +75,8 @@ class FinanceFilamentPlugin implements Plugin
             ExpenseClaimResource::class,
             InvoiceReminderRuleResource::class,
             PaymentBatchResource::class,
+            PaymentAllocationResource::class,
+            AdvancePaymentResource::class,
 
             // General Ledger
             AccountResource::class,
@@ -85,6 +92,7 @@ class FinanceFilamentPlugin implements Plugin
             CurrencyResource::class,
             FxRateResource::class,
             ChequeResource::class,
+            JournalEntryLogResource::class,
 
             // Fixed Assets
             AssetCategoryResource::class,
@@ -117,6 +125,8 @@ class FinanceFilamentPlugin implements Plugin
             CustomerStatementReport::class,
             CostCentreReport::class,
             ConsolidatedReport::class,
+            FinancialRatiosPage::class,
+            WhtCertificatePage::class,
         ]);
     }
 

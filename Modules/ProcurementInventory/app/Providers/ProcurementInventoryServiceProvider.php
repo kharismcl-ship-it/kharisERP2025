@@ -33,6 +33,7 @@ use Modules\ProcurementInventory\Models\VendorApplication;
 use Modules\ProcurementInventory\Models\VendorCatalog;
 use Modules\ProcurementInventory\Models\VendorCertificate;
 use Modules\ProcurementInventory\Models\VendorScorecard;
+use Modules\ProcurementInventory\Models\VendorStatement;
 use Modules\ProcurementInventory\Policies\BomPolicy;
 use Modules\ProcurementInventory\Policies\CycleCountPolicy;
 use Modules\ProcurementInventory\Policies\GoodsReceiptPolicy;
@@ -54,6 +55,7 @@ use Modules\ProcurementInventory\Policies\VendorCatalogPolicy;
 use Modules\ProcurementInventory\Policies\VendorCertificatePolicy;
 use Modules\ProcurementInventory\Policies\VendorPerformancePolicy;
 use Modules\ProcurementInventory\Policies\VendorPolicy;
+use Modules\ProcurementInventory\Policies\VendorStatementPolicy;
 use Modules\ProcurementInventory\Policies\WarehousePolicy;
 use Modules\ProcurementInventory\Policies\WarehouseTransferPolicy;
 use Modules\ProcurementInventory\Services\CycleCountService;
@@ -136,6 +138,7 @@ class ProcurementInventoryServiceProvider extends ServiceProvider
         Gate::policy(PoChangeOrder::class, PoChangeOrderPolicy::class);
         Gate::policy(ProcurementAsn::class, ProcurementAsnPolicy::class);
         Gate::policy(Bom::class, BomPolicy::class);
+        Gate::policy(VendorStatement::class, VendorStatementPolicy::class);
     }
 
     /**
