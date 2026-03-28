@@ -44,6 +44,11 @@ use Modules\Farms\Http\Livewire\Requests\Index as RequestsIndex;
 use Modules\Farms\Http\Livewire\Requests\Show as RequestsShow;
 use Modules\Farms\Http\Livewire\Tasks\Index as TasksIndex;
 
+// ── Farm USSD webhook (Africa's Talking compatible) ──────────────────────────
+Route::post('/farm-ussd', [\Modules\Farms\Http\Controllers\FarmUssdController::class, 'handle'])
+    ->name('farms.ussd.webhook')
+    ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+
 // ── PWA assets (served from root path so SW can scope /farm-shop/) ──────────
 Route::get('/farm-shop-sw.js', function () {
     $content = <<<'JS'

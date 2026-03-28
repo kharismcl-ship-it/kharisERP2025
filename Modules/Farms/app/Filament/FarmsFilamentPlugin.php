@@ -56,6 +56,13 @@ use Modules\Farms\Filament\Resources\FarmNdviResource;
 use Modules\Farms\Filament\Resources\FarmWeatherAlertResource;
 use Modules\Farms\Filament\Resources\FarmStorageLocationResource;
 use Modules\Farms\Filament\Resources\FarmPostHarvestResource;
+// Phase 4 — gap features
+use Modules\Farms\Filament\Resources\FarmTrialResource;
+use Modules\Farms\Filament\Resources\FarmPastureResource;
+use Modules\Farms\Filament\Resources\FarmInputCreditResource;
+use Modules\Farms\Filament\Resources\FarmInputVoucherResource;
+use Modules\Farms\Filament\Resources\FarmCarbonResource;
+use Modules\Farms\Filament\Resources\FarmSmsCommandResource;
 // Phase 3 — new pages
 use Modules\Farms\Filament\Pages\SprayDiaryPage;
 use Modules\Farms\Filament\Pages\LotTraceabilityPage;
@@ -118,6 +125,13 @@ class FarmsFilamentPlugin implements Plugin
             FarmWeatherAlertResource::class,
             FarmStorageLocationResource::class,
             FarmPostHarvestResource::class,
+            // Phase 4 — gap features
+            FarmTrialResource::class,
+            FarmPastureResource::class,
+            FarmInputCreditResource::class,
+            FarmInputVoucherResource::class,
+            FarmCarbonResource::class,
+            FarmSmsCommandResource::class,
         ]);
 
         // Clusters extend Page — register via pages() so Filament recognises
