@@ -151,10 +151,13 @@
 - `FarmAgronomistResource` with AgronomistVisitsRelationManager
 - `FarmAgronomistVisitResource`
 
-⚠️ **16. USSD / SMS Interface for Field Workers**
-- Infrastructure layer needed: SMS command parser, USSD session management
-- *Status: Not yet implemented — requires MTN/AirtelTigo USSD application registration*
-- Tables needed: `farm_ussd_sessions`, `farm_sms_commands`
+✅ **16. USSD / SMS Interface for Field Workers**
+- `farm_ussd_sessions` table (session_id, phone_number, current_menu, session_data JSON, status)
+- `farm_sms_commands` table (command_type, parsed_data JSON, response_message)
+- `FarmUssdService` — Africa's Talking compatible handler; 4-menu flow (Tasks / Attendance / Report / Weather); resolves worker by phone number
+- `FarmUssdController` (POST `/farm-ussd`, CSRF exempt) + route registered
+- `FarmSmsCommandResource` — read-only admin log of USSD-submitted commands
+- *Remaining: MTN/AirtelTigo USSD shortcode registration (external telecom process)*
 
 ✅ **17. Crop Insurance Integration**
 - `farm_insurance_policies` table (GAIP, weather-index, multi-peril, livestock)
@@ -173,17 +176,20 @@
 - `farm_iot_alert_rules` table (threshold-based alerts)
 - `FarmIotDeviceResource` + `IotSensorDashboardPage` (live device cards)
 
-⚠️ **20. Agronomic Trial / Experiment Management**
-- *Status: Not yet implemented*
-- Tables needed: `farm_trials`, `farm_trial_plots`, `farm_trial_observations`
+✅ **20. Agronomic Trial / Experiment Management**
+- `farm_trials` table (variety_comparison/input_comparison/practice_comparison; hypothesis, objective, methodology, conclusion)
+- `farm_trial_plots` table (treatment_label, area_ha, expected/actual yield; auto-computes yield_per_ha + cost_per_kg in boot())
+- `farm_trial_observations` table (observation_type, value, unit, attachments JSON)
+- `FarmTrialResource` — Crop Management group; TrialPlots + Observations via RelationManagers; `getBestPerformingPlot()` method
 
 ---
 
 ### 🟢 LOWER PRIORITY — Enterprise Differentiators & Emerging Standards
 
-⚠️ **21. Carbon / ESG Footprint Reporting**
-- *Status: Not yet implemented*
-- Tables needed: `farm_carbon_records`
+✅ **21. Carbon / ESG Footprint Reporting**
+- `farm_carbon_records` table (fertilizer/fuel/livestock/electricity/other tCO2e; sequestration_tco2e; auto-sums net_emissions, intensity per ha + per kg, water use m³)
+- `FarmCarbonRecord` model — boot() auto-computes all totals and intensity metrics
+- `FarmCarbonResource` — Compliance group; 5 form sections (emission sources, sequestration, water use, intensity summary)
 
 ❌ **22. Drone / Aerial Imagery Integration**
 - *Status: Not planned — requires dedicated drone hardware ecosystem*
@@ -191,16 +197,22 @@
 ⚠️ **23. Variable Rate Technology (VRT) Prescription Maps**
 - *Status: Not yet implemented — depends on NDVI zones*
 
-⚠️ **24. GPS Field Boundary Drawing Tool**
-- *Status: Partial — lat/lng stored, no interactive polygon drawing UI*
+✅ **24. GPS Field Boundary Drawing Tool**
+- `eduardoribeirodev/filament-leaflet` MapPicker used on FarmResource and FarmPlotsRelationManager
+- Full drawing tools: polygon, polyline, rectangle, circle, edit, drag, delete
+- GeoJSON stored in `geometry` JSON column on both `farms` and `farm_plots` via `HasGeoJsonFile` trait
+- 80px MapColumn table preview on farm list
+- `dotswan/filament-map-picker` also installed (point-only, used only in Hostels)
 
-⚠️ **25. Livestock — Pasture / Grazing Management**
-- *Status: Not yet implemented*
-- Tables needed: `farm_pastures`, `farm_grazing_events`
+✅ **25. Livestock — Pasture / Grazing Management**
+- `farm_pastures` table (FOO kg/ha, carrying_capacity_au_ha, is_occupied, current_batch_id, rest_days_required, available_from_date)
+- `farm_grazing_events` table (move_in/move_out/foo_measurement/rotation_plan; stock_density, days_in_paddock)
+- `FarmPastureResource` — Livestock group; "Move Mob In" + "Move Mob Out" table actions; `isLowFoo()` + `daysInRest()` helpers
 
-⚠️ **26. Input Credit / Digital Voucher Management**
-- *Status: Not yet implemented*
-- Tables needed: `farm_input_vouchers`, `farm_input_credit_accounts`
+✅ **26. Input Credit / Digital Voucher Management**
+- `farm_input_credit_accounts` table (ICA-YYYYMM-NNNNN; scheme: govt_subsidy/cooperative_advance/commercial_credit/ngo; credit_limit, drawn, repaid)
+- `farm_input_vouchers` table (VCH-YYYYMM-NNNNN; 6-digit verification_pin auto-generated; seed/fertilizer/chemical/equipment; face_value, redeemed_value)
+- `FarmInputCreditResource` + `FarmInputVoucherResource` — Cooperatives group; "Mark Redeemed" action with PIN verification
 
 ❌ **27. Blockchain / Tamper-Proof Traceability**
 - *Status: Not planned — emerging standard, lower priority*
@@ -229,7 +241,7 @@
 | Batch Traceability (Seed-to-Sale) | 80% | 100% | ✅ Done (QR/blockchain lower priority) |
 | Livestock — Core Records | 85% | 100% | ✅ Near Complete |
 | Livestock — Breeding / Reproductive | 85% | 100% | ✅ Done |
-| Livestock — Pasture / Grazing | 0% | 100% | ⚠️ Pending |
+| Livestock — Pasture / Grazing | 100% | 100% | ✅ Done |
 | Equipment / Machinery Operations | 85% | 100% | ✅ Done |
 | Farm Worker & Labor Management | 80% | 100% | ✅ Near Complete |
 | Labor Payroll Integration | 80% | 100% | ✅ Done |
@@ -245,14 +257,13 @@
 | Cooperative / Outgrower Network | 85% | 100% | ✅ Done |
 | Post-Harvest Storage & Grading | 80% | 100% | ✅ Done |
 | Agronomist Collaboration Portal | 85% | 100% | ✅ Done |
-| USSD / SMS Interface | 0% | 100% | ⚠️ Pending (telecom registration required) |
+| USSD / SMS Interface | 85% | 100% | ✅ Done (telecom shortcode registration external) |
 | Commodity Price Feed | 75% | 100% | ✅ Done (Esoko API hook ready) |
 | Crop Insurance Integration | 80% | 100% | ✅ Done |
-| Agronomic Trials | 0% | 100% | ⚠️ Pending |
+| Agronomic Trials | 100% | 100% | ✅ Done |
 | Dashboard & Benchmarking Analytics | 70% | 100% | ✅ Done (advanced dashboard) |
-| Carbon / ESG Reporting | 0% | 100% | ⚠️ Pending |
-| Livestock Pasture / Grazing | 0% | 100% | ⚠️ Pending |
-| Input Credit / Digital Voucher | 0% | 100% | ⚠️ Pending |
+| Carbon / ESG Reporting | 100% | 100% | ✅ Done |
+| Input Credit / Digital Voucher | 100% | 100% | ✅ Done |
 | Native Mobile App | 0% | 100% | ❌ Lower priority |
 | Blockchain Traceability | 0% | 100% | ❌ Lower priority |
 | Farm Marketplace (E-Commerce) | 100% | 100% | ✅ Done |
@@ -284,19 +295,19 @@
 4. **Agronomist Collaboration Portal** — ✅ farm_agronomists + visits
 5. **Commodity Price Feed** — ✅ farm_commodity_prices + Esoko API hook
 
-### Phase 4 — Ghana-Specific & Enterprise Differentiators ⚠️ PARTIAL
-1. **USSD / SMS Interface** — ⚠️ Infrastructure pending (telecom registration)
+### Phase 4 — Ghana-Specific & Enterprise Differentiators ✅ COMPLETE
+1. **USSD / SMS Interface** — ✅ Infrastructure done (FarmUssdService + FarmUssdController + farm_ussd_sessions + farm_sms_commands)
 2. **IoT Sensor Dashboard** — ✅ farm_iot_devices + sensor_readings + IotSensorDashboardPage
 3. **Crop Insurance Integration** — ✅ farm_insurance_policies + claim workflow
 4. **Labor Payroll Integration** — ✅ farm_labor_payroll_records
-5. **Input Credit / Digital Voucher** — ⚠️ Pending
+5. **Input Credit / Digital Voucher** — ✅ farm_input_credit_accounts + farm_input_vouchers + PIN verification
 
-### Phase 5 — Remaining Lower-Priority Gaps ⚠️ PENDING
-1. **Agronomic Trial Management** — farm_trials + trial_plots + observations
-2. **Livestock Pasture / Grazing** — farm_pastures + grazing_events
-3. **Carbon / ESG Footprint** — farm_carbon_records
-4. **Input Credit / Digital Voucher** — farm_input_vouchers + credit_accounts
-5. **USSD Infrastructure Layer** — farm_ussd_sessions + sms_commands
+### Phase 5 — Remaining Lower-Priority Gaps ✅ COMPLETE
+1. **Agronomic Trial Management** — ✅ farm_trials + trial_plots + observations + FarmTrialResource
+2. **Livestock Pasture / Grazing** — ✅ farm_pastures + grazing_events + FarmPastureResource (Move Mob In/Out)
+3. **Carbon / ESG Footprint** — ✅ farm_carbon_records + FarmCarbonResource (tCO2e, intensity per ha/kg)
+4. **Input Credit / Digital Voucher** — ✅ farm_input_vouchers + credit_accounts (ICA/VCH refs, PIN verification)
+5. **USSD Infrastructure Layer** — ✅ farm_ussd_sessions + sms_commands + Africa's Talking handler
 
 ---
 
@@ -310,7 +321,7 @@
 | Spray diary | ✅ | ❌ | ❌ | ✅ | ❌ | ✅ |
 | Livestock health records | ✅ | ✅ | ❌ | ✅ | ❌ | ❌ |
 | Livestock breeding events | ✅ | ✅ | ❌ | ✅ | ❌ | ❌ |
-| Pasture / grazing mgmt | ⚠️ | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Pasture / grazing mgmt | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
 | Equipment field logs | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
 | NDVI satellite monitoring | ✅ | ❌ | ✅ | ✅ | ✅ | ❌ |
 | Weather API + alerts | ✅ | ✅ | ✅ | ✅ | ✅ | ❌ |
@@ -323,14 +334,14 @@
 | Farm marketplace (B2C) | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | B2B wholesale portal | ✅ | ❌ | ❌ | ❌ | ❌ | ✅ |
 | Finance module integration | ✅ | ✅ | ✅ | ✅ | ❌ | ❌ |
-| USSD / SMS interface | ⚠️ | ❌ | ❌ | ❌ | ❌ | ❌ |
+| USSD / SMS interface | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | Mobile money payments | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | PWA / offline | ✅ | ✅ | ✅ | ❌ | ✅ | ❌ |
 | IoT sensor dashboard | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | Crop insurance | ✅ | ❌ | ❌ | ❌ | ❌ | ❌ |
 | Agronomist portal | ✅ | ❌ | ❌ | ✅ | ❌ | ❌ |
-| Carbon / ESG tracking | ⚠️ | ✅ | ❌ | ❌ | ❌ | ❌ |
-| Agronomic trials | ⚠️ | ❌ | ✅ | ✅ | ❌ | ❌ |
+| Carbon / ESG tracking | ✅ | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Agronomic trials | ✅ | ❌ | ✅ | ✅ | ❌ | ❌ |
 | Labor payroll | ✅ | ❌ | ✅ | ❌ | ❌ | ❌ |
 
 ---
