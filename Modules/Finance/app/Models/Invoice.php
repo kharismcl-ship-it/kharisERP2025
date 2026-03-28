@@ -86,4 +86,12 @@ class Invoice extends Model
     {
         return $this->hasMany(Payment::class, 'invoice_id');
     }
+
+    /**
+     * Get the documents attached to this invoice.
+     */
+    public function documents()
+    {
+        return $this->hasMany(InvoiceDocument::class, 'invoice_id');
+    }
 }

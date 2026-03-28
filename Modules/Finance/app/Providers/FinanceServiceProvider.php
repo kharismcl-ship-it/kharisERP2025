@@ -89,6 +89,7 @@ class FinanceServiceProvider extends ServiceProvider
             \Modules\Finance\Console\Commands\MarkOverdueInvoicesCommand::class,
             \Modules\Finance\Console\Commands\GenerateRecurringInvoicesCommand::class,
             \Modules\Finance\Console\Commands\DepreciationAccrualCommand::class,
+            \Modules\Finance\Console\Commands\RunDepreciationCommand::class,
         ]);
     }
 
