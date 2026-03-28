@@ -2,6 +2,8 @@
 
 namespace Modules\ProcurementInventory\Filament\Resources;
 
+use Filament\Actions\Action;
+use Filament\Actions\ViewAction;
 use Filament\Forms;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
@@ -99,9 +101,9 @@ class StockLevelResource extends Resource
                     ->label('Category'),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                ViewAction::make(),
 
-                Tables\Actions\Action::make('adjust')
+                Action::make('adjust')
                     ->label('Adjust')
                     ->icon('heroicon-o-adjustments-horizontal')
                     ->color('warning')
@@ -129,7 +131,7 @@ class StockLevelResource extends Resource
                             ->send();
                     }),
 
-                Tables\Actions\Action::make('reorder')
+                Action::make('reorder')
                     ->label('Reorder Now')
                     ->icon('heroicon-o-shopping-cart')
                     ->color('info')

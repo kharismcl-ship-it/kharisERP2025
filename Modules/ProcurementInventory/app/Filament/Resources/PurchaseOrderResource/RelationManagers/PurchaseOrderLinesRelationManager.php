@@ -26,14 +26,21 @@ class PurchaseOrderLinesRelationManager extends RelationManager
                 ->searchable()
                 ->preload()
                 ->live()
-                ->afterStateUpdated(function ($state, callable $set) {
-                    if ($state) {
-                        $item = \Modules\ProcurementInventory\Models\Item::find($state);
-                        if ($item) {
-                            $set('description', $item->name);
-                            $set('unit_of_measure', $item->unit_of_measure);
-                            $set('unit_price', $item->unit_price);
-                        }
+                ->afterStateUpdated(function ($state, callable $set, $livewire) {
+                    if (! $state) {
+                        return;
+                    }
+                    $item = \Modules\ProcurementInventory\Models\Item::find($state);
+                    if ($item) {
+                        $set('description', $item->name);
+                        $set('unit_of_measure', $item->unit_of_measure);
+                        // Try vendor catalog price first
+                        $po = $livewire->ownerRecord ?? null;
+                        $companyId = $po?->company_id ?? auth()->user()?->current_company_id;
+                        $catalogItem = $companyId
+                            ? \Modules\ProcurementInventory\Models\VendorCatalog::getBestPrice($companyId, $state)
+                            : null;
+                        $set('unit_price', $catalogItem ? $catalogItem->unit_price : $item->unit_price);
                     }
                 }),
 

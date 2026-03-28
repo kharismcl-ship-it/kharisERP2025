@@ -21,6 +21,8 @@ class Item extends Model
         'item_category_id',
         'name',
         'sku',
+        'barcode',
+        'qr_code',
         'slug',
         'description',
         'type',

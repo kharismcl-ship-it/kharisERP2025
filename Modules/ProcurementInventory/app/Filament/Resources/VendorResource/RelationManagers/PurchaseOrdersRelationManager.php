@@ -2,6 +2,7 @@
 
 namespace Modules\ProcurementInventory\Filament\Resources\VendorResource\RelationManagers;
 
+use Filament\Actions\Action;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables;
@@ -48,13 +49,13 @@ class PurchaseOrdersRelationManager extends RelationManager
                     ->options(PurchaseOrder::STATUSES),
             ])
             ->headerActions([
-                Tables\Actions\Action::make('new_po')
+                Action::make('new_po')
                     ->label('New Purchase Order')
                     ->icon('heroicon-o-plus')
                     ->url(fn () => PurchaseOrderResource::getUrl('create')),
             ])
             ->actions([
-                Tables\Actions\Action::make('view')
+                Action::make('view')
                     ->icon('heroicon-o-eye')
                     ->url(fn ($record) => PurchaseOrderResource::getUrl('view', ['record' => $record])),
             ])

@@ -42,13 +42,14 @@ class AutoCreatePurchaseOrderOnApproval
 
         try {
             $po = PurchaseOrder::create([
-                'company_id'  => $requisition->company_id,
-                'vendor_id'   => $requisition->preferred_vendor_id,
-                'po_number'   => 'PO-' . now()->format('Ym') . '-' . str_pad(PurchaseOrder::count() + 1, 5, '0', STR_PAD_LEFT),
-                'po_date'     => now()->toDateString(),
-                'status'      => 'draft',
-                'notes'       => "Auto-created from Requisition {$requisition->reference}.",
-                'currency'    => 'GHS',
+                'company_id'    => $requisition->company_id,
+                'vendor_id'     => $requisition->preferred_vendor_id,
+                'po_number'     => 'PO-' . now()->format('Ym') . '-' . str_pad(PurchaseOrder::count() + 1, 5, '0', STR_PAD_LEFT),
+                'po_date'       => now()->toDateString(),
+                'status'        => 'draft',
+                'notes'         => "Auto-created from Requisition {$requisition->reference}.",
+                'currency'      => 'GHS',
+                'requisition_id'=> $requisition->id,
             ]);
 
             foreach ($linkedItems as $item) {

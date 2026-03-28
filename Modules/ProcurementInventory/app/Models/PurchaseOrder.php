@@ -41,6 +41,8 @@ class PurchaseOrder extends Model
         'project_id',
         'farm_id',
         'module_tag',
+        'requisition_id',
+        'contract_id',
     ];
 
     protected $casts = [
@@ -191,5 +193,15 @@ class PurchaseOrder extends Model
     public function scopePending($query)
     {
         return $query->whereIn('status', ['submitted', 'approved', 'ordered', 'partially_received']);
+    }
+
+    public function requisition(): BelongsTo
+    {
+        return $this->belongsTo(\Modules\Requisition\Models\Requisition::class);
+    }
+
+    public function contract(): BelongsTo
+    {
+        return $this->belongsTo(ProcurementContract::class);
     }
 }

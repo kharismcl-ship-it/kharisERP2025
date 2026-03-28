@@ -51,6 +51,16 @@ class ItemResource extends Resource
                 ->maxLength(100)
                 ->unique(ignoreRecord: true),
 
+            Forms\Components\TextInput::make('barcode')
+                ->label('Barcode')
+                ->maxLength(100)
+                ->nullable(),
+
+            Forms\Components\TextInput::make('qr_code')
+                ->label('QR Code')
+                ->maxLength(100)
+                ->nullable(),
+
             Forms\Components\TextInput::make('slug')
                 ->required()
                 ->maxLength(255),

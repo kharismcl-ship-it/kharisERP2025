@@ -2,6 +2,7 @@
 
 namespace Modules\ProcurementInventory\Filament\Vendor\Resources;
 
+use Filament\Actions\ViewAction;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -77,7 +78,7 @@ class VendorPurchaseOrderResource extends Resource
                     ->formatStateUsing(fn ($state) => PurchaseOrder::STATUSES[$state] ?? ucfirst($state)),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                ViewAction::make(),
             ])
             ->bulkActions([]);
     }

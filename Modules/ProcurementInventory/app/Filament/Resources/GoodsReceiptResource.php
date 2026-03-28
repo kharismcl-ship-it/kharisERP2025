@@ -4,6 +4,7 @@ namespace Modules\ProcurementInventory\Filament\Resources;
 
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
@@ -122,7 +123,7 @@ class GoodsReceiptResource extends Resource
                     ->options(['draft' => 'Draft', 'confirmed' => 'Confirmed']),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                ViewAction::make(),
                 DeleteAction::make()
                     ->visible(fn (GoodsReceipt $record) => $record->status === 'draft'),
             ])
