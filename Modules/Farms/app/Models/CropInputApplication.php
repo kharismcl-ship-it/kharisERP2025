@@ -15,16 +15,25 @@ class CropInputApplication extends Model
     protected $fillable = [
         'crop_cycle_id',
         'farm_id',
+        'farm_plot_id',
         'company_id',
         'item_id',
+        'farm_input_chemical_id',
+        'applicator_worker_id',
         'application_date',
         'input_type',
         'product_name',
         'quantity',
         'unit',
+        'quantity_used',
         'unit_cost',
         'total_cost',
         'application_method',
+        'weather_condition',
+        'wind_speed_kmh',
+        'temperature_c',
+        'humidity_pct',
+        'phi_compliant',
         'notes',
     ];
 
@@ -33,6 +42,10 @@ class CropInputApplication extends Model
         'quantity'         => 'decimal:4',
         'unit_cost'        => 'decimal:4',
         'total_cost'       => 'decimal:2',
+        'wind_speed_kmh'   => 'float',
+        'temperature_c'    => 'float',
+        'humidity_pct'     => 'float',
+        'phi_compliant'    => 'boolean',
     ];
 
     const INPUT_TYPES = ['seed', 'fertilizer', 'pesticide', 'herbicide', 'irrigation_water', 'other'];
@@ -68,5 +81,28 @@ class CropInputApplication extends Model
     public function item(): BelongsTo
     {
         return $this->belongsTo(Item::class);
+    }
+
+    public function farmPlot(): BelongsTo
+    {
+        return $this->belongsTo(FarmPlot::class, 'farm_plot_id');
+    }
+
+    public function chemical(): BelongsTo
+    {
+        return $this->belongsTo(FarmInputChemical::class, 'farm_input_chemical_id');
+    }
+
+    public function applicatorWorker(): BelongsTo
+    {
+        return $this->belongsTo(FarmWorker::class, 'applicator_worker_id');
+    }
+
+    /**
+     * Alias: quantity_used falls back to quantity for backwards compatibility.
+     */
+    public function getQuantityUsedAttribute(): mixed
+    {
+        return $this->attributes['quantity_used'] ?? $this->attributes['quantity'] ?? null;
     }
 }

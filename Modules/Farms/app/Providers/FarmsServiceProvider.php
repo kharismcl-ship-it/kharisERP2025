@@ -238,6 +238,9 @@ class FarmsServiceProvider extends ServiceProvider
             \Modules\Farms\Console\Commands\FarmsNotifyRestockCommand::class,
             \Modules\Farms\Console\Commands\FarmsAbandonedCartRecoveryCommand::class,
             \Modules\Farms\Console\Commands\FarmsProcessSubscriptionsCommand::class,
+            // Phase 3 — precision agriculture commands
+            \Modules\Farms\Console\Commands\FetchNdviDataCommand::class,
+            \Modules\Farms\Console\Commands\FetchWeatherCommand::class,
         ]);
     }
 
@@ -260,6 +263,10 @@ class FarmsServiceProvider extends ServiceProvider
             $schedule->command('farms:abandoned-cart-recovery')->everyThirtyMinutes();
             // Subscription order generation — daily at 6am
             $schedule->command('farms:process-subscriptions')->dailyAt('06:00');
+            // NDVI satellite data — weekly on Mondays at 8am
+            $schedule->command('farms:fetch-ndvi')->weeklyOn(1, '08:00');
+            // Weather data + alerts — every hour
+            $schedule->command('farms:fetch-weather')->hourly();
         });
     }
 

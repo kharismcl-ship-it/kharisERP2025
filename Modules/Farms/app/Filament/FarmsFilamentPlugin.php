@@ -47,6 +47,19 @@ use Modules\Farms\Filament\Resources\LivestockEventResource;
 use Modules\Farms\Filament\Resources\LivestockHealthRecordResource;
 use Modules\Farms\Filament\Resources\HarvestRecordResource;
 use Modules\Farms\Filament\Resources\SoilTestRecordResource;
+// Phase 3 — new resources
+use Modules\Farms\Filament\Resources\FarmEquipmentLogResource;
+use Modules\Farms\Filament\Resources\FarmInputChemicalResource;
+use Modules\Farms\Filament\Resources\LivestockBreedingEventResource;
+use Modules\Farms\Filament\Resources\FarmProduceLotResource;
+use Modules\Farms\Filament\Resources\FarmNdviResource;
+use Modules\Farms\Filament\Resources\FarmWeatherAlertResource;
+use Modules\Farms\Filament\Resources\FarmStorageLocationResource;
+use Modules\Farms\Filament\Resources\FarmPostHarvestResource;
+// Phase 3 — new pages
+use Modules\Farms\Filament\Pages\SprayDiaryPage;
+use Modules\Farms\Filament\Pages\LotTraceabilityPage;
+use Modules\Farms\Filament\Pages\AdvancedFarmDashboardPage;
 
 class FarmsFilamentPlugin implements Plugin
 {
@@ -96,6 +109,15 @@ class FarmsFilamentPlugin implements Plugin
             FarmShopPageResource::class,
             FarmShopBlogPostResource::class,
             FarmB2bAccountResource::class,
+            // Phase 3 — new resources
+            FarmEquipmentLogResource::class,
+            FarmInputChemicalResource::class,
+            LivestockBreedingEventResource::class,
+            FarmProduceLotResource::class,
+            FarmNdviResource::class,
+            FarmWeatherAlertResource::class,
+            FarmStorageLocationResource::class,
+            FarmPostHarvestResource::class,
         ]);
 
         // Clusters extend Page — register via pages() so Filament recognises
@@ -111,6 +133,10 @@ class FarmsFilamentPlugin implements Plugin
             LivestockReport::class,
             FarmFinancialReport::class,
             FarmShopSettingsPage::class,
+            // Phase 3 — new pages
+            SprayDiaryPage::class,
+            LotTraceabilityPage::class,
+            AdvancedFarmDashboardPage::class,
         ]);
     }
 
