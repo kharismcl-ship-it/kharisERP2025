@@ -10,7 +10,7 @@ use Modules\Farms\Models\FarmProduceLot;
 
 class LotTraceabilityPage extends Page
 {
-    protected static ?string $navigationIcon = 'heroicon-o-magnifying-glass';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-magnifying-glass';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Farm Operations';
 

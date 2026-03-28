@@ -23,7 +23,7 @@ class SprayDiaryPage extends Page implements HasTable
 {
     use InteractsWithTable;
 
-    protected static ?string $navigationIcon = 'heroicon-o-document-text';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Farm Operations';
 

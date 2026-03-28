@@ -1,4 +1,4 @@
-e<?php
+<?php
 
 namespace Modules\Requisition\Filament\Resources\RequisitionGrnResource\Pages;
 

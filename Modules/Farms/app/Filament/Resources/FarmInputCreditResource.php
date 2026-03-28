@@ -21,7 +21,7 @@ use Filament\Facades\Filament;
 class FarmInputCreditResource extends Resource
 {
     protected static ?string $model = FarmInputCreditAccount::class;
-    protected static ?string $navigationIcon = 'heroicon-o-credit-card';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-credit-card';
     protected static string|\UnitEnum|null $navigationGroup = 'Cooperatives';
     protected static ?string $navigationLabel = 'Input Credit Accounts';
     protected static ?int $navigationSort = 1;

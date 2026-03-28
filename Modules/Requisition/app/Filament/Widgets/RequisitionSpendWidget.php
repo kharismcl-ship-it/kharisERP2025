@@ -13,7 +13,7 @@ class RequisitionSpendWidget extends ChartWidget
 
     protected static ?int $sort = 3;
 
-    protected static ?string $maxHeight = '300px';
+    protected ?string $maxHeight = '300px';
 
     protected function getData(): array
     {

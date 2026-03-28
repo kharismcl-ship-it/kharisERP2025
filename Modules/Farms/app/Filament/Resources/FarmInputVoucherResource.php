@@ -23,7 +23,7 @@ use Filament\Facades\Filament;
 class FarmInputVoucherResource extends Resource
 {
     protected static ?string $model = FarmInputVoucher::class;
-    protected static ?string $navigationIcon = 'heroicon-o-ticket';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-ticket';
     protected static string|\UnitEnum|null $navigationGroup = 'Cooperatives';
     protected static ?string $navigationLabel = 'Input Vouchers';
     protected static ?int $navigationSort = 2;

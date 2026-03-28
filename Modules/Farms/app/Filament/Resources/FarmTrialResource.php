@@ -22,7 +22,7 @@ use Filament\Facades\Filament;
 class FarmTrialResource extends Resource
 {
     protected static ?string $model = FarmTrial::class;
-    protected static ?string $navigationIcon = 'heroicon-o-beaker';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-beaker';
     protected static string|\UnitEnum|null $navigationGroup = 'Crop Management';
     protected static ?string $navigationLabel = 'Agronomic Trials';
     protected static ?int $navigationSort = 9;

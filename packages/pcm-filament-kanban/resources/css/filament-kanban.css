@@ -1,0 +1,32 @@
+/* PCM Filament Kanban — source CSS */
+
+/* Grabbing cursor while dragging */
+body.grabbing,
+body.grabbing * {
+    cursor: grabbing !important;
+}
+
+/* Kanban record drag handle */
+.record {
+    cursor: grab;
+}
+
+.record:active {
+    cursor: grabbing;
+}
+
+/* SortableJS ghost placeholder */
+.sortable-ghost {
+    opacity: 0.4;
+}
+
+/* SortableJS drag clone */
+.sortable-drag {
+    opacity: 1;
+    transform: rotate(2deg);
+}
+
+/* Smooth drop animation */
+.sortable-chosen {
+    box-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.2);
+}

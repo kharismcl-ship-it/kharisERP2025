@@ -22,7 +22,7 @@ use Filament\Facades\Filament;
 class FarmCarbonResource extends Resource
 {
     protected static ?string $model = FarmCarbonRecord::class;
-    protected static ?string $navigationIcon = 'heroicon-o-globe-alt';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-globe-alt';
     protected static string|\UnitEnum|null $navigationGroup = 'Compliance';
     protected static ?string $navigationLabel = 'Carbon / ESG Records';
     protected static ?int $navigationSort = 1;

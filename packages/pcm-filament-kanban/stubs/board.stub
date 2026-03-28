@@ -1,0 +1,18 @@
+<?php
+
+namespace DummyNamespace;
+
+use Pcm\FilamentKanban\Pages\KanbanBoard;
+
+class DummyClass extends KanbanBoard
+{
+    protected static ?string $navigationIcon = 'heroicon-o-view-columns';
+
+    protected static string $model = \App\Models\Model::class;
+
+    protected static string $statusEnum = \App\Enums\ModelStatus::class;
+
+    protected static string $recordTitleAttribute = 'title';
+
+    protected static string $recordStatusAttribute = 'status';
+}

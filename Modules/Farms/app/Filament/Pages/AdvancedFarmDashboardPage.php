@@ -13,7 +13,7 @@ use Modules\Farms\Models\FarmWorkerAttendance;
 
 class AdvancedFarmDashboardPage extends Page
 {
-    protected static ?string $navigationIcon = 'heroicon-o-chart-bar';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-chart-bar';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Farms';
 
