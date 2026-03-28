@@ -27,7 +27,29 @@ class EmployeeDocument extends Model
         'file_path',
         'uploaded_by_user_id',
         'description',
+        'expires_at',
+        'version',
+        'requires_acknowledgment',
+        'acknowledged_at',
     ];
+
+    protected $casts = [
+        'expires_at'              => 'date',
+        'acknowledged_at'         => 'datetime',
+        'requires_acknowledgment' => 'boolean',
+    ];
+
+    public function isExpired(): bool
+    {
+        return $this->expires_at && $this->expires_at->isPast();
+    }
+
+    public function isExpiringSoon(int $days = 30): bool
+    {
+        return $this->expires_at
+            && $this->expires_at->isFuture()
+            && $this->expires_at->diffInDays(now()) <= $days;
+    }
 
     /**
      * Get the company that owns the employee document.

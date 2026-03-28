@@ -5,7 +5,9 @@ namespace Modules\HR\Filament;
 use Filament\Contracts\Plugin;
 use Filament\Panel;
 use Modules\HR\Filament\Pages\ClockInOutPage;
+use Modules\HR\Filament\Pages\MyOnboardingPage;
 use Modules\HR\Filament\Pages\MyProfilePage;
+use Modules\HR\Filament\Pages\MySurveysPage;
 use Modules\HR\Filament\Pages\StaffDashboard;
 use Modules\HR\Filament\Resources\Staff\MyAnnouncementResource;
 use Modules\HR\Filament\Resources\Staff\MyAttendanceRecordResource;
@@ -20,6 +22,8 @@ use Modules\HR\Filament\Resources\Staff\MyPayslipResource;
 use Modules\HR\Filament\Resources\Staff\MyPerformanceReviewResource;
 use Modules\HR\Filament\Resources\Staff\MyShiftScheduleResource;
 use Modules\HR\Filament\Resources\Staff\MyTrainingResource;
+use Modules\HR\Filament\Resources\Staff\MySkillProfileResource;
+use Modules\HR\Filament\Resources\Staff\MySafetyIncidentResource;
 
 class HRStaffPlugin implements Plugin
 {
@@ -49,12 +53,16 @@ class HRStaffPlugin implements Plugin
             MyAttendanceRecordResource::class,
             MyPerformanceReviewResource::class,
             MyEmployeeGoalResource::class,
+            MySkillProfileResource::class,
+            MySafetyIncidentResource::class,
         ]);
 
         $panel->pages([
             StaffDashboard::class,
             MyProfilePage::class,
             ClockInOutPage::class,
+            MyOnboardingPage::class,
+            MySurveysPage::class,
         ]);
     }
 

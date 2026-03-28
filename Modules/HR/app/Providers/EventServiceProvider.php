@@ -11,6 +11,7 @@ use Modules\HR\Events\PayrollFinalized;
 use Modules\HR\Listeners\NotifyLeaveAccrued;
 use Modules\HR\Listeners\PostPayrollToFinance;
 use Modules\HR\Listeners\SendPayslipEmails;
+use Modules\HR\Listeners\CreateOnboardingForEmployee;
 use Modules\HR\Listeners\SendWelcomeEmail;
 use Modules\HR\Listeners\SyncEmployeeRoles;
 
@@ -30,6 +31,7 @@ class EventServiceProvider extends ServiceProvider
         ],
         NewEmployeeOnboarded::class => [
             SendWelcomeEmail::class,
+            CreateOnboardingForEmployee::class,
         ],
         PayrollFinalized::class => [
             PostPayrollToFinance::class,

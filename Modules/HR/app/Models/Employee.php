@@ -197,6 +197,30 @@ class Employee extends Model
     }
 
     /**
+     * Get the skills associated with this employee.
+     */
+    public function skills()
+    {
+        return $this->hasMany(EmployeeSkill::class);
+    }
+
+    /**
+     * Get onboarding tasks for this employee.
+     */
+    public function onboardingTasks()
+    {
+        return $this->hasMany(OnboardingTask::class);
+    }
+
+    /**
+     * Get safety incidents reported by this employee.
+     */
+    public function safetyIncidents()
+    {
+        return $this->hasMany(SafetyIncident::class, 'reported_by_employee_id');
+    }
+
+    /**
      * Get communication name for notification system
      */
     public function getCommName(): string
