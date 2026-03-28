@@ -30,6 +30,7 @@ use Modules\ProcurementInventory\Filament\Resources\VendorCatalogResource;
 use Modules\ProcurementInventory\Filament\Resources\VendorContactResource;
 use Modules\ProcurementInventory\Filament\Resources\VendorPerformanceResource;
 use Modules\ProcurementInventory\Filament\Resources\VendorResource;
+use Modules\ProcurementInventory\Filament\Resources\VendorStatementResource;
 
 class ProcurementInventoryFilamentPlugin implements Plugin
 {
@@ -77,6 +78,8 @@ class ProcurementInventoryFilamentPlugin implements Plugin
             PoChangeOrderResource::class,
             ProcurementAsnResource::class,
             BomResource::class,
+            // Vendor reconciliation
+            VendorStatementResource::class,
         ]);
     }
 

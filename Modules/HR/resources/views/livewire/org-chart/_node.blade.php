@@ -1,39 +1,48 @@
-{{-- Recursive org chart node --}}
-<li class="relative {{ $depth > 0 ? 'ml-8 border-l-2 border-gray-200 pl-4 pt-2' : '' }}">
+@php
+    $children = $allEmployees->filter(fn ($e) => $e->reporting_to_employee_id == $employee->id)->values();
+    $initials = strtoupper(substr($employee->first_name ?? '', 0, 1) . substr($employee->last_name ?? '', 0, 1));
+@endphp
 
-    {{-- Employee card --}}
-    <div class="inline-flex items-center gap-3 bg-white border border-gray-200 rounded-lg shadow-sm px-3 py-2 mb-1 min-w-[200px]">
-        {{-- Avatar --}}
-        <div class="flex-shrink-0">
-            @if($employee->photo_path)
-                <img src="{{ Storage::url($employee->photo_path) }}"
-                     alt="{{ $employee->full_name }}"
-                     class="w-9 h-9 rounded-full object-cover">
-            @else
-                <div class="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-semibold text-sm">
-                    {{ strtoupper(substr($employee->first_name, 0, 1)) }}{{ strtoupper(substr($employee->last_name ?? '', 0, 1)) }}
-                </div>
-            @endif
+<div class="flex flex-col items-center">
+    {{-- Employee Card --}}
+    <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm p-3 w-40 text-center hover:shadow-md transition-shadow">
+        <div class="w-10 h-10 rounded-full bg-primary-100 dark:bg-primary-900 text-primary-700 dark:text-primary-300 font-bold text-sm flex items-center justify-center mx-auto mb-2">
+            {{ $initials ?: '?' }}
         </div>
-
-        {{-- Info --}}
-        <div class="min-w-0">
-            <p class="text-sm font-semibold text-gray-800 truncate">{{ $employee->full_name }}</p>
-            @if($employee->jobPosition)
-                <p class="text-xs text-gray-500 truncate">{{ $employee->jobPosition->title }}</p>
-            @endif
-            @if($employee->department)
-                <p class="text-xs text-indigo-500 truncate">{{ $employee->department->name }}</p>
-            @endif
-        </div>
+        <p class="text-xs font-semibold text-gray-800 dark:text-white truncate" title="{{ $employee->full_name ?? trim(($employee->first_name ?? '') . ' ' . ($employee->last_name ?? '')) }}">
+            {{ $employee->full_name ?? trim(($employee->first_name ?? '') . ' ' . ($employee->last_name ?? '')) }}
+        </p>
+        <p class="text-xs text-gray-500 dark:text-gray-400 truncate mt-0.5" title="{{ $employee->job_title ?? $employee->jobPosition?->title ?? '' }}">
+            {{ $employee->job_title ?? $employee->jobPosition?->title ?? '—' }}
+        </p>
+        @if($employee->department?->name)
+            <p class="text-xs text-primary-500 dark:text-primary-400 truncate mt-0.5">
+                {{ $employee->department->name }}
+            </p>
+        @endif
     </div>
 
-    {{-- Subordinates --}}
-    @if($employee->subordinates && $employee->subordinates->count() > 0)
-        <ul class="flex flex-col gap-0 mt-0">
-            @foreach($employee->subordinates->where('employment_status', 'active') as $sub)
-                @include('hr::livewire.org-chart._node', ['employee' => $sub, 'depth' => $depth + 1])
+    @if($children->isNotEmpty())
+        {{-- Vertical connector to horizontal bar --}}
+        <div class="w-0.5 h-4 bg-gray-300 dark:bg-gray-600"></div>
+
+        {{-- Children container --}}
+        <div class="flex gap-6 relative">
+            {{-- Horizontal bar across children (only if more than one) --}}
+            @if($children->count() > 1)
+                <div class="absolute top-0 left-0 right-0 h-0.5 bg-gray-300 dark:bg-gray-600" style="left: 50%; transform: translateX(-50%); width: calc(100% - 80px);"></div>
+            @endif
+
+            @foreach($children as $child)
+                <div class="flex flex-col items-center">
+                    {{-- Vertical connector from bar to child card --}}
+                    <div class="w-0.5 h-4 bg-gray-300 dark:bg-gray-600"></div>
+                    @include('hr::livewire.org-chart._node', [
+                        'employee'     => $child,
+                        'allEmployees' => $allEmployees,
+                    ])
+                </div>
             @endforeach
-        </ul>
+        </div>
     @endif
-</li>
+</div>

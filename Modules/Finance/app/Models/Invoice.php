@@ -94,4 +94,36 @@ class Invoice extends Model
     {
         return $this->hasMany(InvoiceDocument::class, 'invoice_id');
     }
+
+    /**
+     * Get payment allocations for this invoice.
+     */
+    public function paymentAllocations()
+    {
+        return $this->hasMany(PaymentAllocation::class, 'invoice_id');
+    }
+
+    /**
+     * Total amount paid via allocations.
+     */
+    public function amountPaid(): float
+    {
+        return (float) $this->paymentAllocations()->sum('amount');
+    }
+
+    /**
+     * Amount still outstanding.
+     */
+    public function amountOutstanding(): float
+    {
+        return max(0.0, (float) $this->total - $this->amountPaid());
+    }
+
+    /**
+     * Whether the invoice is fully paid via allocations.
+     */
+    public function isPaidInFull(): bool
+    {
+        return $this->amountOutstanding() <= 0.01;
+    }
 }
