@@ -4,8 +4,15 @@ namespace Modules\Requisition\Filament;
 
 use Filament\Contracts\Plugin;
 use Filament\Panel;
+use Modules\Requisition\Filament\Pages\BulkRequisitionImportPage;
 use Modules\Requisition\Filament\Pages\RequisitionDashboard;
+use Modules\Requisition\Filament\Resources\RequisitionApprovalDelegationResource;
+use Modules\Requisition\Filament\Resources\RequisitionCustomFieldResource;
+use Modules\Requisition\Filament\Resources\RequisitionGrnResource;
+use Modules\Requisition\Filament\Resources\RequisitionReminderRuleResource;
 use Modules\Requisition\Filament\Resources\RequisitionResource;
+use Modules\Requisition\Filament\Resources\RequisitionRfqResource;
+use Modules\Requisition\Filament\Resources\RequisitionScheduleResource;
 use Modules\Requisition\Filament\Resources\RequisitionTemplateResource;
 use Modules\Requisition\Filament\Resources\RequisitionWorkflowRuleResource;
 use Modules\Requisition\Filament\Widgets\RequisitionChartWidget;
@@ -27,9 +34,16 @@ class RequisitionFilamentPlugin implements Plugin
                 RequisitionResource::class,
                 RequisitionTemplateResource::class,
                 RequisitionWorkflowRuleResource::class,
+                RequisitionRfqResource::class,
+                RequisitionGrnResource::class,
+                RequisitionScheduleResource::class,
+                RequisitionReminderRuleResource::class,
+                RequisitionCustomFieldResource::class,
+                RequisitionApprovalDelegationResource::class,
             ])
             ->pages([
                 RequisitionDashboard::class,
+                BulkRequisitionImportPage::class,
             ])
             ->widgets([
                 RequisitionStatsWidget::class,

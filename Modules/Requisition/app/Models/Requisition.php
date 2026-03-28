@@ -242,6 +242,11 @@ class Requisition extends Model
         return $this->hasMany(RequisitionActivity::class)->orderByDesc('created_at');
     }
 
+    public function customFieldValues()
+    {
+        return $this->hasMany(RequisitionCustomFieldValue::class);
+    }
+
     // ── Helpers ───────────────────────────────────────────────────────────────
 
     public function isOverdue(): bool

@@ -66,6 +66,7 @@ class RequisitionResource extends Resource
             RelationManagers\RequisitionPartiesRelationManager::class,
             RelationManagers\RequisitionAttachmentsRelationManager::class,
             RelationManagers\RequisitionActivitiesRelationManager::class,
+            RelationManagers\CustomFieldValuesRelationManager::class,
         ];
     }
 

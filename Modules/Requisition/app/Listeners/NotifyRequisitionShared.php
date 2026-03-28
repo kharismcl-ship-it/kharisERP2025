@@ -20,11 +20,22 @@ class NotifyRequisitionShared
             return;
         }
 
+        // Generate email-approval token for approvers
+        if ($approver->role === 'approver' && $approver->decision === 'pending') {
+            $approver->generateToken();
+        }
+
         $data = [
-            'reference' => $req->reference,
-            'title'     => $req->title,
-            'role'      => ucfirst($approver->role),
-            'requester' => optional($req->requesterEmployee)->getCommName(),
+            'reference'   => $req->reference,
+            'title'       => $req->title,
+            'role'        => ucfirst($approver->role),
+            'requester'   => optional($req->requesterEmployee)->getCommName(),
+            'approve_url' => $approver->approval_token
+                ? route('requisition.email-approve', ['token' => $approver->approval_token])
+                : null,
+            'reject_url'  => $approver->approval_token
+                ? route('requisition.email-reject', ['token' => $approver->approval_token])
+                : null,
         ];
 
         try {

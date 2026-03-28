@@ -20,14 +20,30 @@ class RequisitionApprover extends Model
         'decided_at',
         'comment',
         'signature',
+        'approval_token',
+        'token_expires_at',
     ];
 
     protected function casts(): array
     {
         return [
-            'decided_at' => 'datetime',
-            'is_active'  => 'boolean',
+            'decided_at'       => 'datetime',
+            'is_active'        => 'boolean',
+            'token_expires_at' => 'datetime',
         ];
+    }
+
+    public function generateToken(): void
+    {
+        $this->update([
+            'approval_token'   => \Illuminate\Support\Str::random(64),
+            'token_expires_at' => now()->addDays(7),
+        ]);
+    }
+
+    public function isTokenValid(): bool
+    {
+        return $this->token_expires_at && $this->token_expires_at->isFuture();
     }
 
     protected static function boot(): void

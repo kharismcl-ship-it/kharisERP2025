@@ -88,4 +88,9 @@ class RequisitionItem extends Model
     {
         return $this->belongsTo(\Modules\ProcurementInventory\Models\Item::class, 'item_id');
     }
+
+    public function costAllocations()
+    {
+        return $this->hasMany(RequisitionItemCostAllocation::class);
+    }
 }

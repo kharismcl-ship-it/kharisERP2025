@@ -60,6 +60,8 @@ class RequisitionServiceProvider extends ServiceProvider
     {
         $this->commands([
             \Modules\Requisition\Console\Commands\EscalateOverdueRequisitionsCommand::class,
+            \Modules\Requisition\Console\Commands\ProcessRequisitionSchedulesCommand::class,
+            \Modules\Requisition\Console\Commands\SendRequisitionRemindersCommand::class,
         ]);
     }
 
@@ -67,6 +69,8 @@ class RequisitionServiceProvider extends ServiceProvider
     {
         $this->callAfterResolving(\Illuminate\Console\Scheduling\Schedule::class, function (\Illuminate\Console\Scheduling\Schedule $schedule) {
             $schedule->command('requisition:escalate-overdue')->dailyAt('06:00');
+            $schedule->command('requisition:process-schedules')->dailyAt('07:00');
+            $schedule->command('requisition:send-reminders')->hourly();
         });
     }
 
