@@ -2,11 +2,14 @@
 
 namespace Modules\Requisition\Filament\Resources\Staff\MyRequisitionResource\Tables;
 
+use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ViewAction;
-use Filament\Tables\Table;
+use Filament\Notifications\Notification;
 use Filament\Tables;
+use Filament\Tables\Table;
 use Modules\Requisition\Models\Requisition;
+use Modules\Requisition\Models\RequisitionActivity;
 
 class RequisitionsTable
 {
@@ -34,13 +37,14 @@ class RequisitionsTable
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
                     ->color(fn ($state): string => match ($state) {
-                        'approved'  => 'success',
-                        'fulfilled' => 'success',
-                        'rejected'  => 'danger',
-                        'submitted' => 'info',
-                        'under_review' => 'warning',
+                        'approved'         => 'success',
+                        'fulfilled'        => 'success',
+                        'rejected'         => 'danger',
+                        'cancelled'        => 'danger',
+                        'submitted'        => 'info',
+                        'under_review'     => 'warning',
                         'pending_revision' => 'warning',
-                        default     => 'gray',
+                        default            => 'gray',
                     })
                     ->formatStateUsing(fn ($state) => Requisition::STATUSES[$state] ?? ucfirst($state)),
                 Tables\Columns\TextColumn::make('targetDepartment.name')
@@ -53,6 +57,47 @@ class RequisitionsTable
             ])
             ->actions([
                 ViewAction::make(),
+
+                Action::make('reorder')
+                    ->label('Reorder')
+                    ->icon('heroicon-o-document-duplicate')
+                    ->color('gray')
+                    ->visible(fn (Requisition $r) => in_array($r->status, ['approved', 'fulfilled', 'closed']))
+                    ->requiresConfirmation()
+                    ->modalHeading('Reorder / Clone Requisition')
+                    ->modalDescription('This will create a new requisition based on this one.')
+                    ->action(function (Requisition $record): void {
+                        $newReq = $record->replicate([
+                            'reference',
+                            'status',
+                            'approved_by',
+                            'approved_at',
+                            'fulfilled_at',
+                            'rejection_reason',
+                            'cancellation_reason',
+                        ]);
+                        $newReq->status    = 'submitted';
+                        $newReq->reference = null;
+                        $newReq->save();
+
+                        foreach ($record->items as $item) {
+                            $newItem = $item->replicate(['requisition_id']);
+                            $newItem->requisition_id = $newReq->id;
+                            $newItem->save();
+                        }
+
+                        RequisitionActivity::log(
+                            $newReq,
+                            'requisition_created',
+                            "Reordered from {$record->reference}.",
+                        );
+
+                        Notification::make()
+                            ->success()
+                            ->title("New requisition {$newReq->reference} submitted.")
+                            ->send();
+                    }),
+
                 DeleteAction::make()
                     ->visible(fn (Requisition $r) => in_array($r->status, ['draft', 'submitted', 'pending_revision'])),
             ]);

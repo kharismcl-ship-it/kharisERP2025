@@ -4,6 +4,8 @@ namespace Modules\Requisition\Filament\Pages;
 
 use Filament\Pages\Page;
 use Modules\Requisition\Filament\Widgets\RequisitionChartWidget;
+use Modules\Requisition\Filament\Widgets\RequisitionCycleTimeWidget;
+use Modules\Requisition\Filament\Widgets\RequisitionSpendWidget;
 use Modules\Requisition\Filament\Widgets\RequisitionStatsWidget;
 
 class RequisitionDashboard extends Page
@@ -24,7 +26,14 @@ class RequisitionDashboard extends Page
     {
         return [
             RequisitionStatsWidget::class,
+            RequisitionSpendWidget::class,
+            RequisitionCycleTimeWidget::class,
             RequisitionChartWidget::class,
         ];
+    }
+
+    protected function getColumns(): int
+    {
+        return 2;
     }
 }
