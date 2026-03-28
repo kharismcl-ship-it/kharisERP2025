@@ -71,6 +71,36 @@ class PurchaseOrderResource extends Resource
                         ->placeholder('Uses vendor default'),
                 ]),
 
+            Forms\Components\Section::make('Procurement Source')
+                ->columns(2)
+                ->schema([
+                    Forms\Components\Select::make('requisition_id')
+                        ->label('Linked Requisition')
+                        ->nullable()
+                        ->searchable()
+                        ->options(function () {
+                            $companyId = filament()->getTenant()?->id ?? auth()->user()?->current_company_id;
+                            return \Modules\Requisition\Models\Requisition::query()
+                                ->when($companyId, fn ($q) => $q->where('company_id', $companyId))
+                                ->whereIn('status', ['approved', 'fulfilled'])
+                                ->get()
+                                ->mapWithKeys(fn ($r) => [$r->id => "{$r->reference} — {$r->title}"]);
+                        }),
+
+                    Forms\Components\Select::make('contract_id')
+                        ->label('Contract')
+                        ->nullable()
+                        ->searchable()
+                        ->options(function () {
+                            $companyId = filament()->getTenant()?->id ?? auth()->user()?->current_company_id;
+                            return \Modules\ProcurementInventory\Models\ProcurementContract::query()
+                                ->when($companyId, fn ($q) => $q->where('company_id', $companyId))
+                                ->where('status', 'active')
+                                ->get()
+                                ->mapWithKeys(fn ($c) => [$c->id => "{$c->contract_number} — {$c->title}"]);
+                        }),
+                ]),
+
             Forms\Components\Section::make('Delivery & Notes')
                 ->columns(1)
                 ->schema([
@@ -120,6 +150,11 @@ class PurchaseOrderResource extends Resource
                     ->money('GHS')
                     ->sortable(),
 
+                Tables\Columns\TextColumn::make('requisition.reference')
+                    ->label('Requisition')
+                    ->placeholder('—')
+                    ->toggleable(isToggledHiddenByDefault: true),
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -134,7 +169,7 @@ class PurchaseOrderResource extends Resource
                     ->options(PurchaseOrder::STATUSES),
             ])
             ->actions([
-                Tables\Actions\Action::make('submit')
+                Action::make('submit')
                     ->icon('heroicon-o-paper-airplane')
                     ->color('warning')
                     ->visible(fn (PurchaseOrder $record) => $record->status === 'draft')
@@ -148,7 +183,7 @@ class PurchaseOrderResource extends Resource
                         }
                     }),
 
-                Tables\Actions\Action::make('approve')
+                Action::make('approve')
                     ->icon('heroicon-o-check-circle')
                     ->color('success')
                     ->visible(fn (PurchaseOrder $record) => $record->status === 'submitted')
@@ -162,7 +197,7 @@ class PurchaseOrderResource extends Resource
                         }
                     }),
 
-                Tables\Actions\Action::make('mark_ordered')
+                Action::make('mark_ordered')
                     ->label('Mark Ordered')
                     ->icon('heroicon-o-truck')
                     ->color('info')
@@ -191,6 +226,8 @@ class PurchaseOrderResource extends Resource
         return [
             RelationManagers\PurchaseOrderLinesRelationManager::class,
             RelationManagers\GoodsReceiptsRelationManager::class,
+            RelationManagers\ChangeOrdersRelationManager::class,
+            RelationManagers\ProcurementAsnRelationManager::class,
         ];
     }
 

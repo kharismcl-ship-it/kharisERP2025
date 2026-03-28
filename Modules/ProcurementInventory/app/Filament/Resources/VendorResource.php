@@ -86,6 +86,35 @@ class VendorResource extends Resource
                     Forms\Components\TextInput::make('bank_branch'),
                 ]),
 
+            Forms\Components\Section::make('Compliance & Diversity')
+                ->columns(2)
+                ->schema([
+                    Forms\Components\Toggle::make('is_local')
+                        ->label('Local Vendor')
+                        ->default(false),
+
+                    Forms\Components\Select::make('diversity_class')
+                        ->label('Diversity Classification')
+                        ->options([
+                            'none'          => 'None',
+                            'women_owned'   => 'Women-Owned',
+                            'minority_owned'=> 'Minority-Owned',
+                            'sme'           => 'SME',
+                            'veteran_owned' => 'Veteran-Owned',
+                            'youth_owned'   => 'Youth-Owned',
+                        ])
+                        ->default('none'),
+
+                    Forms\Components\TextInput::make('local_content_score')
+                        ->label('Local Content Score (%)')
+                        ->numeric()
+                        ->minValue(0)
+                        ->maxValue(100)
+                        ->step(0.01)
+                        ->suffix('%')
+                        ->nullable(),
+                ]),
+
             Forms\Components\Textarea::make('notes')->rows(3)->columnSpanFull(),
         ]);
     }
@@ -125,6 +154,26 @@ class VendorResource extends Resource
                     ->counts('purchaseOrders')
                     ->label('POs'),
 
+                Tables\Columns\TextColumn::make('diversity_class')
+                    ->badge()
+                    ->label('Diversity')
+                    ->color(fn (?string $state): string => match ($state) {
+                        'women_owned'    => 'pink',
+                        'minority_owned' => 'purple',
+                        'sme'            => 'info',
+                        'veteran_owned'  => 'warning',
+                        'youth_owned'    => 'success',
+                        default          => 'gray',
+                    })
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                Tables\Columns\TextColumn::make('latestScorecard.overall_score')
+                    ->label('Score')
+                    ->numeric(1)
+                    ->suffix('/100')
+                    ->placeholder('—')
+                    ->toggleable(isToggledHiddenByDefault: true),
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -150,6 +199,7 @@ class VendorResource extends Resource
     {
         return [
             \Modules\ProcurementInventory\Filament\Resources\VendorResource\RelationManagers\PurchaseOrdersRelationManager::class,
+            \Modules\ProcurementInventory\Filament\Resources\VendorResource\RelationManagers\VendorCertificatesRelationManager::class,
         ];
     }
 

@@ -36,10 +36,15 @@ class Vendor extends Model
         'bank_branch',
         'status',
         'notes',
+        'is_local',
+        'diversity_class',
+        'local_content_score',
     ];
 
     protected $casts = [
-        'payment_terms' => 'integer',
+        'payment_terms'       => 'integer',
+        'is_local'            => 'boolean',
+        'local_content_score' => 'decimal:2',
     ];
 
     protected static function booted(): void
@@ -69,5 +74,42 @@ class Vendor extends Model
     public function scopeActive($query)
     {
         return $query->where('status', 'active');
+    }
+
+    public function performanceRecords(): HasMany
+    {
+        return $this->hasMany(VendorPerformanceRecord::class);
+    }
+
+    public function scorecards(): HasMany
+    {
+        return $this->hasMany(VendorScorecard::class);
+    }
+
+    public function latestScorecard(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(VendorScorecard::class)
+            ->orderByDesc('period_year')
+            ->orderByDesc('period_month');
+    }
+
+    public function overallScore(): float
+    {
+        return (float) ($this->latestScorecard?->overall_score ?? 0.0);
+    }
+
+    public function certificates(): HasMany
+    {
+        return $this->hasMany(VendorCertificate::class);
+    }
+
+    public function contracts(): HasMany
+    {
+        return $this->hasMany(ProcurementContract::class);
+    }
+
+    public function catalogs(): HasMany
+    {
+        return $this->hasMany(VendorCatalog::class);
     }
 }

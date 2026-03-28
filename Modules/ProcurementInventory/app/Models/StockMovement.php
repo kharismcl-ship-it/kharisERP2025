@@ -22,6 +22,8 @@ class StockMovement extends Model
         'quantity',
         'quantity_before',
         'quantity_after',
+        'unit_cost',
+        'total_cost',
         'reference',
         'source_type',
         'source_id',
@@ -33,6 +35,8 @@ class StockMovement extends Model
         'quantity'        => 'decimal:4',
         'quantity_before' => 'decimal:4',
         'quantity_after'  => 'decimal:4',
+        'unit_cost'       => 'decimal:4',
+        'total_cost'      => 'decimal:4',
     ];
 
     public const TYPES = [

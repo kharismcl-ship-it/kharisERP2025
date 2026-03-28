@@ -32,6 +32,7 @@ class ReorderAlertCommand extends Command
         foreach ($levels as $stockLevel) {
             try {
                 $this->sendAlert($stockLevel);
+                $this->createDraftRequisition($stockLevel);
                 $sent++;
             } catch (\Throwable $e) {
                 Log::warning("ReorderAlert failed for StockLevel #{$stockLevel->id}: " . $e->getMessage());
@@ -42,6 +43,34 @@ class ReorderAlertCommand extends Command
         $this->info("Reorder alerts sent for {$sent} item(s).");
 
         return self::SUCCESS;
+    }
+
+    private function createDraftRequisition(StockLevel $stockLevel): void
+    {
+        if (! class_exists(\Modules\Requisition\Models\Requisition::class)) {
+            return;
+        }
+
+        $item = $stockLevel->item;
+
+        // Only create if no open draft reorder requisition already exists for this item
+        $exists = \Modules\Requisition\Models\Requisition::where('company_id', $stockLevel->company_id)
+            ->where('title', "Reorder: {$item->name}")
+            ->where('status', 'draft')
+            ->exists();
+
+        if ($exists) {
+            return;
+        }
+
+        \Modules\Requisition\Models\Requisition::create([
+            'company_id'  => $stockLevel->company_id,
+            'request_type'=> 'material',
+            'title'       => "Reorder: {$item->name}",
+            'description' => "Auto-generated reorder — stock at {$stockLevel->quantity_on_hand} {$item->unit_of_measure} (reorder level: {$item->reorder_level})",
+            'urgency'     => 'medium',
+            'status'      => 'draft',
+        ]);
     }
 
     private function sendAlert(StockLevel $stockLevel): void

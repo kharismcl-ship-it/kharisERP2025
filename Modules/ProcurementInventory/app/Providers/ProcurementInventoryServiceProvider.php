@@ -14,17 +14,52 @@ use Modules\ProcurementInventory\Models\Vendor;
 use Modules\ProcurementInventory\Models\Warehouse;
 use Modules\ProcurementInventory\Models\WarehouseTransfer;
 use Illuminate\Console\Scheduling\Schedule;
+use Modules\ProcurementInventory\Console\Commands\CheckProcurementContractsCommand;
+use Modules\ProcurementInventory\Console\Commands\CheckVendorCertificatesCommand;
+use Modules\ProcurementInventory\Console\Commands\ExpireStockLotsCommand;
 use Modules\ProcurementInventory\Console\Commands\ReorderAlertCommand;
+use Modules\ProcurementInventory\Models\Bom;
+use Modules\ProcurementInventory\Models\CycleCount;
+use Modules\ProcurementInventory\Models\InspectionLot;
+use Modules\ProcurementInventory\Models\LandedCost;
+use Modules\ProcurementInventory\Models\PoChangeOrder;
+use Modules\ProcurementInventory\Models\ProcurementApprovalRule;
+use Modules\ProcurementInventory\Models\ProcurementAsn;
+use Modules\ProcurementInventory\Models\ProcurementContract;
+use Modules\ProcurementInventory\Models\ProcurementInvoiceMatch;
+use Modules\ProcurementInventory\Models\RtvOrder;
+use Modules\ProcurementInventory\Models\StockLot;
+use Modules\ProcurementInventory\Models\VendorApplication;
+use Modules\ProcurementInventory\Models\VendorCatalog;
+use Modules\ProcurementInventory\Models\VendorCertificate;
+use Modules\ProcurementInventory\Models\VendorScorecard;
+use Modules\ProcurementInventory\Policies\BomPolicy;
+use Modules\ProcurementInventory\Policies\CycleCountPolicy;
 use Modules\ProcurementInventory\Policies\GoodsReceiptPolicy;
+use Modules\ProcurementInventory\Policies\InspectionLotPolicy;
 use Modules\ProcurementInventory\Policies\ItemCategoryPolicy;
 use Modules\ProcurementInventory\Policies\ItemPolicy;
+use Modules\ProcurementInventory\Policies\LandedCostPolicy;
+use Modules\ProcurementInventory\Policies\PoChangeOrderPolicy;
+use Modules\ProcurementInventory\Policies\ProcurementApprovalRulePolicy;
+use Modules\ProcurementInventory\Policies\ProcurementAsnPolicy;
+use Modules\ProcurementInventory\Policies\ProcurementContractPolicy;
+use Modules\ProcurementInventory\Policies\ProcurementInvoiceMatchPolicy;
 use Modules\ProcurementInventory\Policies\PurchaseOrderPolicy;
+use Modules\ProcurementInventory\Policies\RtvOrderPolicy;
 use Modules\ProcurementInventory\Policies\StockLevelPolicy;
+use Modules\ProcurementInventory\Policies\StockLotPolicy;
+use Modules\ProcurementInventory\Policies\VendorApplicationPolicy;
+use Modules\ProcurementInventory\Policies\VendorCatalogPolicy;
+use Modules\ProcurementInventory\Policies\VendorCertificatePolicy;
+use Modules\ProcurementInventory\Policies\VendorPerformancePolicy;
 use Modules\ProcurementInventory\Policies\VendorPolicy;
 use Modules\ProcurementInventory\Policies\WarehousePolicy;
 use Modules\ProcurementInventory\Policies\WarehouseTransferPolicy;
+use Modules\ProcurementInventory\Services\CycleCountService;
 use Modules\ProcurementInventory\Services\ProcurementService;
 use Modules\ProcurementInventory\Services\StockService;
+use Modules\ProcurementInventory\Services\VendorPerformanceService;
 use Modules\ProcurementInventory\Services\WarehouseTransferService;
 use Nwidart\Modules\Traits\PathNamespace;
 use RecursiveDirectoryIterator;
@@ -69,8 +104,10 @@ class ProcurementInventoryServiceProvider extends ServiceProvider
         $this->app->register(RouteServiceProvider::class);
 
         $this->app->singleton(StockService::class);
+        $this->app->singleton(VendorPerformanceService::class);
         $this->app->singleton(ProcurementService::class);
         $this->app->singleton(WarehouseTransferService::class);
+        $this->app->singleton(CycleCountService::class);
     }
 
     protected function registerPolicies(): void
@@ -83,6 +120,22 @@ class ProcurementInventoryServiceProvider extends ServiceProvider
         Gate::policy(StockLevel::class, StockLevelPolicy::class);
         Gate::policy(Warehouse::class, WarehousePolicy::class);
         Gate::policy(WarehouseTransfer::class, WarehouseTransferPolicy::class);
+        Gate::policy(ProcurementApprovalRule::class, ProcurementApprovalRulePolicy::class);
+        Gate::policy(ProcurementInvoiceMatch::class, ProcurementInvoiceMatchPolicy::class);
+        Gate::policy(VendorScorecard::class, VendorPerformancePolicy::class);
+        Gate::policy(VendorApplication::class, VendorApplicationPolicy::class);
+        Gate::policy(ProcurementContract::class, ProcurementContractPolicy::class);
+        Gate::policy(VendorCatalog::class, VendorCatalogPolicy::class);
+        Gate::policy(VendorCertificate::class, VendorCertificatePolicy::class);
+        Gate::policy(InspectionLot::class, InspectionLotPolicy::class);
+        Gate::policy(RtvOrder::class, RtvOrderPolicy::class);
+        // Phase 3 & 4
+        Gate::policy(StockLot::class, StockLotPolicy::class);
+        Gate::policy(CycleCount::class, CycleCountPolicy::class);
+        Gate::policy(LandedCost::class, LandedCostPolicy::class);
+        Gate::policy(PoChangeOrder::class, PoChangeOrderPolicy::class);
+        Gate::policy(ProcurementAsn::class, ProcurementAsnPolicy::class);
+        Gate::policy(Bom::class, BomPolicy::class);
     }
 
     /**
@@ -92,6 +145,9 @@ class ProcurementInventoryServiceProvider extends ServiceProvider
     {
         $this->commands([
             ReorderAlertCommand::class,
+            CheckVendorCertificatesCommand::class,
+            CheckProcurementContractsCommand::class,
+            ExpireStockLotsCommand::class,
         ]);
     }
 
@@ -104,6 +160,12 @@ class ProcurementInventoryServiceProvider extends ServiceProvider
             $schedule = $this->app->make(Schedule::class);
             // Daily reorder alert at 07:00
             $schedule->command('procurement:reorder-alert')->dailyAt('07:00');
+            // Daily certificate expiry check at 08:00
+            $schedule->command('procurement:check-certificates')->dailyAt('08:00');
+            // Daily contract expiry check at 08:05
+            $schedule->command('procurement:check-contracts')->dailyAt('08:05');
+            // Daily expire stock lots at 06:30
+            $schedule->command('procurement:expire-lots')->dailyAt('06:30');
         });
     }
 

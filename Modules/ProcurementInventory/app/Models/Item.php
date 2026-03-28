@@ -21,6 +21,8 @@ class Item extends Model
         'item_category_id',
         'name',
         'sku',
+        'barcode',
+        'qr_code',
         'slug',
         'description',
         'type',
@@ -56,6 +58,16 @@ class Item extends Model
     public function stockLevel(): HasOne
     {
         return $this->hasOne(StockLevel::class);
+    }
+
+    public function boms(): HasMany
+    {
+        return $this->hasMany(Bom::class);
+    }
+
+    public function usedInBoms(): HasMany
+    {
+        return $this->hasMany(BomLine::class, 'component_item_id');
     }
 
     public function scopeActive($query)

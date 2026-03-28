@@ -9,12 +9,17 @@ use Modules\ProcurementInventory\Events\GoodsReceived;
 use Modules\ProcurementInventory\Events\PurchaseOrderApproved;
 use Modules\ProcurementInventory\Models\GoodsReceipt;
 use Modules\ProcurementInventory\Models\GoodsReceiptLine;
+use Modules\ProcurementInventory\Models\ProcurementApprovalRule;
+use Modules\ProcurementInventory\Models\ProcurementInvoiceMatch;
 use Modules\ProcurementInventory\Models\PurchaseOrder;
 use Modules\ProcurementInventory\Models\PurchaseOrderLine;
 
 class ProcurementService
 {
-    public function __construct(protected StockService $stockService) {}
+    public function __construct(
+        protected StockService $stockService,
+        protected VendorPerformanceService $vendorPerformanceService,
+    ) {}
 
     /**
      * Submit a draft PO for approval.
@@ -37,6 +42,17 @@ class ProcurementService
     {
         if (! $po->canBeApproved()) {
             throw new \Exception("PO {$po->po_number} cannot be approved in status: {$po->status}");
+        }
+
+        // DoA check: if approval rules exist for this company, enforce them
+        $rules = ProcurementApprovalRule::matchingRules($po);
+        if ($rules->isNotEmpty()) {
+            $authUserId = Auth::id();
+            $allowedApproverIds = $rules->pluck('approver_user_id')->filter()->unique();
+            if (! $allowedApproverIds->contains($authUserId)) {
+                $approverNames = $rules->map(fn ($r) => optional($r->approver)->name ?? "User #{$r->approver_user_id}")->implode(', ');
+                throw new \Exception("Approval requires: {$approverNames}");
+            }
         }
 
         DB::transaction(function () use ($po) {
@@ -138,6 +154,31 @@ class ProcurementService
 
             // Create Finance payable invoice when PO is fully/partially received
             $this->createFinanceInvoice($po->fresh());
+
+            // Create 3-Way Match record
+            $freshGrn = $grn->fresh()->load('lines');
+            $freshPo  = $po->fresh();
+            $grnTotal = $freshGrn->lines->sum(fn ($l) => (float) $l->quantity_received * (float) $l->unit_price);
+            $poTotal  = (float) $freshPo->total;
+            $variance = abs($poTotal - $grnTotal);
+            $tolerancePct = 2.0;
+            $matchStatus = $poTotal > 0 && ($variance / max($poTotal, 0.01)) * 100 <= $tolerancePct
+                ? 'matched'
+                : 'po_grn_mismatch';
+
+            ProcurementInvoiceMatch::create([
+                'company_id'        => $freshPo->company_id,
+                'purchase_order_id' => $freshPo->id,
+                'goods_receipt_id'  => $freshGrn->id,
+                'po_total'          => $poTotal,
+                'grn_total'         => $grnTotal,
+                'po_grn_variance'   => $poTotal - $grnTotal,
+                'status'            => $matchStatus,
+                'matched_at'        => $matchStatus === 'matched' ? now() : null,
+            ]);
+
+            // Record vendor performance
+            $this->vendorPerformanceService->recordFromGrn($freshGrn);
 
             return $grn->fresh();
         });

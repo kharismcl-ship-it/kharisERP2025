@@ -41,6 +41,11 @@ class PurchaseOrder extends Model
         'project_id',
         'farm_id',
         'module_tag',
+        'requisition_id',
+        'contract_id',
+        'vendor_acknowledged_at',
+        'vendor_confirmed_delivery_date',
+        'vendor_delivery_notes',
     ];
 
     protected $casts = [
@@ -49,9 +54,11 @@ class PurchaseOrder extends Model
         'subtotal'              => 'decimal:2',
         'tax_total'             => 'decimal:2',
         'total'                 => 'decimal:2',
-        'approved_at'           => 'datetime',
-        'ordered_at'            => 'datetime',
-        'received_at'           => 'datetime',
+        'approved_at'                    => 'datetime',
+        'ordered_at'                     => 'datetime',
+        'received_at'                    => 'datetime',
+        'vendor_acknowledged_at'         => 'datetime',
+        'vendor_confirmed_delivery_date' => 'date',
     ];
 
     public const STATUSES = [
@@ -191,5 +198,25 @@ class PurchaseOrder extends Model
     public function scopePending($query)
     {
         return $query->whereIn('status', ['submitted', 'approved', 'ordered', 'partially_received']);
+    }
+
+    public function requisition(): BelongsTo
+    {
+        return $this->belongsTo(\Modules\Requisition\Models\Requisition::class);
+    }
+
+    public function contract(): BelongsTo
+    {
+        return $this->belongsTo(ProcurementContract::class);
+    }
+
+    public function changeOrders(): HasMany
+    {
+        return $this->hasMany(PoChangeOrder::class);
+    }
+
+    public function asns(): HasMany
+    {
+        return $this->hasMany(ProcurementAsn::class);
     }
 }
