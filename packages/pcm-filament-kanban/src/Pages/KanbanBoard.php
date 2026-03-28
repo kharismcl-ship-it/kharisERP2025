@@ -14,7 +14,7 @@ class KanbanBoard extends Page
     use HasEditRecordModal;
     use HasStatusChange;
 
-    protected static ?string $navigationIcon = 'heroicon-o-view-columns';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-view-columns';
 
     // v4 FIX: $view must be non-static on Page subclasses
     protected string $view = 'pcm-filament-kanban::kanban-board';

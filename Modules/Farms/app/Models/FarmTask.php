@@ -5,6 +5,7 @@ namespace Modules\Farms\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\Concerns\BelongsToCompany;
+use Modules\Farms\Enums\FarmTaskStatus;
 
 class FarmTask extends Model
 {
@@ -17,11 +18,14 @@ class FarmTask extends Model
         'assigned_to_worker_id', 'farm_equipment_id', 'vehicle_id', 'company_id',
         'title', 'description', 'task_type', 'priority',
         'due_date', 'completed_at', 'notes',
+        'kanban_status', 'sort_order',
     ];
 
     protected $casts = [
-        'due_date'     => 'date',
-        'completed_at' => 'datetime',
+        'due_date'      => 'date',
+        'completed_at'  => 'datetime',
+        'kanban_status' => FarmTaskStatus::class,
+        'sort_order'    => 'integer',
     ];
 
     const TASK_TYPES = [
