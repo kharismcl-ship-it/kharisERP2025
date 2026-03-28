@@ -1,0 +1,7 @@
+/* PCM Filament Kanban — compiled CSS */
+body.grabbing,body.grabbing *{cursor:grabbing!important}
+.record{cursor:grab}
+.record:active{cursor:grabbing}
+.sortable-ghost{opacity:.4}
+.sortable-drag{opacity:1;transform:rotate(2deg)}
+.sortable-chosen{box-shadow:0 10px 25px -5px rgb(0 0 0/.2)}

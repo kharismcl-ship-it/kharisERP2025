@@ -26,7 +26,7 @@ use Filament\Facades\Filament;
 class FarmPastureResource extends Resource
 {
     protected static ?string $model = FarmPasture::class;
-    protected static ?string $navigationIcon = 'heroicon-o-map';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-map';
     protected static string|\UnitEnum|null $navigationGroup = 'Livestock';
     protected static ?string $navigationLabel = 'Pastures / Grazing';
     protected static ?int $navigationSort = 8;

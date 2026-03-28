@@ -11,7 +11,7 @@ use Modules\Farms\Models\FarmSmsCommand;
 class FarmSmsCommandResource extends Resource
 {
     protected static ?string $model = FarmSmsCommand::class;
-    protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-left';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-chat-bubble-left';
     protected static string|\UnitEnum|null $navigationGroup = 'Precision Agriculture';
     protected static ?string $navigationLabel = 'SMS / USSD Log';
     protected static ?int $navigationSort = 10;

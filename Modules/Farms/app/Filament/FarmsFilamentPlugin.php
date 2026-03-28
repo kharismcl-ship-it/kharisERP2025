@@ -67,6 +67,7 @@ use Modules\Farms\Filament\Resources\FarmSmsCommandResource;
 use Modules\Farms\Filament\Pages\SprayDiaryPage;
 use Modules\Farms\Filament\Pages\LotTraceabilityPage;
 use Modules\Farms\Filament\Pages\AdvancedFarmDashboardPage;
+use Modules\Farms\Filament\Pages\FarmTaskKanbanPage;
 
 class FarmsFilamentPlugin implements Plugin
 {
@@ -151,6 +152,7 @@ class FarmsFilamentPlugin implements Plugin
             SprayDiaryPage::class,
             LotTraceabilityPage::class,
             AdvancedFarmDashboardPage::class,
+            FarmTaskKanbanPage::class,
         ]);
     }
 

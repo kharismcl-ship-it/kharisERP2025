@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "68e51006f0dcd219738a81297420a2f0",
+    "content-hash": "31edd4ddddf20697592a1ea32aa51510",
     "packages": [
         {
             "name": "alizharb/filament-module-manager",
@@ -5382,6 +5382,53 @@
                 "source": "https://github.com/paragonie/constant_time_encoding"
             },
             "time": "2025-09-24T15:06:41+00:00"
+        },
+        {
+            "name": "pcm/filament-kanban",
+            "version": "1.0.0",
+            "dist": {
+                "type": "path",
+                "url": "packages/pcm-filament-kanban",
+                "reference": "5ed100aab21582fc79cf7a593f5da42d69257ba9"
+            },
+            "require": {
+                "filament/filament": "^4.0|^5.0",
+                "illuminate/contracts": "^11.0|^12.0",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.15.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Pcm\\FilamentKanban\\FilamentKanbanServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Pcm\\FilamentKanban\\": "src/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PCM (forked from Mo Khosh)",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Kanban boards for Filament v4+ — forked from mokhosh/filament-kanban and updated for Filament v4/v5 compatibility",
+            "keywords": [
+                "filament-kanban",
+                "filament-v4",
+                "laravel",
+                "pcm"
+            ],
+            "transport-options": {
+                "relative": true
+            }
         },
         {
             "name": "phpdocumentor/reflection",
